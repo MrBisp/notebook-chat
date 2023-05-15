@@ -1,0 +1,253 @@
+.chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    /*background: linear-gradient(180deg, #fef5f5 0%, #ffe3e3 100%);*/
+    background: #FDFDFD;
+}
+
+.header {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.chat a {
+    text-decoration: underline;
+    color: inherit;
+}
+
+.top {
+    display: inline-block;
+    padding: 1rem;
+    background: rgb(255, 245, 245);
+    width: 100%;
+
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: scroll;
+    margin: 1rem;
+}
+
+.messagesInner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    padding: 0 1.5rem;
+}
+
+.bottom {
+    display: flex;
+    padding: 1rem 2rem;
+    width: 100%;
+    max-width: 1000px;
+    align-self: center;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+.clearButton {
+    display: inline-block;
+    margin: 0rem;
+    box-shadow: none;
+    background: transparent;
+    color: #000000;
+}
+
+.inputContainer {
+    display: flex;
+    flex-grow: 1;
+    background: #F8F8F8;
+    border-radius: 10px;
+}
+
+.newMessageInput {
+    display: flex;
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 1rem;
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    border-radius: 10px;
+    background: #F8F8F8;
+    resize: none;
+}
+
+.newMessageButton {
+    display: inline-block;
+    margin: 1rem;
+    box-shadow: none;
+    opacity: 0.8;
+    background: #43a047;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.newMessageButton:hover {
+    opacity: 1;
+}
+
+.bottom button:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* MESSAGES */
+.message {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 10px;
+    max-width: 60%;
+    white-space: pre-wrap;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* ALign messages to the right */
+.message[data-sender="user"] {
+    align-self: flex-end;
+    background: #ffffff;
+}
+
+.message[data-sender="assistant"] {
+    align-self: flex-start;
+    background: #F4F8F7;
+    max-width: 80%;
+    color: #438C71;
+}
+
+.message[data-sender="system"] {
+    display: none;
+}
+
+.message[data-sender="loading"] {
+    align-self: flex-start;
+    background: transparent;
+    color: #000000;
+    max-width: 100%;
+    /* Set animation but with a delay */
+    animation-delay: 0.5s;
+}
+
+.errorMessage {
+    color: #ff0000;
+    width: 100%;
+    text-align: center;
+    font-size: 1.25rem;
+}
+
+.sendAgain {
+    color: #000000;
+    font-size: 1rem;
+    text-decoration: underline;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.hamburger {
+    display: none;
+}
+
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(1rem)
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0rem)
+    }
+}
+
+
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .chat {
+        z-index: 5;
+        position: relative;
+    }
+
+    .hamburger {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 1rem;
+        z-index: 99;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .messages {
+        min-height: 50vh;
+        padding: 0;
+    }
+
+    .bottom,
+    .messagesInner {
+        padding: 0;
+    }
+
+    .bottom * {
+        width: 100%;
+        margin: 0;
+    }
+
+    .inputContainer {
+        flex-wrap: wrap;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
+    .chat,
+    .top {
+        background: var(--appMainBg);
+    }
+
+    .newMessageInput {
+        margin-bottom: 1rem;
+    }
+
+    .inputContainer {
+        background: transparent;
+    }
+
+    .header {
+        margin: 0;
+        padding: 0 2rem;
+        font-size: 1.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        min-height: 2rem;
+    }
+}

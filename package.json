@@ -1,0 +1,29 @@
+{
+  "name": "youandx-search",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookies-next": "^2.1.1",
+    "file-saver": "^2.0.5",
+    "jsonwebtoken": "^9.0.0",
+    "mathjs": "^11.7.0",
+    "mongoose": "^7.1.1",
+    "next": "13.2.4",
+    "nextjs-google-analytics": "^2.3.3",
+    "openai": "^3.2.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^4.8.0"
+  },
+  "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+  "main": "next.config.js",
+  "author": "",
+  "license": "ISC"
+}
