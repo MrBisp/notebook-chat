@@ -27,24 +27,12 @@ export default async function handler(req, res) {
     //Add the new message to the messages array as the very first
     messages.unshift(newMessageObject);
 
-    //Let's make sure that the messages are not too long
-    let messagesLength = messages[messages.length - 1].content.length;
-    let maxLength = 3000;
-
-    for (let i = 0; i < messages.length; i++) {
-        if (messagesLength > maxLength) {
-            messages.splice(i, messages.length - i);
-            //Now add the very last message again
-            messages.push({ content: newMessage, role: 'user' });
-            console.log('Messages: ' + JSON.stringify(messages));
-            messages[messages.length - 1].content += context;
-            break;
-        }
-        messagesLength += messages[i].content.length;
-        messagesLength += messages[i].role.length;
+    //Let's only keep the last 10 messages
+    if (messages.length > 10) {
+        messages = messages.slice(0, 10);
     }
 
-    console.log('Final messages: ' + JSON.stringify(messages));
+    //console.log('Final messages: ' + JSON.stringify(messages));
 
     console.log(req.body.model)
     console.log(messages)
