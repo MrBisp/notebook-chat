@@ -14,11 +14,14 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('Home page loaded');
+    console.log('User: ', user);
+    console.log('Loading: ', loading);
     //Check if the user is logged in after we are done loading
     if (!loading && !user) {
+      console.log('User is not logged in, redirecting to login page');
       router.push('/login');
     }
-
   }, [user, authToken, loading]);
 
   return (
@@ -42,4 +45,4 @@ const Home = () => {
   )
 }
 
-export default withAuth(Home);
+export default Home;

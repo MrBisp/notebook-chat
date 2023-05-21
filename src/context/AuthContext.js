@@ -46,6 +46,8 @@ export const AuthProvider = ({ children }) => {
                 }
             };
             fetchData();
+        } else {
+            setLoading(false);
         }
     }, []);
 
