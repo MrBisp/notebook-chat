@@ -11,7 +11,7 @@ import { MdClose } from 'react-icons/md';
 
 const Conversations = () => {
 
-    const { user, conversations, selectedConversation, addConversation, selectConversation, deleteConversation, updateConversation, updateUserToken } = useContext(AuthContext);
+    const { user, conversations, selectedConversation, addConversation, selectConversation, deleteConversation, updateConversation, updateUserToken, logout } = useContext(AuthContext);
 
     const [showOptionsModal, setShowOptionsModal] = useState(false);
     const [conversationToUpdate, setConversationToUpdate] = useState(null);
@@ -109,6 +109,11 @@ const Conversations = () => {
         setShowSettingsModal(false);
     };
 
+    const logOutHandler = async () => {
+        console.log('Logging out');
+        logout();
+    };
+
 
 
 
@@ -181,6 +186,11 @@ const Conversations = () => {
                                 <span className={styles.optionsLabel}>API Token</span>
                                 <input className={styles.optionsInput} value={token} onChange={(e) => setToken(e.target.value)}></input>
                                 <span className={styles.optionsTip}>You can find or create your API token at <a href="https://platform.openai.com/account/api-keys">OpenAI's website</a>.</span>
+                            </div>
+                        </div>
+                        <div className={styles.optionsContent}>
+                            <div className={styles.option}>
+                                <span className={styles.optionsLabel} onClick={logOutHandler}>Log out</span>
                             </div>
                         </div>
                         <div className={styles.optionsButtons}>

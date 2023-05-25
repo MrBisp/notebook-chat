@@ -1,6 +1,6 @@
 // Login.js
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 
@@ -8,7 +8,7 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const { login } = useContext(AuthContext);
+    const { login, authToken } = useContext(AuthContext);
 
     const router = useRouter();
 
@@ -20,13 +20,16 @@ const Login = () => {
                 setErrorMessage(response.message);
                 return;
             }
-            console.log('Login successful')
-            router.push('/');
-
         } catch (error) {
             setErrorMessage("Something went wrong");
         }
     };
+
+    useEffect(() => {
+        if (authToken) {
+            router.replace('/');
+        }
+    }, [authToken]);
 
     return (
         <div>

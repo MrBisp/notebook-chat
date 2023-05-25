@@ -10,22 +10,26 @@ const withAuth = (WrappedComponent) => {
         const { authToken, user, login, logout, loading } = useContext(AuthContext);
 
         useEffect(() => {
+            console.log('Running withAuth effect')
             if (!loading) {
                 if (typeof window !== 'undefined') {
-                    if (!authToken && router) {
+                    if (!authToken) {
                         console.log('No auth token, redirecting to login')
                         router.replace('/login');
+                    } else {
+                        console.log('User:')
+                        console.log(user);
                     }
-                } else {
-                    console.log('User:')
-                    console.log(user);
                 }
             }
-
         }, [authToken, router, loading]);
 
+        //Describe what is going on next
+        //If we are loading or there is no auth token, return an empty fragment
         if (loading || !authToken) {
-            return <></>;
+            return <>
+                <p>Loading...</p>
+            </>;
         }
 
         return (

@@ -12,15 +12,55 @@ export const AuthProvider = ({ children }) => {
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const [userSet, setUserSet] = useState(false);
+
     const router = useRouter();
 
     //Get user data from server on page load
     useEffect(() => {
+        logUserIn();
+    }, []);
+
+    useEffect(() => {
+        if (userSet) {
+            setLoading(false);
+        }
+    }, [userSet]);
+
+
+    const login = async (email, password) => {
+        console.log('Logging in user: ' + email + ' with password: ' + password);
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            console.log(data);
+
+            if (!data.authToken) {
+                return false;
+            }
+
+            localStorage.setItem('authToken', data.authToken);
+
+            await logUserIn();
+
+            return true;
+        } catch (error) {
+            console.log(error.message);
+            return false;
+        }
+    };
+
+    const logUserIn = async () => {
         const storedAuthToken = localStorage.getItem('authToken');
-        //console.log('Stored auth token: ' + storedAuthToken)
+        console.log('Getting user from token...')
 
         if (storedAuthToken) {
-            setAuthToken(storedAuthToken);
 
             const fetchData = async () => {
                 try {
@@ -42,39 +82,13 @@ export const AuthProvider = ({ children }) => {
                 } catch (error) {
                     console.error(error);
                 } finally {
-                    setLoading(false);
+                    setUserSet(true);
+                    setAuthToken(storedAuthToken);
                 }
             };
             fetchData();
         } else {
             setLoading(false);
-        }
-    }, []);
-
-
-    const login = async (email, password) => {
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ email, password }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            const data = await response.json();
-            console.log(data);
-            console.log(data.authToken)
-
-            if (!data.authToken) {
-                return false;
-            }
-
-            setAuthToken(data.authToken);
-            localStorage.setItem('authToken', data.authToken);
-
-            return true;
-        } catch (error) {
-            console.error(error);
         }
     };
 
@@ -84,6 +98,7 @@ export const AuthProvider = ({ children }) => {
         setConversations([]);
         setSelectedConversation(null);
         localStorage.removeItem('authToken');
+        router.push('/login');
     };
 
     const addConversation = async () => {
@@ -246,6 +261,8 @@ export const AuthProvider = ({ children }) => {
         const conversation = conversations.find((conversation) => conversation.id === id);
         setSelectedConversation(conversation);
     };
+
+
 
     const values = {
         authToken,

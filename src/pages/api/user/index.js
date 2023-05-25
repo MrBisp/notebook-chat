@@ -19,13 +19,16 @@ export default async (req, res) => {
         case "POST":
             console.log('Creating new user...')
             try {
+                let email = req.body.email;
+                let password = req.body.password;
                 req.body.password = await bcrypt.hash(req.body.password, 10);
 
                 const user = await User.create(
                     req.body
                 );
 
-                res.status(201).json({ success: true, data: user });
+                console.log('User created successfully');
+                res.status(201).json({ success: true, data: { email, password } });
             } catch (error) {
                 console.log(error)
                 res.status(400).json({ success: false, error: error });

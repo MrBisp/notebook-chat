@@ -9,29 +9,40 @@ const RegisterPage = () => {
     const { login } = useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
 
     const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Call your API to register a new user
-        const response = await fetch("/api/user", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-        });
-        const data = await response.json();
+        try {
+            // Call your API to register a new user
+            const response = await fetch("/api/user", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+            console.log(data.data);
+            console.log(data.data.email)
 
-        if (data.authToken) {
-            // Log the user in
-            login(data.user, data.authToken);
-            // Redirect them to the home page
-            router.push("/");
-        } else {
-            console.error("Error: ", data.error);
-            // Show error message to the user (e.g., using an alert or in the UI)
+            // Check if the response is successful
+            if (data.data.email) {
+                // Log the user in
+                login(data.data.email, data.data.password);
+                // Redirect them to the home page
+                router.push("/chat");
+            } else {
+                console.log("Something went wrong...");
+                setError("Something went wrong...");
+            }
+        } catch (error) {
+            console.error("An unexpected error happened occurred:", error);
+            setError("An unexpected error happened occurred:", error.message);
         }
+
+
     };
 
     return (
@@ -48,6 +59,7 @@ const RegisterPage = () => {
                 </label>
                 <button type="submit">Submit</button>
             </form>
+            <p style={{ color: "red" }}>{error}</p>
             <p>
                 Already have an account? <Link href="/login">Login</Link>
             </p>
