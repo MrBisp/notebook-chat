@@ -46,7 +46,7 @@ const RegisterPage = () => {
     };
 
     return (
-        <>
+        <div className='login-container'>
             <form onSubmit={handleSubmit}>
                 <h1>Register</h1>
                 <label>
@@ -63,7 +63,7 @@ const RegisterPage = () => {
             <p>
                 Already have an account? <Link href="/login">Login</Link>
             </p>
-        </>
+        </div>
     );
 };
 
