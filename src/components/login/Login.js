@@ -34,9 +34,9 @@ const Login = () => {
     return (
         <div className='login-container'>
             <h1>Login</h1>
-            <h2>
+            <h5>
                 Log in to use the chat app. It's just like ChatGPT, but you bring your own keys and it's prettier!
-            </h2>
+            </h5>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="username">Username</label>
