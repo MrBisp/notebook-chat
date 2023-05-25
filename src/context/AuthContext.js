@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
 
     const addConversation = async () => {
         try {
-            const response = await fetch(`/api/conversations?user_id=${user.id}`, {
+            const response = await fetch('/api/conversations?user_id=' + user.id, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
