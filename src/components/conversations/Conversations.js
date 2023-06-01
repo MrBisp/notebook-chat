@@ -3,7 +3,7 @@ import styles from './Conversations.module.css';
 import axios from 'axios';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import withAuth from '../../components/withAuth/WithAuth';
+import withAuth from '../withAuth/WithAuth';
 
 import { MdDeleteOutline } from "react-icons/md";
 import { MdSettings } from 'react-icons/md';
@@ -113,9 +113,6 @@ const Conversations = () => {
         console.log('Logging out');
         logout();
     };
-
-
-
 
     return (
         <>

@@ -1,0 +1,232 @@
+.conversations {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    background: #F6F6F6;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.middleContainer {
+    overflow-y: scroll;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-x: hidden;
+}
+
+.conversation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0rem;
+    border-radius: 10px;
+    margin: 0rem 0rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 0px;
+    background: rgba(255, 255, 255, 0.0);
+    width: 100%;
+}
+
+.conversation:hover .conversation__name {
+    color: black;
+}
+
+.conversation__name,
+.conversation_new {
+    font-size: 0.8rem;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #4B4A4D;
+    padding-left: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.conversation_hover {
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    justify-content: flex-end;
+}
+
+.conversation_hover * {
+    display: none;
+    margin: 0 0.1rem;
+}
+
+.conversation:hover .conversation_hover * {
+    display: flex;
+}
+
+.conversation_new_container {}
+
+.conversation_new {
+    font-size: 0.8rem;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 1rem;
+    color: #4B4A4D;
+}
+
+.conversation_new:hover {
+    color: rgba(0, 0, 0, 1);
+}
+
+.bottomContainer {
+    margin: 1rem 0.5rem 2rem;
+}
+
+.settings {
+    cursor: pointer;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+}
+
+.conversationHeader {
+    padding-left: 1rem;
+}
+
+/* OPTIONS STUFF */
+.optionsButton {
+    cursor: pointer;
+}
+
+.optionsOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.optionsContainer {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    padding: 0rem;
+    background: rgb(255, 255, 255);
+    transition: transform 0.3s ease-in-out;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+
+.optionsClose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+}
+
+.optionsTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #000000;
+    padding: 1rem 2rem;
+    text-align: center;
+}
+
+.optionsContent {
+    padding: 1.5rem 1.5rem 0rem;
+}
+
+.optionsLabel {
+    font-size: 1rem;
+    width: 100%;
+    display: inline-block;
+}
+
+.optionsTip {
+    font-size: 0.8rem;
+    width: 100%;
+    display: inline-block;
+    margin: 0.5rem 0 2rem;
+    color: rgb(110 110 110);
+}
+
+.optionsTip a {
+    color: rgb(110 110 110);
+    text-decoration: underline;
+}
+
+.option select,
+.option textarea,
+.option input {
+    display: inline-block;
+    width: 100%;
+    margin: 0.5rem 0 2rem;
+    padding: 0.5rem;
+    border: 1px solid rgb(110 110 110);
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #000000;
+    outline: none;
+}
+
+.optionsButtons {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.optionsButtons button {
+    border-radius: 8px;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    align-self: flex-end;
+}
+
+.optionsResetButton {
+    background: transparent !important;
+    color: black !important;
+    text-decoration: underline;
+    padding-left: 0.25rem !important;
+}
+
+
+
+/* MOBILE DESIGN */
+@media only screen and (max-width: 600px) {
+
+    .conversations {
+        transform: translateX(-100%);
+        transition: transform 0.0s ease-in-out;
+        padding-top: 2rem;
+    }
+
+    .conversation_hover * {
+        display: flex;
+    }
+
+    .optionsContainer {
+        width: 100%;
+        height: 100%;
+        border-radius: 0px;
+    }
+
+
+}

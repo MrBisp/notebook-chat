@@ -54,7 +54,11 @@ const userSchema = new mongoose.Schema({
     token: {
         type: String,
         required: false,
-    }
+    },
+    workbooks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workbook',
+    }],
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);

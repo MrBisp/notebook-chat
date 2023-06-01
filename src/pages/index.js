@@ -17,6 +17,7 @@ const Home = () => {
     console.log('Home page loaded');
     console.log('User: ', user);
     console.log('Loading: ', loading);
+
     //Check if the user is logged in after we are done loading
     if (!loading && !user) {
       console.log('User is not logged in, redirecting to login page');

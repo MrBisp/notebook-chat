@@ -10,8 +10,9 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [workbooks, setWorkbooks] = useState([]);
 
+    const [loading, setLoading] = useState(true);
     const [userSet, setUserSet] = useState(false);
 
     const router = useRouter();
@@ -79,6 +80,7 @@ export const AuthProvider = ({ children }) => {
 
                     setUser(data.user);
                     setConversations(data.user.conversations);
+                    setWorkbooks(data.user.workbooks);
                 } catch (error) {
                     console.error(error);
                 } finally {
@@ -262,6 +264,109 @@ export const AuthProvider = ({ children }) => {
         setSelectedConversation(conversation);
     };
 
+    const addWorkbook = async (title) => {
+        console.log('Adding notebook: ' + title);
+        try {
+            const response = await fetch('/api/workbook', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    title: title
+                })
+            });
+            const data = await response.json();
+            console.log("New notebook: " + JSON.stringify(data));
+            console.log(data.workbook)
+
+            if (data.workbook) {
+                setWorkbooks((prevWorkbooks) => [...prevWorkbooks, data.workbook]);
+            }
+            return data.workbook;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+    //id is workbook id
+    const addPage = async (id, title = "New page", parentPageId = null) => {
+        console.log('Adding page: ' + title + ' to workbook: ' + id);
+        try {
+            const response = await fetch('/api/workbook/' + id + '/page', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    title: title,
+                    workbook_id: id,
+                    parentPageId: parentPageId
+                })
+            });
+            const data = await response.json();
+            console.log("New page: " + JSON.stringify(data));
+            console.log(data.page)
+
+            if (data.page) {
+                setWorkbooks((prevWorkbooks) =>
+                    prevWorkbooks.map((workbook) => {
+                        if (workbook._id === id) {
+                            workbook.pages.push(data.page);
+                        }
+                        return workbook;
+                    })
+                );
+            }
+            return data.page;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const updatePage = async (id, data, workbookId) => {
+        console.log('Updating page: ' + id + ' with data: ' + JSON.stringify(data));
+        try {
+            //Only update the data that is sent with the request
+            const updateData = {};
+            if (data.title) updateData.title = data.title;
+            if (data.content) updateData.content = data.content;
+            if (data.subPages) updateData.subPages = data.subPages;
+            const response = await fetch(`/api/page/${id}`, {
+                method: "PUT",
+                body: JSON.stringify(updateData),
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+            const updatedPage = await response.json();
+            console.log('Updated page: ' + JSON.stringify(updatedPage));
+
+            if (updatedPage.success) {
+                setWorkbooks((prevWorkbooks) =>
+                    prevWorkbooks.map((workbook) => {
+                        if (workbook._id === workbookId) {
+                            workbook.pages = workbook.pages.map((page) => {
+                                if (page._id === id) {
+                                    return updatedPage.page;
+                                }
+                                return page;
+                            });
+                        }
+                        return workbook;
+                    })
+                );
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
 
 
     const values = {
@@ -277,7 +382,11 @@ export const AuthProvider = ({ children }) => {
         deleteConversation,
         updateConversation,
         addMessage,
-        updateUserToken
+        updateUserToken,
+        workbooks,
+        addWorkbook,
+        addPage,
+        updatePage
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
