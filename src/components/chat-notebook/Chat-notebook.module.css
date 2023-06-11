@@ -3,8 +3,8 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
-    /*background: linear-gradient(180deg, #fef5f5 0%, #ffe3e3 100%);*/
-    background: #FDFDFD;
+    min-width: 20vw;
+    background: #F9FAFB;
 }
 
 .header {
@@ -17,14 +17,6 @@
 .chat a {
     text-decoration: underline;
     color: inherit;
-}
-
-.top {
-    display: inline-block;
-    padding: 1rem;
-    background: rgb(255, 245, 245);
-    width: 100%;
-
 }
 
 .title {
@@ -75,21 +67,23 @@
 .inputContainer {
     display: flex;
     flex-grow: 1;
-    background: #F8F8F8;
+    background: #f4f4f4;
     border-radius: 10px;
+    border: 1px solid #e7e7e7;
 }
 
 .newMessageInput {
     display: flex;
     flex-grow: 1;
-    border: none;
     outline: none;
     padding: 1rem;
     font-size: 16px;
     font-weight: 400;
     color: #000000;
     border-radius: 10px;
-    background: #F8F8F8;
+    background: #f4f4f4;
+    border: 1px solid #e7e7e7;
+    border-right: none;
     resize: none;
 }
 
@@ -172,6 +166,64 @@
     display: none;
 }
 
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    flex-wrap: wrap;
+}
+
+.answerFromText {
+    width: 100%;
+    text-align: center;
+    color: #575757;
+}
+
+.contextBox {
+    border: 1px solid #DDDDDD;
+    width: 30%;
+    aspect-ratio: 1/1;
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.contextBox svg {
+    font-size: 2rem;
+    color: #515151;
+}
+
+.contextBox span {
+    font-size: 0.75rem;
+    color: #515151;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.contextBox.active {
+    border: 1px solid #438C71;
+}
+
+.contextBox.active svg {
+    color: #438C71;
+}
+
+.contextBox.active span {
+    color: #438C71;
+}
+
+.currentContext {
+    width: 100%;
+    padding: 0rem 1rem;
+    color: #438C71;
+    text-align: center;
+}
+
 
 /* ANIMATIONS */
 @keyframes fadeIn {
@@ -190,6 +242,11 @@
 
 /* MOBILE */
 @media (max-width: 768px) {
+    .header {
+        font-size: 2rem !important;
+        padding: 1rem 0rem 0rem !important;
+    }
+
     .chat {
         z-index: 5;
         position: relative;
@@ -211,9 +268,7 @@
         padding: 0;
     }
 
-    .bottom {
-        padding: 1rem;
-    }
+    .bottom {}
 
     .messagesInner {
         padding: 0;

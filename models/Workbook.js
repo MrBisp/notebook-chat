@@ -4,11 +4,14 @@ const pageSchema = new mongoose.Schema({
     title: String,
     content: { type: String, required: true, default: "" },
     subPages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Page', default: [] }], // Reference to sub-pages
+    lastEdited: { type: Date, default: Date.now },
+
 });
 
 const workBookSchema = new mongoose.Schema({
     title: { type: String, required: true, default: '' },
-    pages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Page', default: [] }]
+    pages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Page', default: [] }],
+    lastEdited: { type: Date, default: Date.now },
 });
 
 

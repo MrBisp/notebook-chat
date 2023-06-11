@@ -7,7 +7,7 @@
     overflow-x: hidden;
     padding: 0 0.5rem;
     box-sizing: border-box;
-    background: #F6F6F6;
+    background: #F9FAFB;
     justify-content: space-between;
     overflow: hidden;
 }
@@ -19,6 +19,8 @@
     flex-direction: column;
     flex-grow: 1;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 .conversation {
@@ -34,6 +36,7 @@
     border-radius: 0px;
     background: rgba(255, 255, 255, 0.0);
     width: 100%;
+    max-width: 100%;
 }
 
 .conversation:hover .conversation__name {
@@ -46,9 +49,9 @@
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
-    color: #4B4A4D;
+    color: #2C2F3B;
     padding-left: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
 }
 
@@ -213,9 +216,8 @@
 @media only screen and (max-width: 600px) {
 
     .conversations {
-        transform: translateX(-100%);
         transition: transform 0.0s ease-in-out;
-        padding-top: 2rem;
+        padding-top: 0rem;
     }
 
     .conversation_hover * {

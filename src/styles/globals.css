@@ -38,8 +38,8 @@ main {
     height: 100vh;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .main-container__left {
@@ -47,11 +47,6 @@ main {
     height: 100vh;
 }
 
-.main-container__right {
-    width: 85vw;
-    height: 100vh;
-    overflow: scroll;
-}
 
 button {
     border: none;
@@ -144,12 +139,188 @@ pre {
 }
 
 /* WORKBOOK */
+.workbooks {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.workbooks-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0rem;
+}
+
+.add-new-workbook-button {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.day-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem 0rem;
+    border-bottom: 1px solid #f5f5f5;
+    flex-wrap: wrap;
+}
+
+.day-container h2 {
+    width: 100%;
+}
+
+.card {
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    margin: 1rem 2rem 1rem 0rem;
+    width: 32rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.card h3 {
+    margin: 0;
+}
+
+.card .left,
+.card .right {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.card .left p {
+    color: #444444;
+}
+
+.card .create-new-workbook-symbol {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+.card:hover .create-new-workbook-symbol {
+    scale: 1.25;
+}
+
 .workbook-container {
     display: flex;
     flex-direction: column;
     width: 100%;
     padding: 1rem;
     min-height: 100vh;
+}
+
+.page-previews {
+    position: relative;
+    height: 10rem;
+    width: 100%;
+}
+
+.page-inner {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    padding: 0rem 0rem;
+}
+
+.page-preview {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10rem;
+    height: 12rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+    padding: 1rem;
+    transition-duration: 0.75s;
+}
+
+.page-preview-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.page-preview-content,
+.page-preview-content * {
+    font-size: 0.6rem !important;
+    width: 100%;
+    pointer-events: none;
+}
+
+.page-preview:nth-child(1) {
+    rotate: -5deg;
+    translate: -2rem -1rem;
+}
+
+.page-preview:nth-child(2) {
+    rotate: 1deg;
+    translate: 0rem -1rem;
+}
+
+.page-preview:nth-child(3) {
+    rotate: 10deg;
+    translate: 1.5rem -0.75rem;
+}
+
+.page-preview:last-child:not(:nth-child(3)) {
+    rotate: 5deg;
+    translate: 0rem -1rem;
+}
+
+.card {
+    transition: all 0.75s;
+}
+
+.card:hover {
+    transform: scale(1.01);
+}
+
+.card:hover .page-preview:nth-child(1) {
+    rotate: -10deg;
+    translate: -3rem -2rem;
+}
+
+.card:hover .page-preview:nth-child(2) {
+    rotate: 5deg;
+    translate: 0rem -2rem;
+}
+
+.card:hover .page-preview:nth-child(3) {
+    rotate: 16deg;
+    translate: 3rem -2rem;
+}
+
+.card:hover .page-preview:last-child:not(:nth-child(3)) {
+    scale: 1.02;
+    translate: 0rem -1rem;
+    rotate: 2deg;
 }
 
 .page {
@@ -174,6 +345,47 @@ pre {
     outline: none;
     border: none;
     font-weight: 700;
+}
+
+/* PAGES */
+.show-all-pages {
+    padding: 0rem 5rem;
+}
+
+.all-pages-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0rem 0rem;
+}
+
+.all-pages-header .settings {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.back-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem 1rem 0rem;
+}
+
+.back-container * {
+    cursor: pointer;
+    color: #9a9a9a;
+}
+
+.back-container span {
+    font-size: 0.7rem;
+    font-weight: 600;
+
+    margin-left: 0.5rem;
+    cursor: pointer;
 }
 
 /* QUILL */
@@ -207,8 +419,9 @@ pre {
     padding: 0rem !important;
 }
 
-.quill p {
-    font-size: 1rem;
+.quill p,
+.quill li {
+    font-size: 1rem !important;
 }
 
 .quill h1 {
@@ -251,24 +464,273 @@ pre {
     border-bottom-right-radius: 8px;
 }
 
+.ql-clipboard {
+    /* Fixes scroll up bug */
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    display: none;
+}
+
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    padding: 0rem;
+    background: rgb(255, 255, 255);
+    transition: transform 0.3s ease-in-out;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-x {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    transform: translateY(-3px)
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #000000;
+    padding: 1rem 0rem;
+    text-align: center;
+    width: 100%;
+}
+
+.modal-content {
+    padding: 1.5rem 1.5rem 0rem;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.modal-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0.5rem 0rem;
+}
+
+.modal-option-label {
+    font-size: 1rem;
+    width: 100%;
+    display: inline-block;
+}
+
+.modal-option-input {
+    width: 100%;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border-radius: 12px;
+    border: 1px solid #b9b9b9;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.modal-option .modal-option-delete-button {
+    background: none;
+    color: #ff0000;
+    text-decoration: underline;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    align-self: flex-start;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between !important;
+    width: 100%;
+}
+
+.modal-button-cancel {
+    text-decoration: underline;
+    color: #444444;
+    font-size: 1rem;
+    background: none;
+}
+
+.modal-button {
+    border-radius: 8px;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    align-self: flex-end;
+}
+
+
+#notebook-chat .modal-content .card {
+    width: 100% !important;
+}
+
+.card-small {
+    width: calc(50% - 1rem) !important;
+    margin: 0.5rem !important;
+    transition-duration: 0.2s;
+}
+
+.modal-option-select-pages {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.card-small .page-preview {
+    width: 100%;
+    aspect-ratio: 1/1;
+    height: unset;
+    position: relative;
+    translate: 0rem 0rem !important;
+}
+
+.card-small .page-preview * {
+    transition-duration: 0.2s;
+}
+
+.card-small .page-previews {
+    height: auto;
+}
+
+.card-small.active {
+    background-color: rgba(67, 140, 113, 0.2);
+}
+
+.card-small.active .page-preview {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.card-small.active .page-preview * {
+    color: rgb(67, 140, 113) !important;
+}
+
+
+/* SLIDE IN AND OUT */
+.chat-icon {
+    position: absolute;
+    top: 1rem;
+    left: 0rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s ease-in-out;
+    transform: translateX(-3rem);
+    color: #cccccc;
+}
+
+.chat-icon:hover {
+    color: #424242;
+}
+
+.main-container__chat {
+    position: relative;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+    width: 30vw;
+}
+
+.main-container__chat.hide {
+    width: 0;
+}
+
+.main-container__left {
+    position: relative;
+    width: 15vw;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+.main-container__left.hide {
+    width: 0;
+}
+
+.close-icon {
+    position: absolute;
+    top: 1rem;
+    right: 0rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s ease-in-out;
+    transform: translateX(3rem) rotate(0deg);
+    color: #cccccc;
+}
+
+.close-icon:hover {
+    color: #424242;
+}
+
+.close-icon.point-right {
+    transform: translate(3rem) rotate(180deg)
+}
+
+.main-container__right {
+    width: auto;
+    height: 100vh;
+    overflow: scroll;
+    flex-grow: 1
+}
+
+.workbookPagesComponent {
+    overflow: hidden;
+}
+
 
 /* MOBILE DESIGN */
 @media only screen and (max-width: 600px) {
     .main-container {
         display: inline-block;
         position: relative;
-    }
-
-    .main-container__left {
-        width: 100vw;
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
-
-    .main-container__right {
-        width: 100vw;
-        padding: 1rem;
+        padding-bottom: 4rem;
     }
 
     #conversationscontainer.showOnMobile {
@@ -303,6 +765,85 @@ pre {
 
     .workbook-container {
         padding: 0;
+    }
+
+    .main-container__left {
+        width: 100vw;
+    }
+
+    .main-container__right {
+        width: 100vw;
+        padding: 1rem;
+    }
+
+    #chat-notebook {
+        width: 100vw;
+    }
+
+    .main-container__left.hide {
+        width: 0;
+        display: none;
+    }
+
+    .main-container__right.hide {
+        width: 0;
+        display: none;
+    }
+
+    #chat-notebook.hide {
+        width: 0;
+        display: none;
+    }
+
+    .modal {
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+        max-height: none;
+        justify-content: stretch;
+    }
+
+    .modal .modal-header {
+        padding: 1rem 1.5rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between !important;
+        width: 100%;
+    }
+
+    .modal .modal-content {
+        padding: 1rem 1.5rem;
+    }
+
+    .workbooks-header {
+        flex-wrap: wrap;
+    }
+
+    .workbooks-header * {
+        width: 100%;
+    }
+
+    .card {
+        width: 100% !important;
+    }
+
+    .page-preview {
+        width: 8rem;
+        height: 12rem;
+        rotate: 5deg !important;
+        translate: 1rem -1rem !important;
+    }
+
+    .page-preview:not(:first-child) {
+        display: none;
+    }
+
+    .show-all-pages {
+        padding: 0.5rem 0.5rem 3rem;
     }
 
 

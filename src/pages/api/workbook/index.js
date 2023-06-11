@@ -11,7 +11,6 @@ export default async (req, res) => {
 
     switch (method) {
         case "POST":
-
             try {
                 console.log(req.body);
                 let title = req.body.title;

@@ -291,6 +291,63 @@ export const AuthProvider = ({ children }) => {
     };
 
 
+    const updateWorkbook = async (id, data) => {
+        console.log('Updating workbook: ' + id + ' with data: ' + JSON.stringify(data));
+        try {
+            const response = await fetch(`/api/workbook/${id}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    title: data.title,
+                    pages: data.pages
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+            const updatedWorkbook = await response.json();
+            console.log('Updated workbook: ' + JSON.stringify(updatedWorkbook));
+
+            if (updatedWorkbook.success) {
+                setWorkbooks((prevWorkbooks) =>
+                    prevWorkbooks.map((workbook) => {
+                        if (workbook._id === id) {
+                            return updatedWorkbook.workbook;
+                        }
+                        return workbook;
+                    })
+                );
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const deleteWorkbook = async (id) => {
+        console.log('Deleting workbook: ' + id);
+        try {
+            const response = await fetch(`/api/workbook/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({ user_id: user.id })
+            });
+            const data = await response.json();
+            console.log(data);
+
+            if (data.success) {
+                setWorkbooks((prevWorkbooks) =>
+                    prevWorkbooks.filter((workbook) => workbook._id !== id)
+                );
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
     //id is workbook id
     const addPage = async (id, title = "New page", parentPageId = null) => {
         console.log('Adding page: ' + title + ' to workbook: ' + id);
@@ -304,7 +361,8 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({
                     title: title,
                     workbook_id: id,
-                    parentPageId: parentPageId
+                    parentPageId: parentPageId,
+                    content: ' '
                 })
             });
             const data = await response.json();
@@ -327,6 +385,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+
     const updatePage = async (id, data, workbookId) => {
         console.log('Updating page: ' + id + ' with data: ' + JSON.stringify(data));
         try {
@@ -335,6 +394,7 @@ export const AuthProvider = ({ children }) => {
             if (data.title) updateData.title = data.title;
             if (data.content) updateData.content = data.content;
             if (data.subPages) updateData.subPages = data.subPages;
+            updateData.workbookId = workbookId;
             const response = await fetch(`/api/page/${id}`, {
                 method: "PUT",
                 body: JSON.stringify(updateData),
@@ -386,7 +446,9 @@ export const AuthProvider = ({ children }) => {
         workbooks,
         addWorkbook,
         addPage,
-        updatePage
+        updatePage,
+        updateWorkbook,
+        deleteWorkbook
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

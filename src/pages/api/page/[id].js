@@ -1,6 +1,6 @@
 import dbConnect from "utils/dbConnect";
 import User from "models/User";
-import { Page } from "models/Workbook";
+import { Page, Workbook } from "models/Workbook";
 import jwt from "jsonwebtoken";
 
 export default async (req, res) => {
@@ -37,10 +37,18 @@ export default async (req, res) => {
                     if (req.body.subPages) {
                         updates.subPages = req.body.subPages;
                     }
+                    updates.lastEdited = Date.now();
 
                     //Update the page
                     const updatedPage = await Page.findByIdAndUpdate(id, updates, { new: true });
                     res.status(200).json({ success: true, page: updatedPage });
+
+                    //Now update the workbook
+                    const workbook = await Workbook.findOne({ _id: req.body.workbookId });
+                    if (workbook) {
+                        workbook.lastEdited = Date.now();
+                        await workbook.save();
+                    }
                 }
             } catch (error) {
                 console.log(error)
