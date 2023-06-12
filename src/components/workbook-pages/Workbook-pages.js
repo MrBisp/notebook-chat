@@ -47,7 +47,7 @@ const WorkbookPages = ({ workbook }) => {
                     <div className={styles.topContainer}>
                         <div className='back-container' onClick={() => { router.push('/notebook') }}>
                             <MdKeyboardBackspace />
-                            <span>All workbooks</span>
+                            <span>All notebooks</span>
                         </div>
 
                         <Link href={`/notebook/${workbookState._id}`}>

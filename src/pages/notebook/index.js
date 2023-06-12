@@ -6,7 +6,9 @@ import { AuthContext } from '../../context/AuthContext';
 import withAuth from '../../components/withAuth/WithAuth';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { MdClose } from 'react-icons/md';
+import { MdClose, MdChat, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
+import WorkbookPages from '@/components/workbook-pages/Workbook-pages';
+
 
 const WorkbookPage = () => {
     const { workbooks, addWorkbook } = useContext(AuthContext);
@@ -16,6 +18,8 @@ const WorkbookPage = () => {
     const [workbookTitle, setWorkbookTitle] = useState('');
     const [showAddWorkbook, setShowAddWorkbook] = useState(false);
     const [sortedWorkbooks, setSortedWorkbooks] = useState([]);
+
+    const [showPages, setShowPages] = useState(true);
 
     const addWorkbookHandler = async () => {
         const res = await addWorkbook(workbookTitle);
@@ -146,9 +150,8 @@ const WorkbookPage = () => {
 
     return (
         <>
-
             <Head>
-                <title>Chat and notebook</title>
+                <title>Notebook chat</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
@@ -165,11 +168,11 @@ const WorkbookPage = () => {
                         {
                             workbooks.length == 0 && (
                                 <>
-                                    <p>You don't have any workbooks yet. Creating one takes less than 10 seconds.</p>
+                                    <p>You don't have any notebooks yet. Creating one takes less than 10 seconds.</p>
                                     <div className='card' onClick={() => setShowAddWorkbook(true)}>
                                         <div className='left'>
-                                            <h3>Create workbook</h3>
-                                            <p>Workbooks are a collection of pages. You can create as many workbooks as you want.</p>
+                                            <h3>Create notebook</h3>
+                                            <p>Notebooks are a collection of pages. You can create as many notebooks as you want.</p>
                                         </div>
                                         <div className='right'>
                                             <span className='create-new-workbook-symbol'>+</span>
@@ -187,7 +190,7 @@ const WorkbookPage = () => {
                         <div className="modal-overlay">
                             <div className='modal'>
                                 <div className='modal-header'>
-                                    <span className='modal-title'>Create workbook</span>
+                                    <span className='modal-title'>Create notebook</span>
                                     <div className='modal-x' onClick={() => { setShowAddWorkbook(false); }}><MdClose /></div>
                                 </div>
                                 <div className='modal-content'>

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import styles from './Chat-notebook.module.css';
 import { MdMenuBook, MdOutlineAssignment, MdClose } from 'react-icons/md'; //Possibly change to MdMenuBook MdOutlineAssignment MdOutlineListAlt MdOutlineMargin MdOutlineTextSnippet
-import { set } from 'mongoose';
 
 
 const ChatNotebook = ({ currentPage, workbook }) => {
+    const { addPage, sendNotebookChatMessage } = useContext(AuthContext);
+
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
 
@@ -18,9 +19,66 @@ const ChatNotebook = ({ currentPage, workbook }) => {
 
     const [errorMessage, setErrorMessage] = useState('');
 
+    const extractText = (html) => {
+        let span = document.createElement('span');
+        span.innerHTML = html;
+        return span.textContent || span.innerText;
+    }
+
 
     const sendMessage = async () => {
+        if (!isReady) return;
 
+        if (message === '') {
+            setErrorMessage('Please enter a message');
+            return;
+        }
+
+        setIsReady(false);
+
+        let newMessage = {
+            role: 'user',
+            content: message
+        }
+
+        let context = ''
+        if (contextOption === 'current-page') {
+            context = 'Title: ' + currentPage.title + '. Content: ' + extractText(currentPage.content) + '.\n'
+        } else {
+            for (let i = 0; i < contextPages.length; i++) {
+                context += 'Title: ' + contextPages[i].title + '. Content: ' + extractText(contextPages[i].content) + '.\n'
+            }
+        }
+
+        let allMessages = [...messages, newMessage];
+
+        setMessages(allMessages);
+        setMessage('');
+
+        let chat = document.getElementById('notebook-chat-scrollable');
+        chat.scrollTop = chat.scrollHeight;
+
+        let response = await sendNotebookChatMessage(allMessages, context);
+
+        if (response) {
+            setIsReady(true);
+
+            //Scroll to bottom
+            let chat = document.getElementById('notebook-chat-scrollable');
+            chat.scrollTop = chat.scrollHeight;
+
+
+            let aiMessage = {
+                role: 'assistant',
+                content: response
+            }
+
+            setMessages([...allMessages, aiMessage]);
+        } else {
+            setErrorMessage('Something went wrong. Please try again later.');
+        }
+
+        setIsReady(true);
     }
 
     useEffect(() => {
@@ -35,66 +93,73 @@ const ChatNotebook = ({ currentPage, workbook }) => {
         }
     }, [contextOption])
 
+    const clearHandler = () => {
+        setMessages([]);
+        setIsReady(true);
+    }
+
     return (
         <>
             <div className={styles.chat} id="notebook-chat">
-                <h1 className={styles.header}>Chat</h1>
-                <div className={styles.top}>
-                    <span className={styles.answerFromText}>Answering user context from</span>
-                    <div className={styles.contextBox} id='currentPage' onClick={() => { setContextOption('current-page') }}>
-                        <MdOutlineAssignment />
-                        <span>Current page</span>
-                    </div>
-                    <div className={styles.contextBox} id='choosePages' onClick={() => { setContextOption('choose-pages'); setShowSelectPages(true) }}>
-                        <MdMenuBook />
-                        <span>Choose pages</span>
-                    </div>
-                    <div className={styles.currentContext}>
-                        {
-                            contextPages.length > 0 &&
-                            contextPages.map((page, index) => {
-                                if (page?.title) {
-                                    return (
-                                        <span key={index} className={styles.contextPage}>{index + 1 == contextPages.length ? page.title : page.title + ', '}</span>
-                                    )
-                                }
-                            })
-                        }
-
-                    </div>
-                </div>
-                <div className={styles.messages} id="messagesContainer">
-                    <div className={styles.messagesInner}>
-                        {
-                            messages.length > 0 ?
-                                messages.map((message, index) => {
-                                    return (
-                                        <div key={index} className={message.role}>
-                                            <div className={styles.message} data-sender={message.role}>
-                                                {
-                                                    message.role === 'assistant' && <div className={styles.messagecontent} dangerouslySetInnerHTML={{ __html: message.content }}></div>
-                                                }
-                                                {
-                                                    message.role === 'user' && <div className={styles.messagecontent}>{message.content}</div>
-                                                }
-
-                                            </div>
-                                        </div>
-                                    )
+                <div className={styles.scrollable} id="notebook-chat-scrollable">
+                    <div className={styles.top}>
+                        <h1 className={styles.header}>Chat</h1>
+                        <span className={styles.answerFromText}>Answering user context from</span>
+                        <div className={styles.contextBox} id='currentPage' onClick={() => { setContextOption('current-page') }}>
+                            <MdOutlineAssignment />
+                            <span>Current page</span>
+                        </div>
+                        <div className={styles.contextBox} id='choosePages' onClick={() => { setContextOption('choose-pages'); setShowSelectPages(true) }}>
+                            <MdMenuBook />
+                            <span>Choose pages</span>
+                        </div>
+                        <div className={styles.currentContext}>
+                            {
+                                contextPages.length > 0 &&
+                                contextPages.map((page, index) => {
+                                    if (page?.title) {
+                                        return (
+                                            <span key={index} className={styles.contextPage}>{index + 1 == contextPages.length ? page.title : page.title + ', '}</span>
+                                        )
+                                    }
                                 })
-                                :
-                                <>
-                                    <div className={styles.message} data-sender="assistant">
-                                        <div className={styles.messagecontent}>Ask me something interesting!</div>
-                                    </div>
-                                </>
-                        }
-                        {
-                            isReady === false &&
-                            <div className={styles.message} data-sender="loading">
-                                <div className={styles.messagecontent}>{aiMessage}</div>
-                            </div>
-                        }
+                            }
+
+                        </div>
+                    </div>
+                    <div className={styles.messages} id="messagesContainer">
+                        <div className={styles.messagesInner}>
+                            {
+                                messages.length > 0 ?
+                                    messages.map((message, index) => {
+                                        return (
+                                            <div key={index} className={message.role}>
+                                                <div className={styles.message} data-sender={message.role}>
+                                                    {
+                                                        message.role === 'assistant' && <div className={styles.messagecontent} dangerouslySetInnerHTML={{ __html: message.content }}></div>
+                                                    }
+                                                    {
+                                                        message.role === 'user' && <div className={styles.messagecontent}>{message.content}</div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                    :
+                                    <>
+                                        <div className={styles.message} data-sender="assistant">
+                                            <div className={styles.messagecontent}>Ask me something interesting!</div>
+                                        </div>
+                                    </>
+                            }
+                            {
+                                isReady === false &&
+                                <div className={styles.message} data-sender="loading">
+                                    <div className={styles.messagecontent}>{aiMessage}</div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className={styles.bottom}>
@@ -106,6 +171,7 @@ const ChatNotebook = ({ currentPage, workbook }) => {
                                 <span className={styles.sendAgain} onClick={() => sendMessage(false)}>Send again</span>
                             </>
                         }
+                        <div className={styles.clearButton} onClick={clearHandler}>Clear</div>
                         <div className={styles.inputContainer}>
                             <textarea rows="3" className={styles.newMessageInput} value={message} onChange={(e) => setMessage(e.target.value)}></textarea>
                             <button className={styles.newMessageButton} onClick={sendMessage}>Send</button>
@@ -128,11 +194,12 @@ const ChatNotebook = ({ currentPage, workbook }) => {
                                     {
                                         workbook.pages.map((page, index) => {
                                             //Check if the workbook has a page with the same id as the current page
-                                            const isActive = contextPages.find(p => p._id === page._id);
+                                            const isActive = contextPages?.find(p => p?._id === page._id);
 
                                             const handleClick = () => {
                                                 if (isActive) {
-                                                    setContextPages(contextPages.filter(p => p._id !== page._id)); // Remove the page from contextPages if already active
+
+                                                    setContextPages(contextPages?.filter(p => p?._id !== page._id)); // Remove the page from contextPages if already active
                                                 } else {
                                                     setContextPages([...contextPages, page]); // Add the page to contextPages if not already active
                                                 }

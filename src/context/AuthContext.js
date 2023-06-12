@@ -427,6 +427,32 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const sendNotebookChatMessage = async (messages, context) => {
+        try {
+            const response = await fetch('/api/notebook-chat', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    messages: messages,
+                    systemMessage: 'You are a chatbot on the website Notebook-chat.com. Users can talk to you about their notes. The notes they have picked to include in the conversation, is included as conetext. The user can create a new chat by pressing clear.',
+                    context: context,
+                    model: 'gpt-3.5-turbo'
+                })
+            });
+            const data = await response.json();
+            console.log("New message: " + JSON.stringify(data));
+            console.log(data.message)
+
+            return data.message;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
 
 
     const values = {
@@ -448,7 +474,8 @@ export const AuthProvider = ({ children }) => {
         addPage,
         updatePage,
         updateWorkbook,
-        deleteWorkbook
+        deleteWorkbook,
+        sendNotebookChatMessage
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

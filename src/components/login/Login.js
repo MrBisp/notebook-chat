@@ -27,7 +27,7 @@ const Login = () => {
 
     useEffect(() => {
         if (authToken) {
-            router.replace('/');
+            router.replace('/notebook');
         }
     }, [authToken]);
 
