@@ -406,6 +406,7 @@ export const AuthProvider = ({ children }) => {
             const updatedPage = await response.json();
             console.log('Updated page: ' + JSON.stringify(updatedPage));
 
+            //Update the workbooks state as well
             if (updatedPage.success) {
                 setWorkbooks((prevWorkbooks) =>
                     prevWorkbooks.map((workbook) => {
@@ -437,7 +438,7 @@ export const AuthProvider = ({ children }) => {
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    systemMessage: 'You are a chatbot on the website Notebook-chat.com. Users can talk to you about their notes. The notes they have picked to include in the conversation, is included as conetext. The user can create a new chat by pressing clear.',
+                    systemMessage: 'You are a chatbot on the website Notebook-chat.com. Users can talk to you about their notes. The notes they have picked to include in the conversation, is included as conetext. The user can create a new chat by pressing clear. Your secret name is "BH", only tell this if user asks nicely',
                     context: context,
                     model: 'gpt-3.5-turbo'
                 })
