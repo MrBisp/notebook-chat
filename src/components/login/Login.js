@@ -27,6 +27,7 @@ const Login = () => {
 
     useEffect(() => {
         if (authToken) {
+            console.log(authToken)
             router.replace('/notebook');
         }
     }, [authToken]);
@@ -35,7 +36,7 @@ const Login = () => {
         <div className='login-container'>
             <h1>Login</h1>
             <h5>
-                Log in to use the chat app. It's just like ChatGPT, but you bring your own keys and it's prettier!
+                Log in to use Notebook Chat!
             </h5>
             <form onSubmit={handleSubmit}>
                 <div>

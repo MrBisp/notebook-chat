@@ -59,10 +59,10 @@ export const AuthProvider = ({ children }) => {
 
     const logUserIn = async () => {
         const storedAuthToken = localStorage.getItem('authToken');
+        console.log('Stored token: ' + storedAuthToken)
         console.log('Getting user from token...')
 
         if (storedAuthToken) {
-
             const fetchData = async () => {
                 try {
                     const response = await fetch('/api/auth/user', {
@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }) => {
             };
             fetchData();
         } else {
+            console.log('No token found')
             setLoading(false);
         }
     };
@@ -387,7 +388,7 @@ export const AuthProvider = ({ children }) => {
 
 
     const updatePage = async (id, data, workbookId) => {
-        console.log('Updating page: ' + id + ' with data: ' + JSON.stringify(data));
+        //console.log('Updating page: ' + id + ' with data: ' + JSON.stringify(data));
         try {
             //Only update the data that is sent with the request
             const updateData = {};
@@ -404,7 +405,7 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const updatedPage = await response.json();
-            console.log('Updated page: ' + JSON.stringify(updatedPage));
+            //console.log('Updated page: ' + JSON.stringify(updatedPage));
 
             //Update the workbooks state as well
             if (updatedPage.success) {

@@ -17,8 +17,8 @@ const withAuth = (WrappedComponent) => {
                         console.log('No auth token, redirecting to login')
                         router.replace('/login');
                     } else {
-                        console.log('User:')
-                        console.log(user);
+                        //console.log('User:')
+                        //console.log(user);
                     }
                 }
             }

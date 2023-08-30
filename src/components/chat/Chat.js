@@ -1,260 +1,222 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styles from './Chat.module.css';
-import axios from 'axios';
-import Link from 'next/link';
 import { AuthContext } from '../../context/AuthContext';
 import withAuth from '../withAuth/WithAuth';
-import { MdMenu } from 'react-icons/md';
+import { useChat } from 'ai/react'
+import { MdOutlineAssignment, MdMenuBook, MdClose } from 'react-icons/md';
 
 
-const Chat = () => {
-    const technicalSystemMessage = "Respond with html. For example links in a <a> tag. To insert a code block use following syntax: <pre><code className=\"js\">{`your code`\}</code></pre>"
+const Chat = ({ currentPage, workbook }) => {
+    const { workbooks } = useContext(AuthContext);
 
-    const [messages, setMessages] = useState([]);
-    const [message, setMessage] = useState('');
+    const [contextOption, setContextOption] = useState('current-page')
+    const [contextPages, setContextPages] = useState([])
+    const [showSelectPages, setShowSelectPages] = useState(false)
 
-    const [isReady, setIsReady] = useState(true);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState("");
+    const [aiMessage, setAiMessage] = useState("Thinking...");
 
-    const [aiMessage, setAiMessage] = useState('');
-
-    const [results, setResults] = useState([]);
-
-    const [model, setModel] = useState('');
-    const [systemMessage, setSystemMessage] = useState('');
-    const [token, setToken] = useState('');
-    const AiMessages = [
-        "Generating answer...",
-    ]
-
-    const { user, selectedConversation, addMessage, addConversation, updateConversation } = useContext(AuthContext);
-
-    const [showOnMobile, setShowOnMobile] = useState(false);
-
-    useEffect(() => {
-        if (selectedConversation) {
-            setMessages(selectedConversation.messages);
-            setSystemMessage(selectedConversation.systemMessage);
-            setModel(selectedConversation.model);
-        } else {
-            setMessages([]);
-            setSystemMessage('');
-            setModel('');
+    const { append, messages, setMessages, input, setInput, handleInputChange, stop, isLoading } = useChat({
+        'api': '/api/chat',
+        'id': 'notebook-chat',
+        onError: err => {
+            console.error(err)
+            setErrorMessage(err.message)
+        },
+        onFinish: () => {
+            setErrorMessage("")
         }
-        if (user) {
-            console.log('User: ' + JSON.stringify(user));
-            setToken(user.token);
-        }
-    }, [selectedConversation, user]);
+    })
 
-    //Set sendNew to false, if you want to try to send the message again
-    const sendMessage = async (sendNew = true) => {
-        console.log('Trying to send a new message')
-        setErrorMessage('');
-        if (isReady === false) return;
-        if (message === '' && sendNew) return;
+    const extractText = (html) => {
+        let span = document.createElement('span');
+        span.innerHTML = html;
+        return span.textContent || span.innerText;
+    }
 
-        //Let's first check if the user has a token
-        if (!token) {
-            setErrorMessage("You need to set your token in the settings.");
-            setIsReady(true);
+    const sendMessage = () => {
+        if (isLoading) return;
+        if (!input) {
+            setErrorMessage("Please enter a message")
             return;
         }
+        let newMessage = input;
+        setInput('')
 
-        let newConversationObject = null;
+        console.log(currentPage)
 
-        //If there is not a selected conversation, let's first make a new conversation
-        if (!selectedConversation) {
-            console.log('No selected conversation, creating a new one')
-            let newConversation = await addConversation();
-
-            if (!newConversation) {
-                setErrorMessage("Something went wrong. Please try again.");
-                setIsReady(true);
-                return;
-            }
-            newConversationObject = newConversation;
-        }
-        //If we just created a new conversation, we need to set the selected conversation to the new conversation
-        let useId = null;
-        if (newConversationObject) {
-            useId = newConversationObject.id;
-        } else {
-            useId = selectedConversation.id;
+        //Now let's append the context
+        let context = '';
+        for (let i = 0; i < contextPages.length; i++) {
+            if (!contextPages[i]?.content || !contextPages[i]?.title) continue;
+            context += 'Title: ' + contextPages[i].title + '. Content: ' + extractText(contextPages[i].content) + '.\n'
         }
 
-        setIsReady(false);
-        setErrorMessage('');
 
-        let newMessage = { content: message, role: "user" };
-
-        //Make a copy of the messages array, and add the new message to it
-        let allMessages = [...messages];
-
-        setMessage('');
-
-
-        //If sendNew = false, then we are trying to send the message again
-        if (sendNew === false) {
-            //Remove the last message from the messages array
-            //allMessages.pop();
-            //TODO: Implement this
-            //Actually, by doing nothing we are just asking GPT for a response. Would work in most cases but not all.
-        } else {
-            allMessages.push(newMessage);
-
-            //First we add the user's message to the messages array
-            let addedUserMessage = await addMessage(useId, newMessage);
-
-            if (!addedUserMessage) {
-                setErrorMessage("Something went wrong. Please try again.");
-                setIsReady(true);
-                return;
-            }
+        newMessage = "###NOTES START###\n" + context + "###NOTES END###\n" + newMessage;
+        let newMessageObj = {
+            role: 'user',
+            content: newMessage
         }
+        console.log(context)
 
-        //Scroll the chat to the bottom
-        scrollToBottom();
+        //This triggers the API to send a response
+        append(newMessageObj);
 
-        //Set a random message from the AiMessages array (loading message)
-        setAiMessage(AiMessages[Math.floor(Math.random() * AiMessages.length)]);
+        removeContext();
 
-        let useModel = null;
-        let useSystemMessage = null;
-        if (newConversationObject) {
-            useModel = newConversationObject.model;
-            useSystemMessage = newConversationObject.systemMessage;
-        } else {
-            useModel = model;
-            useSystemMessage = systemMessage;
-        }
-
-        try {
-            const response = await axios.post('/api/chat', {
-                messages: allMessages,
-                model: useModel,
-                systemMessage: useSystemMessage + ' ' + technicalSystemMessage,
-                token: token
-            });
-            console.log('Response from chat api: ')
-            console.log(response.data)
-            //Add the response to the messages array
-            let newAIMessage = { content: response.data.message, role: "assistant" };
-
-            //Add the message to the messages array
-            await addMessage(useId, newAIMessage);
-
-            scrollToBottom();
-
-            //If it is a new conversation, automatically generate a name for it 
-            if (newConversationObject && false) {
-                //Add the new AI message to the messages array
-                allMessages.push(newAIMessage);
-
-                const response = await axios.post('/api/generate-name', {
-                    messages: allMessages,
-                    token: token
-                });
-                if (response.message) {
-                    console.log('Response from generate name api: ')
-                    console.log(response.data)
-                    //Add the response to the messages array
-                    let newName = response.data.message;
-
-                    //Add the message to the messages array
-                    await updateConversation(useId, { name: newName })
-                }
-            }
-
-        } catch (error) {
-            console.log("Error");
-            console.log(error);
-            setErrorMessage("Something went wrong. Please try again.");
-        }
-
-        setIsReady(true);
+        //Scroll down to bottom now
+        let chat = document.getElementById('notebook-chat-scrollable');
+        chat.scrollTop = chat.scrollHeight;
     }
 
-    const scrollToBottom = () => {
-        //First wait 500 ms
-        setTimeout(() => {
-            //Then scroll to the bottom
-            const messagesInner = document.getElementById('messagesContainer');
-            messagesInner.scrollTop = messagesInner.scrollHeight;
-        }, 50);
+    const clearHandler = () => {
+        setInput('')
+        setMessages([])
     }
 
     useEffect(() => {
-        console.log('Messages changed');
-        console.log(messages);
-    }, [messages]);
+        let chat = document.getElementById('notebook-chat-scrollable');
+        chat.scrollTop = chat.scrollHeight;
+
+        //Save in local storage
+        localStorage.setItem('notebook-chat', JSON.stringify(messages));
+    }, [messages])
 
     useEffect(() => {
-        if (showOnMobile) {
-            let conversationsContainer = document.getElementById('conversationscontainer');
-            conversationsContainer.classList.add('showOnMobile');
-
-            let mainContainer = document.getElementById('main-container__left');
-            mainContainer.classList.add('showOnMobile');
-        } else {
-            let conversationsContainer = document.getElementById('conversationscontainer');
-            conversationsContainer.classList.remove('showOnMobile');
-
-            let mainContainer = document.getElementById('main-container__left');
-            mainContainer.classList.remove('showOnMobile');
+        //Load from local storage
+        let localMessages = JSON.parse(localStorage.getItem('notebook-chat'));
+        if (localMessages) {
+            setMessages(localMessages);
         }
-    }, [showOnMobile]);
+    }, [])
+
+    useEffect(() => {
+        if (contextOption == 'current-page') {
+            console.log("Setting current page", currentPage);
+            setContextPages([currentPage]);
+        }
+    }, [currentPage])
+
+    useEffect(() => {
+        if (contextOption === 'current-page') {
+            document.getElementById('currentPage').classList.add(styles.active);
+            document.getElementById('choosePages').classList.remove(styles.active);
+
+            setContextPages([currentPage]);
+        } else {
+            document.getElementById('currentPage').classList.remove(styles.active);
+            document.getElementById('choosePages').classList.add(styles.active);
+        }
+    }, [contextOption, workbook])
+
+    useEffect(() => {
+        removeContext();
+    }, [messages])
+
+    //Update workbook when context changes
+    useEffect(() => {
+        //First, let's find the workbook that the current page belongs to based on the prop
+        let updatedWorkbook = workbooks.find(w => w._id === workbook._id);
+
+        //Now let's update the pages in contextPages
+        let updatedPages = [];
+        for (let i = 0; i < contextPages.length; i++) {
+            let updatedPage = updatedWorkbook.pages.find(p => p._id === contextPages[i]._id);
+            updatedPages.push(updatedPage);
+        }
+
+        //Now let's update the contextPages if the context option is set to that
+        if (contextOption === 'choose-pages') {
+            setContextPages(updatedPages);
+        }
+
+
+        //Now, let's update the current page
+        let updatedCurrentPage = updatedWorkbook.pages.find(p => p._id === currentPage._id);
+        currentPage = updatedCurrentPage;
+
+        //Finally, let's update the workbook
+        workbook = updatedWorkbook;
+    }, [workbooks])
+
+    const removeContext = () => {
+        let newMessages = [...messages];
+        for (let i = 0; i < newMessages.length; i++) {
+            if (newMessages[i].content.includes('###NOTES START###')) {
+                let contextStartIndex = newMessages[i].content.indexOf('###NOTES START###');
+                let contextEndIndex = newMessages[i].content.indexOf('###NOTES END###');
+                let context = newMessages[i].content.substring(contextStartIndex, contextEndIndex + '###NOTES END###\n'.length);
+                let messageWithoutContext = newMessages[i].content.replace(context, '');
+                newMessages[i].content = messageWithoutContext;
+            }
+        }
+
+        setMessages(newMessages);
+    }
+
+
 
     return (
         <>
-            <div className={styles.hamburger} id="hamburger" onClick={() => { setShowOnMobile(!showOnMobile) }}>
-                <MdMenu />
-            </div>
-            <div className={styles.chat}>
-                <h1 className={styles.header}>{selectedConversation && selectedConversation.name}</h1>
-                <div className={styles.messages} id="messagesContainer">
-
-                    <div className={styles.messagesInner}>
-                        {
-                            messages.length > 0 ?
-                                messages.map((message, index) => {
-                                    return (
-                                        <div key={index} className={message.role}>
-                                            <div className={styles.message} data-sender={message.role}>
-                                                {
-                                                    message.role === 'assistant' && <div className={styles.messagecontent} dangerouslySetInnerHTML={{ __html: message.content }}></div>
-                                                }
-                                                {
-                                                    message.role === 'user' && <div className={styles.messagecontent}>{message.content}</div>
-                                                }
-
-                                            </div>
-                                        </div>
-                                    )
+            <div className={styles.chat} id="notebook-chat">
+                <div className={styles.scrollable} id="notebook-chat-scrollable">
+                    <div className={styles.top}>
+                        <h1 className={styles.header}>Chat</h1>
+                        <span className={styles.answerFromText}>Answering user context from</span>
+                        <div className={styles.contextBox} id='currentPage' onClick={() => { console.log("Setting current page"); setContextOption('current-page') }}>
+                            <MdOutlineAssignment />
+                            <span>Current page</span>
+                        </div>
+                        <div className={styles.contextBox} id='choosePages' onClick={() => { setContextOption('choose-pages'); setShowSelectPages(true) }}>
+                            <MdMenuBook />
+                            <span>Choose pages</span>
+                        </div>
+                        <div className={styles.currentContext}>
+                            {
+                                contextPages.length > 0 &&
+                                contextPages.map((page, index) => {
+                                    if (page?.title) {
+                                        return (
+                                            <span key={index} className={styles.contextPage}>{index + 1 == contextPages.length ? page.title : page.title + ', '}</span>
+                                        )
+                                    }
                                 })
-                                :
-                                <>
-                                    <div className={styles.message} data-sender="assistant">
-                                        <div className={styles.messagecontent}>Hey dude, what's up?</div>
-                                    </div>
-                                    <div className={styles.message} data-sender="assistant">
-                                        <div className={styles.messagecontent}>
-                                            Here are some things you can ask me about:
-                                            <ul>
-                                                <li>How to get a Finnish girlfriend?</li>
-                                                <li>What is the meaning of life?</li>
-                                                <li>Who is the best Youtuber of all time?</li>
-                                            </ul>
+                            }
+                            {
+                                contextPages.length === 0 &&
+                                <span className={styles.contextPage}>No pages selected</span>
+                            }
+
+                        </div>
+                    </div>
+                    <div className={styles.messages} id="messagesContainer">
+                        <div className={styles.messagesInner}>
+                            {
+                                messages.length > 0 ?
+                                    messages.map((message, index) => {
+                                        return (
+                                            <div key={index} className={message.role}>
+                                                <div className={styles.message} data-sender={message.role}>
+                                                    {
+                                                        message.role === 'assistant' && <div className={styles.messagecontent} dangerouslySetInnerHTML={{ __html: message.content }}></div>
+                                                    }
+                                                    {
+                                                        message.role === 'user' && <div className={styles.messagecontent}>{message.content}</div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                    :
+                                    <>
+                                        <div className={styles.message} data-sender="assistant">
+                                            <div className={styles.messagecontent}>Ask me something interesting!</div>
                                         </div>
-                                    </div>
-                                </>
-                        }
-                        {
-                            isReady === false &&
-                            <div className={styles.message} data-sender="loading">
-                                <div className={styles.messagecontent}>{aiMessage}</div>
-                            </div>
-                        }
+                                    </>
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className={styles.bottom}>
@@ -263,16 +225,73 @@ const Chat = () => {
                             errorMessage &&
                             <>
                                 <div className={styles.errorMessage}>{errorMessage}</div>
-                                <span className={styles.sendAgain} onClick={() => sendMessage(false)}>Send again</span>
                             </>
                         }
+                        {
+                            isLoading && <div className={styles.stop} onClick={stop}>Stop</div>
+                        }
+                        <div className={styles.clearButton} onClick={clearHandler}>Clear</div>
                         <div className={styles.inputContainer}>
-                            <textarea rows="3" className={styles.newMessageInput} value={message} onChange={(e) => setMessage(e.target.value)}></textarea>
+                            <textarea rows="3" className={styles.newMessageInput} value={input} onChange={handleInputChange}></textarea>
                             <button className={styles.newMessageButton} onClick={sendMessage}>Send</button>
                         </div>
                     </>
                 </div>
             </div >
+            {
+                showSelectPages &&
+                <div className="modal-overlay">
+                    <div className='modal'>
+                        <div className='modal-header'>
+                            <span className='modal-title'>Select which pages to use as context</span>
+                            <div className='modal-x' onClick={() => { setShowSelectPages(false); }}><MdClose /></div>
+                        </div>
+                        <div className='modal-content'>
+                            <div className='modal-option'>
+                                <span className='modal-option-label'>Pages</span>
+                                <div className='modal-option-select-pages'>
+                                    {
+                                        workbook.pages.map((page, index) => {
+                                            //Check if the workbook has a page with the same id as the current page
+                                            const isActive = contextPages?.find(p => p?._id === page._id);
+
+                                            const handleClick = () => {
+                                                if (isActive) {
+                                                    setContextPages(contextPages?.filter(p => p?._id !== page._id)); // Remove the page from contextPages if already active
+                                                } else {
+                                                    setContextPages([...contextPages, page]); // Add the page to contextPages if not already active
+                                                }
+                                            };
+
+                                            return (
+                                                <div key={index} className={`card card-small ${isActive ? 'active' : ''}`} onClick={handleClick}>
+                                                    <div className='right'>
+                                                        <span className='page-previews'>
+                                                            <div className='page-preview'>
+                                                                <div className='page-inner'>
+                                                                    <div className='page-preview-title'>{page.title}</div>
+                                                                    <div className='page-preview-content' dangerouslySetInnerHTML={{ __html: page.content }}></div>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div className='modal-footer'>
+                            <button className='modal-button-cancel' onClick={() => { setShowSelectPages(false); }}>Close</button>
+                            <button className='modal-button' onClick={() => {
+                                setShowSelectPages(false);
+                            }} >Update</button>
+                        </div>
+
+                    </div>
+                </div>
+            }
         </>
     )
 

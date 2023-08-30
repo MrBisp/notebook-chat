@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     }
 
     const configuration = new Configuration({
-        apiKey: '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', //Notebook-chat-default
+        apiKey: process.env.OPENAI_TOKEN, //Notebook-chat-default
     });
     const openai = new OpenAIApi(configuration);
 
@@ -40,26 +40,25 @@ export default async function handler(req, res) {
     let totalLength = 0;
     for (let i = messages.length; i > 0; i--) {
         totalLength += messages[i - 1].content.length;
+
+        //If it is the system message, include it no matter what
+        if (messages[i - 1].role == 'system') {
+            continue;
+        }
+
         if (totalLength > maxLength) {
             messages = messages.slice(i, messages.length);
             break;
         }
     }
-
-    //console.log('Final messages: ' + JSON.stringify(messages));
-
-    //console.log(req.body.model)
-    //console.log(messages)
-
     //Remove the id from the messages before sending them to the AI
     for (let i = 0; i < messages.length; i++) {
         delete messages[i]._id;
     }
 
-
     //Add the context to the last message
     if (req.body.context) {
-        messages[messages.length - 1].content += '\n### Context:' + req.body.context;
+        messages[messages.length - 2].content = '### CONTEXT START ###\n\n' + req.body.context + '\n\n### CONTEXT END ###\n\n' + messages[messages.length - 1].content;
     }
 
     console.log('Messages: ' + JSON.stringify(messages));

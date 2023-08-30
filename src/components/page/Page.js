@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import 'react-quill/dist/quill.snow.css';
 import dynamic from "next/dynamic";
 import { AuthContext } from '../../context/AuthContext';
-
+import Tiptap from '../tiptap/TipTap';
 
 const Page = ({ page, initialContent, workbookId }) => {
     const { updatePage } = useContext(AuthContext);
@@ -34,8 +34,8 @@ const Page = ({ page, initialContent, workbookId }) => {
         }
     };
 
-    const handleContentChange = (content, delta, source, editor) => {
-        setContent(editor.getHTML());
+    const handleContentChange = (content) => {
+        setContent(content);
         changeSinceLastSave.current = true;
         lastChange.current = new Date().getTime();
         contentRef.current = content;
@@ -51,6 +51,7 @@ const Page = ({ page, initialContent, workbookId }) => {
         updatePage(page._id, update, workbookId)
     }
 
+    //Save the page every 1 seconds
     useEffect(() => {
         const interval = setInterval(() => {
             timeSinceLastChange.current = new Date().getTime() - lastChange.current;
@@ -78,6 +79,14 @@ const Page = ({ page, initialContent, workbookId }) => {
         savePage();
     }
 
+    //Scroll content to top on load
+    useEffect(() => {
+        let element = document.querySelector('.editor')
+        if (element) {
+            element.scrollTop = 0;
+        }
+    }, [])
+
 
     return (
         <div className='page'>
@@ -88,7 +97,8 @@ const Page = ({ page, initialContent, workbookId }) => {
                 onBlur={handleTitleBlur}
                 className='page_title_input'
             />
-            <ReactQuill theme="snow" value={content} onChange={handleContentChange} modules={modules} />
+            {/*<ReactQuill theme="snow" value={content} onChange={handleContentChange} modules={modules} />*/}
+            <Tiptap saveHandler={handleContentChange} value={content} key={page._id} />
         </div>
     )
 }

@@ -17,7 +17,7 @@ const Workbook = ({ workbookId, pageId = null }) => {
     const [page, setPage] = useState(null);
 
     const [pageKey, setPageKey] = useState(0);
-    const [groupedPages, setGroupedPages] = useState(null);
+    const [pages, setPages] = useState(null);
 
     const [showSettings, setShowSettings] = useState(false);
     const [workbookTitle, setWorkbookTitle] = useState('');
@@ -45,72 +45,9 @@ const Workbook = ({ workbookId, pageId = null }) => {
 
     useEffect(() => {
         if (workbook) {
-            const grouped = groupPagesByDate(workbook.pages);
-            setGroupedPages(grouped);
-
-            setWorkbookTitle(workbook.title);
+            setPages(workbook.pages);
         }
     }, [workbook]);
-
-    const getLastUpdatedString = (date) => {
-        const dateObj = new Date(date);
-        const f = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-        const diff = dateObj.getTime() - Date.now();
-
-        //If the difference is less than 1 day, return the time
-        if (diff < 86400000) {
-            return 'today at ' + dateObj.toLocaleTimeString();
-        }
-
-        //If the difference is less than 1 week, return the day of the week
-        if (diff < 604800000) {
-            return dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-        }
-
-        //If the difference is less than 1 year, return the month and day
-        if (diff < 31536000000) {
-            return dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-        }
-
-        return 'a long time ago';
-    }
-
-    const groupPagesByDate = (pages) => {
-        const groupedPages = {};
-
-        pages.forEach((page) => {
-            const currentDate = new Date();
-            const lastUpdatedDate = new Date(page.lastEdited);
-            const timeDiff = currentDate.getTime() - lastUpdatedDate.getTime();
-            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            let header;
-
-            if (daysDiff === 0) {
-                header = 'Today';
-            } else if (daysDiff === 1) {
-                header = 'Yesterday';
-            } else if (daysDiff <= 7) {
-                header = 'Past 7 days';
-            } else if (daysDiff <= 30) {
-                header = 'Past 30 days';
-            } else {
-                header = 'Older';
-            }
-
-            if (!groupedPages[header]) {
-                groupedPages[header] = [page];
-            } else {
-                groupedPages[header].push(page);
-            }
-        });
-
-        // Sort the pages within each date group based on lastEdited in descending order
-        Object.keys(groupedPages).forEach((date) => {
-            groupedPages[date].sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited));
-        });
-
-        return groupedPages;
-    };
 
     const addPageHandler = async (e) => {
         console.log('Add page')
@@ -168,45 +105,9 @@ const Workbook = ({ workbookId, pageId = null }) => {
     }, [workbooks])
 
 
-    const setShowChatHandler = () => {
-        //Save it in localstorage
-        localStorage.setItem('showChat', !showChat);
-
-        setShowChat(!showChat);
-    }
-
-    const setShowPagesHandler = () => {
-        //Save it in localstorage
-        localStorage.setItem('showPages', !showPages);
-
-        setShowPages(!showPages);
-    }
-
-    useEffect(() => {
-        //If on mobile, abort
-        if (window.innerWidth < 768) return;
-
-        //Check in localstorage if the user has set the showChat or showPages
-        const showChatStorage = localStorage.getItem('showChat');
-        const showPagesStorage = localStorage.getItem('showPages');
-
-        if (showChatStorage !== null) {
-            setShowChat(showChatStorage === 'true'); //Convert to boolean
-        }
-
-        if (showPagesStorage !== null) {
-            setShowPages(showPagesStorage === 'true'); //Convert to boolean
-        }
-    }, [])
-
-
     return (
         <main>
             <div className="main-container">
-                <div className={showPages ? 'main-container__left' : 'main-container__left hide'} id="main-container__left">
-                    <MdKeyboardDoubleArrowLeft className={showPages ? 'close-icon point-left' : 'close-icon point-right'} onClick={() => { setShowPagesHandler() }} />
-                    <WorkbookPages workbook={workbook} key={pageKey} />
-                </div>
                 <div className="main-container__right" id="main-container__right">
                     {
                         workbook && !pageId && (
@@ -224,17 +125,16 @@ const Workbook = ({ workbookId, pageId = null }) => {
                                 {
                                     !workbook && <p>No workbook found!</p>
                                 }
-                                {groupedPages && (
-                                    <div className="">
-                                        {Object.keys(groupedPages).map((date) => (
-                                            <div key={date} className="grouped-pages-group day-container">
-                                                <h2>{date}</h2>
-                                                {groupedPages[date].map((page) => (
+                                {workbook && pages && pages.length > 0 && (
+                                    <>
+                                        {
+                                            pages.map((page) =>
+                                                <>
                                                     <Link href={`/notebook/${workbook._id}/page/${page._id}`} key={page._id}>
                                                         <div key={page._id} className="card">
                                                             <div className='left'>
                                                                 <h3>{page.title}</h3>
-                                                                <p>Last updated {getLastUpdatedString(page.lastEdited)}</p>
+                                                                <p>Last updated at {new Date(page.updatedAt).toLocaleString()}</p>
                                                             </div>
                                                             <div className='right'>
                                                                 <span className='page-previews'>
@@ -248,13 +148,13 @@ const Workbook = ({ workbookId, pageId = null }) => {
                                                             </div>
                                                         </div>
                                                     </Link>
-                                                ))}
-                                            </div>
-                                        ))}
-                                    </div>
+                                                </>
+                                            )
+                                        }
+                                    </>
                                 )}
                                 {
-                                    groupedPages && Object.keys(groupedPages).length === 0 && (
+                                    pages && Object.keys(pages).length === 0 && (
                                         <>
                                             <p>You don't have any pages in this workbook yet. Creating one takes less than 10 seconds.</p>
                                         </>
@@ -280,14 +180,6 @@ const Workbook = ({ workbookId, pageId = null }) => {
                         )
                     }
                 </div>
-                {
-                    true && (
-                        <div className={showChat ? 'main-container__chat' : 'main-container__chat hide'} id="chat-notebook">
-                            <MdChat className="chat-icon" onClick={() => { setShowChatHandler(!showChat) }} />
-                            <ChatNotebook currentPage={page} workbook={workbook} key={pageKey} />
-                        </div>
-                    )
-                }
             </div>
             {
                 showSettings && (
@@ -319,15 +211,12 @@ const Workbook = ({ workbookId, pageId = null }) => {
                                     updateWorkbook(workbook._id, { title: workbookTitle });
                                 }} >Update</button>
                             </div>
-
                         </div>
                     </div>
                 )
             }
             <MobileBottomNavbar showPages={mobileShowPagesHandler} showChat={mobileShowChatHandler} showWrite={mobileShowWriteHandler} />
         </main>
-
-
     );
 }
 

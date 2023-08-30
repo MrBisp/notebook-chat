@@ -1,55 +1,42 @@
-import axios from 'axios';
-import { dot, norm } from 'mathjs';
-import fs from 'fs';
-import path from 'path';
-import { Configuration, OpenAIApi } from "openai";
+import { kv } from '@vercel/kv'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { Configuration, OpenAIApi } from 'openai-edge'
 
+export const runtime = 'edge'
 
-export default async function handler(req, res) {
-    const { query } = req.body;
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_TOKEN
+})
 
-    console.log('--- New message (existing thread) ---')
+const openai = new OpenAIApi(configuration)
 
-    const configuration = new Configuration({
-        apiKey: req.body.token,
-    });
-    const openai = new OpenAIApi(configuration);
+export default async function POST(req) {
+    const json = await req.json()
+    const { messages, previewToken } = json
 
-    let messages = req.body.messages;
-    let newMessage = req.body.newMessage;
-
-    //Set first message
-    //Make a new message and add it as the very first
-    let newMessageObject = {
-        content: req.body.systemMessage,
-        role: 'system'
-    }
-    //Add the new message to the messages array as the very first
-    messages.unshift(newMessageObject);
-
-    //Let's only keep the last 10 messages
-    if (messages.length > 10) {
-        messages = messages.slice(0, 10);
+    if (previewToken) {
+        configuration.apiKey = previewToken
     }
 
-    //console.log('Final messages: ' + JSON.stringify(messages));
+    //Add a system message to the start of the messages array
+    messages.unshift({
+        role: 'system',
+        content: 'You are a chatbot on the website Notebook-chat.com. Users can talk to you about their notes.' +
+            'The notes they have picked to include in the conversation, is included as context.' +
+            'The user can create a new chat by pressing clear.' +
+            'They can also press \'+++\' in their notebook to get AI auto-complete' +
+            'The AI is made by OpenAI, and the auto complete is based on Novel.sh'
+    })
 
-    console.log(req.body.model)
-    console.log(messages)
 
-    //Remove the id from the messages before sending them to the AI
-    for (let i = 0; i < messages.length; i++) {
-        delete messages[i]._id;
-    }
+    const res = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages,
+        temperature: 0.7,
+        stream: true
+    })
 
-    const response = await openai.createChatCompletion({
-        model: req.body.model,
-        messages: messages,
-        temperature: 0.5,
-        max_tokens: 1024,
-    });
-    console.log('Tokens consumed: ' + response.data.usage.total_tokens);
-    console.log('Response: ' + response.data.choices[0].message.content);
+    const stream = OpenAIStream(res);
 
-    res.status(200).json({ message: response.data.choices[0].message.content });
+    return new StreamingTextResponse(stream)
 }

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import styles from './Chat-notebook.module.css';
 import { MdMenuBook, MdOutlineAssignment, MdClose } from 'react-icons/md'; //Possibly change to MdMenuBook MdOutlineAssignment MdOutlineListAlt MdOutlineMargin MdOutlineTextSnippet
+import { useCompletion } from 'ai/react'
 
 
 const ChatNotebook = ({ currentPage, workbook }) => {
     const { addPage, sendNotebookChatMessage } = useContext(AuthContext);
 
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('notebook-chat')) || []);
     const [message, setMessage] = useState('');
 
     const [aiMessage, setAiMessage] = useState('Making a response...');
@@ -19,11 +20,33 @@ const ChatNotebook = ({ currentPage, workbook }) => {
 
     const [errorMessage, setErrorMessage] = useState('');
 
+
+
     const extractText = (html) => {
         let span = document.createElement('span');
         span.innerHTML = html;
         return span.textContent || span.innerText;
     }
+
+    useEffect(() => {
+        let chat = document.getElementById('notebook-chat-scrollable');
+        chat.scrollTop = chat.scrollHeight;
+
+        //Save in local storage
+        localStorage.setItem('notebook-chat', JSON.stringify(messages));
+    }, [messages])
+
+    useEffect(() => {
+        //Load from local storage
+        let localMessages = JSON.parse(localStorage.getItem('notebook-chat'));
+        if (localMessages) {
+            setMessages(localMessages);
+        }
+    }, [])
+
+    useEffect(() => {
+        setContextPages([currentPage]);
+    }, [currentPage])
 
 
     const sendMessage = async () => {
@@ -43,9 +66,11 @@ const ChatNotebook = ({ currentPage, workbook }) => {
 
         let context = ''
         if (contextOption === 'current-page') {
+            if (!currentPage?.content || !currentPage?.title) return;
             context = 'Title: ' + currentPage.title + '. Content: ' + extractText(currentPage.content) + '.\n'
         } else {
             for (let i = 0; i < contextPages.length; i++) {
+                if (!contextPages[i]?.content || !contextPages[i]?.title) continue;
                 context += 'Title: ' + contextPages[i].title + '. Content: ' + extractText(contextPages[i].content) + '.\n'
             }
         }
@@ -55,18 +80,11 @@ const ChatNotebook = ({ currentPage, workbook }) => {
         setMessages(allMessages);
         setMessage('');
 
-        let chat = document.getElementById('notebook-chat-scrollable');
-        chat.scrollTop = chat.scrollHeight;
-
         let response = await sendNotebookChatMessage(allMessages, context);
 
         if (response) {
             setIsReady(true);
-
-            //Scroll to bottom
-            let chat = document.getElementById('notebook-chat-scrollable');
-            chat.scrollTop = chat.scrollHeight;
-
+            setErrorMessage('');
 
             let aiMessage = {
                 role: 'assistant',
@@ -86,7 +104,9 @@ const ChatNotebook = ({ currentPage, workbook }) => {
             document.getElementById('currentPage').classList.add(styles.active);
             document.getElementById('choosePages').classList.remove(styles.active);
 
-            setContextPages([currentPage]);
+            //Find the current page and set it as the context page by default
+            let newPage = workbook?.pages.find(page => page._id === currentPage._id);
+            setContextPages([newPage]);
         } else {
             document.getElementById('currentPage').classList.remove(styles.active);
             document.getElementById('choosePages').classList.add(styles.active);
@@ -96,7 +116,13 @@ const ChatNotebook = ({ currentPage, workbook }) => {
     const clearHandler = () => {
         setMessages([]);
         setIsReady(true);
+        setErrorMessage('');
+
+        //Clear the local storage
+        localStorage.removeItem('notebook-chat');
     }
+
+
 
     return (
         <>
@@ -198,7 +224,6 @@ const ChatNotebook = ({ currentPage, workbook }) => {
 
                                             const handleClick = () => {
                                                 if (isActive) {
-
                                                     setContextPages(contextPages?.filter(p => p?._id !== page._id)); // Remove the page from contextPages if already active
                                                 } else {
                                                     setContextPages([...contextPages, page]); // Add the page to contextPages if not already active

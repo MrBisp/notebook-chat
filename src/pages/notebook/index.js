@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { MdClose, MdChat, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
 import WorkbookPages from '@/components/workbook-pages/Workbook-pages';
+import Main from '@/components/main/Main';
 
 
 const WorkbookPage = () => {
@@ -28,127 +29,7 @@ const WorkbookPage = () => {
         }
     }
 
-    const getLastUpdatedString = (date) => {
-        const dateObj = new Date(date);
-        const f = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-        const diff = dateObj.getTime() - Date.now();
-
-        //If the difference is less than 1 day, return the time
-        if (diff < 86400000) {
-            return 'today at ' + dateObj.toLocaleTimeString();
-        }
-
-        //If the difference is less than 1 week, return the day of the week
-        if (diff < 604800000) {
-            return dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-        }
-
-        //If the difference is less than 1 year, return the month and day
-        if (diff < 31536000000) {
-            return dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-        }
-
-        return 'a long time ago';
-    }
-
-    const getHeaderString = (lastUpdated) => {
-        const currentDate = new Date();
-        const lastUpdatedDate = new Date(lastUpdated);
-        const timeDiff = currentDate.getTime() - lastUpdatedDate.getTime();
-        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-
-        if (daysDiff === 0) {
-            return 'Today';
-        } else if (daysDiff === 1) {
-            return 'Yesterday';
-        } else if (daysDiff <= 7) {
-            return 'Past 7 days';
-        } else if (daysDiff <= 30) {
-            return 'Past 30 days';
-        } else {
-            return 'Older';
-        }
-    };
-
-    useEffect(() => {
-        // Sort the workbooks by lastEdited in descending order
-        const sorted = workbooks.sort((a, b) => b.lastEdited - a.lastEdited);
-        setSortedWorkbooks(sorted);
-    }, [workbooks]);
-
-    const groupWorkbooksByDate = (workbooks) => {
-        const groupedWorkbooks = {};
-
-        workbooks.forEach((workbook) => {
-            const header = getHeaderString(workbook.lastEdited);
-
-            if (!groupedWorkbooks[header]) {
-                groupedWorkbooks[header] = [workbook];
-            }
-
-            // Check if the workbook is already present in the array
-            const isDuplicate = groupedWorkbooks[header].some((w) => w._id === workbook._id);
-
-            if (!isDuplicate) {
-                // Insert the workbook at the beginning of the array for its corresponding header
-                groupedWorkbooks[header].unshift(workbook);
-            }
-        });
-
-        return groupedWorkbooks;
-    };
-
-    const renderGroupedWorkbooks = (groupedWorkbooks) => {
-        const dates = Object.keys(groupedWorkbooks);
-
-        return dates.map((date) => {
-            const workbooks = groupedWorkbooks[date];
-
-            return (
-                <div key={date} className='day-container'>
-                    <h2>{date}</h2>
-                    {workbooks.map((workbook) => {
-                        const lastUpdatedString = getLastUpdatedString(workbook.lastEdited);
-
-                        return (
-                            <Link key={workbook._id} href={`/notebook/${workbook._id}`}>
-                                <div className='card'>
-                                    <div className='left'>
-                                        <h3>{workbook.title}</h3>
-                                        <p>Last updated {lastUpdatedString}</p>
-                                    </div>
-                                    <div className='right'>
-                                        <span className='page-previews'>
-                                            {
-                                                workbook.pages && workbook.pages
-                                                    .slice() // Create a copy of the array
-                                                    .sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited)) // Sort the array by lastEdited in descending order
-                                                    .slice(0, 3) // Get the first three pages after sorting
-                                                    .reverse() // Reverse the order of the three pages
-                                                    .map((page, index) => (
-                                                        <div className='page-preview'>
-                                                            <div className='page-inner'>
-                                                                <div className='page-preview-title'>{page.title}</div>
-                                                                <div className='page-preview-content' dangerouslySetInnerHTML={{ __html: page.content }}></div>
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                            }
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
-            );
-        });
-    }
-
-    // Group workbooks by date
-    const groupedWorkbooks = groupWorkbooksByDate(sortedWorkbooks);
-
-    return (
+    const content = (
         <>
             <Head>
                 <title>Notebook chat</title>
@@ -164,7 +45,36 @@ const WorkbookPage = () => {
                         </div>
 
 
-                        {renderGroupedWorkbooks(groupedWorkbooks)}
+                        {
+                            workbooks.length > 0 && (
+                                <>
+                                    <div className='workbooks-list'>
+                                        {
+                                            workbooks.map((workbook, index) => (
+                                                <div className='card' key={index} onClick={() => { router.push(`/notebook/${workbook._id}`) }}>
+                                                    <div className='left'>
+                                                        <h3>{workbook.title}</h3>
+                                                        <p>Last updated: {new Date(workbook.lastEdited).toLocaleDateString()}</p>
+                                                    </div>
+                                                    <div className='right'>
+                                                        <span className='page-previews'>
+                                                            {
+                                                                workbook.pages.slice(0, 3).map((page, index) => (
+                                                                    <span key={index} className='page-preview'>
+                                                                        <span className='page-preview-title'>{page.title}</span>
+                                                                        <div className='page-preview-content' dangerouslySetInnerHTML={{ __html: page.content }}></div>
+                                                                    </span>
+                                                                ))
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                </>
+                            )
+                        }
                         {
                             workbooks.length == 0 && (
                                 <>
@@ -210,6 +120,10 @@ const WorkbookPage = () => {
                 )
             }
         </>
+    )
+
+    return (
+        <Main middle={content} />
     )
 }
 

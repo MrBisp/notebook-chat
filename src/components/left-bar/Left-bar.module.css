@@ -1,0 +1,90 @@
+.leftbar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: #F2F1F6;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.topContainer,
+.middleContainer,
+.bottomContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.middleContainer {
+    flex-grow: 1;
+}
+
+.iconContainer {
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    color: #40434E;
+    width: 100%;
+}
+
+.iconContainer:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+}
+
+.iconContainer svg {
+    font-size: 1.4rem;
+}
+
+.iconContainer span {
+    padding-left: 0.5rem;
+}
+
+.title {
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: #40434E;
+    padding: 0 0.5rem 0.125rem;
+    margin: 0;
+}
+
+.page {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.page__name {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #40434E;
+    padding: 0.125rem 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.link {
+    padding: 0 0.5rem;
+}
+
+.link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+}
+
+.addNewContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem;
+    cursor: pointer;
+    margin: 0.5rem 0;
+}
+
+.addNewContainer:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+}

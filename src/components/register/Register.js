@@ -32,7 +32,7 @@ const RegisterPage = () => {
                 // Log the user in
                 login(data.data.email, data.data.password);
                 // Redirect them to the home page
-                router.push("/chat");
+                router.push("/notebook");
             } else {
                 console.log("Something went wrong...");
                 setError("Something went wrong...");
