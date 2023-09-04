@@ -1,11 +1,12 @@
 import Head from 'next/head'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
+import { AuthContext } from '../context/AuthContext';
 
 const Home = () => {
+  const { user, loading } = useContext(AuthContext);
 
   useEffect(() => {
-
     //Check if the user is logged in after we are done loading
     if (!loading && !user) {
       console.log('User is not logged in, redirecting to login page');
