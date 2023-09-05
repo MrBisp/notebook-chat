@@ -41,8 +41,6 @@ const RegisterPage = () => {
             console.error("An unexpected error happened occurred:", error);
             setError("An unexpected error happened occurred:", error.message);
         }
-
-
     };
 
     return (
