@@ -2,16 +2,16 @@ import { useEffect, useRef } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
 import { TiptapEditorProps } from "./props"
 import { TiptapExtensions } from "./extensions"
-import { EditorBubbleMenu } from "./components/bubble-menu";
 import { useCompletion } from "ai/react"
 import { getPrevText } from "./editor"
 
-const Tiptap = ({ saveHandler, value }) => {
+const Tiptap = ({ saveHandler, value, setEditor }) => {
 
     useEffect(() => {
         if (!editor) return;
         editor.commands.setContent(value)
     }, [])
+
     const editor = useEditor({
         extensions: TiptapExtensions,
         editorProps: TiptapEditorProps,
@@ -35,6 +35,9 @@ const Tiptap = ({ saveHandler, value }) => {
                 // complete(e.editor.storage.markdown.getMarkdown());
                 //va.track("Autocomplete Shortcut Used")
             }
+        },
+        onCreate: e => {
+            setEditor(e.editor)
         },
         autofocus: "start"
     })
@@ -109,8 +112,6 @@ const Tiptap = ({ saveHandler, value }) => {
             }}
             className="editor"
         >
-            {editor && <EditorBubbleMenu editor={editor} />}
-
             <EditorContent editor={editor} />
         </div>
     );

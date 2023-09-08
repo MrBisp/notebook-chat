@@ -23,9 +23,9 @@ const Home = () => {
       </Head>
       <main>
         <h1>Chat and notebook</h1>
-        <p>
+        <p style={{ textAlign: 'center' }}>
           Log in to use Notebook Chat!
-          <Link href="/login">Log in</Link>
+          <Link href="/login" className='login-button'>Log in</Link>
         </p>
       </main>
     </>

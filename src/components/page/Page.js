@@ -3,13 +3,14 @@ import 'react-quill/dist/quill.snow.css';
 import dynamic from "next/dynamic";
 import { AuthContext } from '../../context/AuthContext';
 import Tiptap from '../tiptap/TipTap';
+import EditorMenu from '../editor-menu/Editor-menu';
 
 const Page = ({ page, initialContent, workbookId }) => {
     const { updatePage } = useContext(AuthContext);
     const [content, setContent] = useState(initialContent);
     const [pageTitle, setPageTitle] = useState(page.title);
     const [editingTitle, setEditingTitle] = useState(false);
-    const ReactQuill = useMemo(() => dynamic(() => import('react-quill'), { ssr: false }), []);
+    const [editor, setEditor] = useState(null);
 
     const timeSinceLastChange = useRef(0);
     const changeSinceLastSave = useRef(false);
@@ -85,11 +86,16 @@ const Page = ({ page, initialContent, workbookId }) => {
         if (element) {
             element.scrollTop = 0;
         }
-    }, [])
+    }, []);
+
+    const setEditorFromRef = (editor) => {
+        setEditor(editor);
+    }
 
 
     return (
         <div className='page'>
+            <EditorMenu editor={editor} />
             <input
                 type="text"
                 value={pageTitle}
@@ -97,8 +103,7 @@ const Page = ({ page, initialContent, workbookId }) => {
                 onBlur={handleTitleBlur}
                 className='page_title_input'
             />
-            {/*<ReactQuill theme="snow" value={content} onChange={handleContentChange} modules={modules} />*/}
-            <Tiptap saveHandler={handleContentChange} value={content} key={page._id} />
+            <Tiptap saveHandler={handleContentChange} value={content} key={page._id} setEditor={setEditorFromRef} />
         </div>
     )
 }

@@ -102,9 +102,7 @@ export const AISelector = ({ editor, isOpen, setIsOpen }) => {
                 }}
             >
                 <p className="text-base">🪄</p>
-                <p>
-                    AI
-                </p>
+                <p>AI</p>
             </button>
             {isOpen && (
                 <div
