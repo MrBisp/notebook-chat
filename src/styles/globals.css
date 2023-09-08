@@ -238,7 +238,7 @@ pre {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 1rem;
+    padding: 0rem;
     min-height: 100vh;
 }
 
@@ -349,7 +349,7 @@ pre {
     display: inline-block;
     margin: 0 auto;
     width: 100%;
-    padding: 0rem 0rem 1rem;
+    padding: 1rem 0rem 1rem;
     outline: none;
     border: none;
     font-weight: 700;
