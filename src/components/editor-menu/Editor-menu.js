@@ -1,13 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-<<<<<<< HEAD
 import { MdCode, MdFormatBold, MdFormatItalic, MdFormatStrikethrough, MdExpandMore, MdOutlineFormatUnderlined, MdDeleteOutline, MdCheck, MdFormatListNumbered, MdFormatListBulleted, MdOutlineDelete } from 'react-icons/md';
 import { getUrlFromString } from "/utils/misc"
 import { useCompletion } from 'ai/react'
-=======
-import { MdCode, MdFormatBold, MdFormatItalic, MdFormatStrikethrough, MdExpandMore, MdOutlineFormatUnderlined, MdDeleteOutline, MdCheck, MdFormatListNumbered, MdFormatListBulleted } from 'react-icons/md';
-import { getUrlFromString } from "/utils/misc"
-import { EditorState } from '@tiptap/pm/state'
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
 import styles from './Editor-menu.module.css'
 import { set } from 'mongoose';
 
@@ -31,7 +25,6 @@ const EditorMenu = ({ editor }) => {
     const headings = [1, 2, 3, 4, 5, 6];
     const [textType, setTextType] = useState("Paragraph");
 
-<<<<<<< HEAD
     const { completion, complete, isLoading } = useCompletion({
         api: "/api/generate-custom"
     })
@@ -39,8 +32,6 @@ const EditorMenu = ({ editor }) => {
     const [command, setCommand] = useState(null)
     const [highlightingText, setHighlightingText] = useState(false)
 
-=======
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
     useEffect(() => {
         if (!showLink) return;
         inputRef.current && inputRef.current?.focus()
@@ -81,10 +72,6 @@ const EditorMenu = ({ editor }) => {
 
         const isCursorInCodeBlock = () => {
             const { $from } = state.selection;
-<<<<<<< HEAD
-=======
-            console.log($from.node().type.name === 'codeBlock')
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
             return $from.node().type.name === 'codeBlock';
         };
 
@@ -97,7 +84,6 @@ const EditorMenu = ({ editor }) => {
 
         // Function to update state based on marks
         const updateMarksState = (marks) => {
-<<<<<<< HEAD
             const bold = marks.some(mark => mark.type?.name === 'bold');
             const italic = marks.some(mark => mark.type?.name === 'italic');
             const strike = marks.some(mark => mark.type?.name === 'strike');
@@ -107,38 +93,18 @@ const EditorMenu = ({ editor }) => {
             setItalic(italic);
             setStrike(strike);
             setUnderline(underline);
-=======
-            if (marks && marks.length > 0) {
-                setBold(marks.some(mark => mark.type?.name === 'bold'));
-                setItalic(marks.some(mark => mark.type?.name === 'italic'));
-                setStrike(marks.some(mark => mark.type?.name === 'strike'));
-                setUnderline(marks.some(mark => mark.type?.name === 'underline'));
-            } else {
-                setBold(false);
-                setItalic(false);
-                setStrike(false);
-                setUnderline(false);
-            }
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
         };
 
         // If there's a selection, check marks at the selection
         if (!empty) {
-<<<<<<< HEAD
             setHighlightingText(true)
-=======
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
             const marksInSelection = [];
             state.doc.nodesBetween(from, to, node => {
                 marksInSelection.push(...node.marks);
             });
 
             // Convert marks to a Set to remove duplicates
-<<<<<<< HEAD
             const uniqueMarks = [...new Set(marksInSelection)];
-=======
-            const uniqueMarks = [...new Set(marksInSelection.map(mark => mark.type.name))];
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
 
             // Update the state based on marks
             updateMarksState(uniqueMarks);
@@ -150,10 +116,7 @@ const EditorMenu = ({ editor }) => {
                 setTextType(type === 'paragraph' ? 'Paragraph' : type === 'codeBlock' ? 'Other' : `Heading ${node.attrs.level}`);
             }
         } else {
-<<<<<<< HEAD
             setHighlightingText(false)
-=======
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
             // If there's no selection, check marks at the cursor position
             const marks = state.selection.$cursor.marks();
             // Update the state based on marks
@@ -169,11 +132,6 @@ const EditorMenu = ({ editor }) => {
     };
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
     useEffect(() => {
         if (!editor) return;
 
@@ -191,7 +149,6 @@ const EditorMenu = ({ editor }) => {
         };
     }, [editor]);
 
-<<<<<<< HEAD
     const AICommands = [
         {
             name: "Expand",
@@ -363,11 +320,6 @@ const EditorMenu = ({ editor }) => {
             }
 
 
-=======
-
-    return (
-        <div className={styles.editorMenu}>
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
             <div className={styles.expandable} onClick={() => {
                 setShowHeading(!showHeading)
                 setShowAI(false)
@@ -402,7 +354,6 @@ const EditorMenu = ({ editor }) => {
                 )}
             </div>
             <div className={styles.button_group}>
-<<<<<<< HEAD
                 <button
                     onClick={() => {
                         editor?.chain().focus().run();
@@ -411,15 +362,6 @@ const EditorMenu = ({ editor }) => {
                 >
                     <MdFormatBold />
                 </button>
-=======
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleBold().run();
-                }}
-                    className={bold ? styles.active : ""}
-                ><MdFormatBold /></button>
-
->>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
                 <button onClick={() => {
                     editor?.chain().focus().run();
                     editor?.chain().toggleItalic().run();
