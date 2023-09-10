@@ -31,8 +31,11 @@
     background: rgba(0, 0, 0, 0.05);
     padding: 0.25rem 0.5rem;
     height: 2rem;
+<<<<<<< HEAD
     margin: 0 0.5rem;
     transition-duration: 0.2s;
+=======
+>>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
 }
 
 .expandable:hover {
@@ -89,7 +92,10 @@
     border-radius: 8px;
     margin: 0rem 0.5rem;
     overflow: hidden;
+<<<<<<< HEAD
     transition-duration: 0.2s;
+=======
+>>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
 }
 
 .button_group button {
@@ -110,6 +116,7 @@
 
 .button_group button.active {
     background: rgba(0, 0, 0, 0.2);
+<<<<<<< HEAD
 }
 
 .result {
@@ -160,4 +167,6 @@
 
 .result .bottom button:hover {
     background: rgba(0, 0, 0, 0.1);
+=======
+>>>>>>> 2ebc4a3b81f9f848eaee13679bf0ea20e79a35b5
 }
