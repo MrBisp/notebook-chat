@@ -184,6 +184,40 @@
     cursor: pointer;
 }
 
+/* MOBILE MENU */
+.mobileMenu {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    position: fixed;
+    background: white;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.MobileBottomNavbar__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+
+.MobileBottomNavbar__item__icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.0rem;
+}
 
 
 /* ANIMATIONS */

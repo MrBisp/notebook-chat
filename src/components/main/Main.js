@@ -5,11 +5,10 @@ import { AuthContext } from '../../context/AuthContext';
 import Link from "next/link";
 import ChatNotebook from "../chat-notebook/Chat-notebook";
 import Chat from "../chat/Chat";
+import { MdHome, MdOutlineAssignment, MdMenuBook, MdChat, MdEditNote } from 'react-icons/md';
 
 
 import { MdClose, MdSearch, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
-
-
 
 const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) => {
 
@@ -26,6 +25,16 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
     const { workbooks, deleteWorkbook, updateWorkbook, addPage } = useContext(AuthContext);
     const [notebook, setNotebook] = useState(null);
     const [page, setPage] = useState(null);
+
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        if (window.innerWidth < 768) {
+            setIsMobile(true);
+        } else {
+            setIsMobile(false);
+        }
+    }, [])
 
     const toggleLeft = () => {
         setShowLeft(!showLeft);
@@ -207,6 +216,49 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                         {modalContent}
                     </div>
                 </div>
+            }
+            {
+                isMobile && (
+                    <div className={styles.mobileMenu}>
+                        <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                            <div className={styles.MobileBottomNavbar__item__icon}>
+                                <MdHome />
+                            </div>
+                            <div className={styles.MobileBottomNavbar__item__text}>
+                                Home
+                            </div>
+                        </div>
+                        <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                            <div className={styles.MobileBottomNavbar__item__icon}>
+                                <MdOutlineAssignment />
+                            </div>
+                            <div className={styles.MobileBottomNavbar__item__text}>
+                                Pages
+                            </div>
+                        </div>
+                        <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                            <div className={styles.MobileBottomNavbar__item__icon}>
+                                <MdEditNote />
+                            </div>
+                            <div className={styles.MobileBottomNavbar__item__text}>
+                                Write
+                            </div>
+                        </div>
+                        {
+                            page && (
+                                <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                                    <div className={styles.MobileBottomNavbar__item__icon}>
+                                        <MdChat />
+                                    </div>
+                                    <div className={styles.MobileBottomNavbar__item__text}>
+                                        Chat
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                    </div>
+                )
             }
         </>
     )

@@ -11,11 +11,6 @@ const MobileBottomNavbar = ({ showPages, showWrite, showChat }) => {
         router.push('/notebook');
     }
 
-
-
-
-
-
     return (
         <div className={Styles.MobileBottomNavbar}>
             <div className={Styles.MobileBottomNavbar__item} onClick={homeClickHandler}>
