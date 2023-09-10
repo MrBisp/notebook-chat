@@ -250,11 +250,22 @@
 
 
 /* MOBILE DESIGN */
-.middle {
-    padding: 0 0rem;
-}
+@media (max-width: 768px) {
+    .middle {
+        padding: 0 0rem;
+    }
 
-.left,
-.right {
-    display: none;
+    .left,
+    .right {
+        display: none;
+    }
+
+    .search {
+        padding: 0;
+    }
+
+    .searchModal {
+        height: 100%;
+        border-radius: 0;
+    }
 }
