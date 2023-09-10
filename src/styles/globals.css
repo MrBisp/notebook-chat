@@ -1012,7 +1012,7 @@ div[data-tippy-root] div {
     .main-container {
         display: inline-block;
         position: relative;
-        padding-bottom: 4rem;
+        padding-bottom: 8rem;
     }
 
     #conversationscontainer.showOnMobile {
@@ -1042,7 +1042,7 @@ div[data-tippy-root] div {
     }
 
     .page {
-        padding: 5rem 0rem 1rem;
+        padding: 0rem 0rem 1rem;
     }
 
     .workbook-container {
@@ -1055,7 +1055,7 @@ div[data-tippy-root] div {
 
     .main-container__right {
         width: 100vw;
-        padding: 1rem;
+        padding: 0rem;
     }
 
     #chat-notebook {
@@ -1111,6 +1111,11 @@ div[data-tippy-root] div {
 
     .card {
         width: 100% !important;
+        margin: 1rem 0;
+    }
+
+    .show-all-pages {
+        flex-direction: column;
     }
 
     .page-preview {
@@ -1126,6 +1131,12 @@ div[data-tippy-root] div {
 
     .show-all-pages {
         padding: 0.5rem 0.5rem 3rem;
+    }
+
+    .editor,
+    .page_title_input {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
 
 

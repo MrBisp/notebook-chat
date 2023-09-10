@@ -1,13 +1,10 @@
 import Head from 'next/head'
-import Workbook from '@/components/workbook/Workbook';
 import { useState, useEffect } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import withAuth from '../../components/withAuth/WithAuth';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { MdClose, MdChat, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
-import WorkbookPages from '@/components/workbook-pages/Workbook-pages';
 import Main from '@/components/main/Main';
 
 
@@ -43,8 +40,6 @@ const WorkbookPage = () => {
                             <h1>Your notebooks</h1>
                             <span className='add-new-workbook-button' onClick={() => setShowAddWorkbook(true)}>+ Add new</span>
                         </div>
-
-
                         {
                             workbooks.length > 0 && (
                                 <>

@@ -437,12 +437,6 @@ const EditorMenu = ({ editor }) => {
                     </>
                 }
             </div>
-            {
-                //TODO:
-                // - Add AI 
-                // - Add table insert and edit
-            }
-
         </div>
     )
 }

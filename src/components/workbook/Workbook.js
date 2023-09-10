@@ -7,8 +7,6 @@ import Page from '../page/Page';
 import Link from 'next/link';
 import { MdClose, MdChat, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
 import { useRouter } from 'next/router';
-import ChatNotebook from '../../components/chat-notebook/Chat-notebook';
-import MobileBottomNavbar from '../mobile-bottom-navbar/Mobile-Bottom-Navbar';
 
 const Workbook = ({ workbookId, pageId = null }) => {
     const { workbooks, deleteWorkbook, updateWorkbook, addPage } = useContext(AuthContext);
@@ -215,7 +213,6 @@ const Workbook = ({ workbookId, pageId = null }) => {
                     </div>
                 )
             }
-            <MobileBottomNavbar showPages={mobileShowPagesHandler} showChat={mobileShowChatHandler} showWrite={mobileShowWriteHandler} />
         </main>
     );
 }

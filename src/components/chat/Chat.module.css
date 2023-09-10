@@ -290,8 +290,6 @@
         padding: 0;
     }
 
-    .bottom {}
-
     .messagesInner {
         padding: 0;
     }
@@ -307,6 +305,10 @@
 
     .message {
         max-width: 85%;
+    }
+
+    .message[data-sender="user"] {
+        margin-right: 1rem;
     }
 
     .chat,

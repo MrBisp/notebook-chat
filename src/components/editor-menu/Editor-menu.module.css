@@ -161,3 +161,27 @@
 .result .bottom button:hover {
     background: rgba(0, 0, 0, 0.1);
 }
+
+/* MOBILE DESIGN */
+@media (max-width: 768px) {
+    .editorMenu {
+        width: auto;
+        top: 0;
+        border-radius: 0;
+        flex-wrap: wrap;
+        padding: 0rem 0rem;
+    }
+
+    .expandable,
+    .button_group {
+        margin: 0.25rem 0.25rem;
+    }
+
+    .submenu {
+        top: 100%;
+        left: 0;
+        width: 100%;
+        border-radius: 0;
+        margin: 0;
+    }
+}

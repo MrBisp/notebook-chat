@@ -6,9 +6,8 @@ import Link from "next/link";
 import ChatNotebook from "../chat-notebook/Chat-notebook";
 import Chat from "../chat/Chat";
 import { MdHome, MdOutlineAssignment, MdMenuBook, MdChat, MdEditNote } from 'react-icons/md';
-
-
 import { MdClose, MdSearch, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
+import { useRouter } from "next/router";
 
 const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) => {
 
@@ -27,6 +26,9 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
     const [page, setPage] = useState(null);
 
     const [isMobile, setIsMobile] = useState(false);
+    const [showMobileChat, setShowMobileChat] = useState(false);
+
+    const router = useRouter();
 
     useEffect(() => {
         if (window.innerWidth < 768) {
@@ -64,7 +66,7 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
     //Set the showLeft and showRight states from localstorage
     useEffect(() => {
         //If on mobile, abort
-        if (window.innerWidth < 768) return;
+        //if (window.innerWidth < 768) return;
 
         //Check in localstorage if the user has set the showChat or showPages
         const showRightStorage = localStorage.getItem('showRight');
@@ -218,9 +220,18 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                 </div>
             }
             {
+                showMobileChat && (
+                    <div className={styles.mobileChat}>
+                        <Chat currentPage={page} workbook={notebook} key={page._id} />
+                    </div>
+                )
+            }
+            {
                 isMobile && (
                     <div className={styles.mobileMenu}>
-                        <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                        <div className={styles.MobileBottomNavbar__item} onClick={() => {
+                            router.push('/notebook');
+                        }}>
                             <div className={styles.MobileBottomNavbar__item__icon}>
                                 <MdHome />
                             </div>
@@ -228,25 +239,21 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                 Home
                             </div>
                         </div>
-                        <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                        <div className={styles.MobileBottomNavbar__item} onClick={() => {
+                            setShowSearch(!showSearch);
+                        }}>
                             <div className={styles.MobileBottomNavbar__item__icon}>
-                                <MdOutlineAssignment />
+                                <MdSearch />
                             </div>
                             <div className={styles.MobileBottomNavbar__item__text}>
-                                Pages
-                            </div>
-                        </div>
-                        <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
-                            <div className={styles.MobileBottomNavbar__item__icon}>
-                                <MdEditNote />
-                            </div>
-                            <div className={styles.MobileBottomNavbar__item__text}>
-                                Write
+                                Search
                             </div>
                         </div>
                         {
                             page && (
-                                <div className={styles.MobileBottomNavbar__item} onClick={() => { }}>
+                                <div className={styles.MobileBottomNavbar__item} onClick={() => {
+                                    setShowMobileChat(!showMobileChat);
+                                }}>
                                     <div className={styles.MobileBottomNavbar__item__icon}>
                                         <MdChat />
                                     </div>
@@ -256,7 +263,6 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                 </div>
                             )
                         }
-
                     </div>
                 )
             }
