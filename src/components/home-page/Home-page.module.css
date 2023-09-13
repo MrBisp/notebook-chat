@@ -1,0 +1,231 @@
+.navbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.navbar .logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar span {
+    margin: 0 1rem;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    background: linear-gradient(180deg, rgba(255, 73, 41, 0.1), rgba(212, 212, 26, 0.1), rgba(0, 0, 0, 0.025));
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 10rem 0 1rem 0;
+    max-width: 56rem;
+}
+
+.hero h2 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 1rem;
+    max-width: 48rem;
+}
+
+.hero img {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 100%;
+    max-width: 56rem;
+    margin: 1rem;
+}
+
+.hero a {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(90deg, #ff4929, #d4d41a);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    margin: 2rem 0 4rem;
+    transition-duration: 0.2s;
+}
+
+.hero a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px 4px rgba(0, 0, 0, 0.2);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 5rem 0;
+}
+
+.features {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 56rem;
+}
+
+.features h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: left;
+    margin: 0rem 0 1rem 0;
+    width: 100%;
+}
+
+.features .featuresText {
+    font-size: 1.5rem;
+    font-weight: 400;
+    text-align: left;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.featureSection {
+    padding: 0rem 0;
+    width: 100%;
+}
+
+.featureTabs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0rem 0 2rem 0;
+}
+
+.featureTab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 1rem;
+    padding: 0rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    transition-duration: 0.2s;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.featureTab h4 {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.7);
+    margin: 0.75rem 0;
+}
+
+.featureTab:first-child {
+    margin-left: 0;
+}
+
+.featureTab.active {
+    background: rgba(0, 0, 0, 0.025);
+    color: #fff;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.activeFeature {
+    width: 100%;
+    display: block;
+}
+
+.activeFeature h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: left;
+    margin: 1rem 0;
+    width: 100%;
+}
+
+.activeFeature p {
+    font-size: 1.1rem;
+    font-weight: 400;
+    text-align: left;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.spacer {
+    width: 100%;
+    height: 100vh;
+    display: inline-block;
+}
+
+.howItWorks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.howItWorks h3 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.howItWorksSection {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: 56rem;
+}
+
+.howItWorksStep {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: calc(100% / 3);
+    max-width: 56rem;
+    margin: 2rem 0;
+}
+
+.howItWorksStepText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: auto;
+    max-width: 56rem;
+    margin: 0 2rem;
+    color: #5a5a5a
+}
+
+.howItWorksStepText h4 {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.howItWorksStepNumber {
+    width: auto;
+    text-align: right;
+    font-size: 2rem;
+}

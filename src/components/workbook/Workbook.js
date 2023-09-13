@@ -56,32 +56,6 @@ const Workbook = ({ workbookId, pageId = null }) => {
         }
     }
 
-    const mobileShowPagesHandler = () => {
-        const left = document.getElementById('main-container__left');
-        const right = document.getElementById('main-container__right');
-        const chatElement = document.getElementById('chat-notebook');
-
-        left.classList.remove('hide');
-        right.classList.add('hide');
-        chatElement.classList.add('hide');
-
-        setShowPages(true);
-        setShowChat(false);
-    }
-
-    const mobileShowChatHandler = () => {
-        const left = document.getElementById('main-container__left');
-        const right = document.getElementById('main-container__right');
-        const chatElement = document.getElementById('chat-notebook');
-
-        left.classList.add('hide');
-        right.classList.add('hide');
-        chatElement.classList.remove('hide');
-
-        setShowPages(false);
-        setShowChat(true);
-    }
-
     const mobileShowWriteHandler = () => {
         const left = document.getElementById('main-container__left');
         const right = document.getElementById('main-container__right');
@@ -128,22 +102,9 @@ const Workbook = ({ workbookId, pageId = null }) => {
                                         {
                                             pages.map((page) =>
                                                 <>
-                                                    <Link href={`/notebook/${workbook._id}/page/${page._id}`} key={page._id}>
-                                                        <div key={page._id} className="card">
-                                                            <div className='left'>
-                                                                <h3>{page.title}</h3>
-                                                                <p>Last updated at {new Date(page.updatedAt).toLocaleString()}</p>
-                                                            </div>
-                                                            <div className='right'>
-                                                                <span className='page-previews'>
-                                                                    <div className='page-preview'>
-                                                                        <div className='page-inner'>
-                                                                            <div className='page-preview-title'>{page.title}</div>
-                                                                            <div className='page-preview-content' dangerouslySetInnerHTML={{ __html: page.content }}></div>
-                                                                        </div>
-                                                                    </div>
-                                                                </span>
-                                                            </div>
+                                                    <Link href={`/notebook/${workbook._id}/page/${page._id}`} key={page._id} className="notebook-page-link">
+                                                        <div key={page._id}>
+                                                            <h3>{page.title}</h3>
                                                         </div>
                                                     </Link>
                                                 </>
@@ -158,14 +119,8 @@ const Workbook = ({ workbookId, pageId = null }) => {
                                         </>
                                     )
                                 }
-                                <div className='card' onClick={(e) => addPageHandler(e)}>
-                                    <div className='left'>
-                                        <h3>Create page</h3>
-                                        <p>Create a page and write something awesome!</p>
-                                    </div>
-                                    <div className='right'>
-                                        <span className='create-new-workbook-symbol'>+</span>
-                                    </div>
+                                <div className='notebook-page-link create-page' onClick={(e) => addPageHandler(e)}>
+                                    <h3>+ Create page</h3>
                                 </div>
                             </div>
                         )
