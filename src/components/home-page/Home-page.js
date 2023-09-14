@@ -22,7 +22,7 @@ const HomePage = () => {
 
     const features = [
         { title: 'Deep knowledge', description: 'Notebook Chat uses the latest AI to understand your notes, and recall them when you need them. It\'s basically like having infinite memory.' },
-        { title: 'Simple to use', description: 'We have removed all unnecessary features, so you can focus on what matters: your notes.' },
+        { title: 'Simple to use', description: 'Do you want customizable tables, expandable texts, and other fancy stuff? Then Notebook Chat is not for you. Notebook Chat is simple, and that\'s the way we like it.' },
         { title: 'Always accessible', description: 'Notebook Chat is available on all your devices, so you can access your notes anywhere, anytime.' },
         { title: 'Stay organized', description: 'Notebook Chat provides you with the ability to efficiently organize your notes by creating notebooks, ensuring your information is well-structured and easily accessible.' }
     ]
