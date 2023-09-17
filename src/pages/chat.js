@@ -1,48 +1,8 @@
-import Head from 'next/head'
-import Link from 'next/link';
-import Chat from '@/components/chat/Chat';
-import Conversations from '@/components/conversations/Conversations';
-import { useState, useEffect } from 'react';
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import withAuth from '../components/withAuth/WithAuth';
-import { useRouter } from 'next/router';
+import Main from "@/components/main/Main";
+import ChatFullscreen from "@/components/chat-fullscreen/Chat-Fullscreen";
 
-const ChatComponent = () => {
-    const { user, authToken, logout, loading } = useContext(AuthContext);
-
-    const router = useRouter();
-
-    useEffect(() => {
-        console.log('Loading: ' + loading)
-        console.log('User: ' + user)
-        //Check if the user is logged in after we are done loading
-        if (!loading && !user) {
-            console.log(user);
-            console.log('User is not logged in, redirecting to login page');
-            router.push('/login');
-        }
-    }, [user, authToken, loading]);
-
+export default function Chat() {
     return (
-        <>
-            <Head>
-                <title>Chat and notebook</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <main>
-                <div className="main-container">
-                    <div className="main-container__left" id="main-container__left">
-                        <Conversations />
-                    </div>
-                    <div className="main-container__right">
-                        <Chat />
-                    </div>
-                </div>
-            </main>
-        </>
+        <Main middle={<ChatFullscreen />} />
     )
 }
-
-export default withAuth(ChatComponent);

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { AuthContext } from "../../context/AuthContext";
 
-import { MdDeleteOutline, MdKeyboardBackspace, MdSettings, MdClose, MdHome, MdSearch, MdOutlineStickyNote2 } from "react-icons/md";
+import { MdDeleteOutline, MdKeyboardBackspace, MdAutoAwesome, MdClose, MdHome, MdSearch, MdOutlineStickyNote2 } from "react-icons/md";
 
 
 const LeftBar = ({ searchFunction, notebook = null }) => {
@@ -27,6 +27,10 @@ const LeftBar = ({ searchFunction, notebook = null }) => {
                 <div className={styles.iconContainer} onClick={() => { router.push('/notebook') }}>
                     <MdHome />
                     <span>Notebooks</span>
+                </div>
+                <div className={styles.iconContainer} onClick={() => { router.push('/chat') }}>
+                    <MdAutoAwesome />
+                    <span>Chat</span>
                 </div>
                 <div className={styles.iconContainer} onClick={() => { searchFunction() }}>
                     <MdSearch />

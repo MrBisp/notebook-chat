@@ -1,15 +1,16 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useRef } from "react"
 import styles from './Main.module.css'
 import LeftBar from '../../components/left-bar/Left-bar';
 import { AuthContext } from '../../context/AuthContext';
 import Link from "next/link";
-import ChatNotebook from "../chat-notebook/Chat-notebook";
 import Chat from "../chat/Chat";
 import { MdHome, MdOutlineAssignment, MdMenuBook, MdChat, MdEditNote } from 'react-icons/md';
 import { MdClose, MdSearch, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
 import { useRouter } from "next/router";
 
 const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) => {
+
+    const { authToken } = useContext(AuthContext);
 
     const [showLeft, setShowLeft] = useState(true);
     const [showRight, setShowRight] = useState(true);
@@ -18,6 +19,12 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
     const [showSearch, setShowSearch] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+
+    const [searchResultsPinecone, setSearchResultsPinecone] = useState([]);
+    const TIMETOSAVE = 500;
+    const timeSinceLastChange = useRef(0);
+    const changeSinceLastSave = useRef(false);
+    const lastChange = useRef(new Date().getTime());
 
     const [showModal, setShowModal] = useState(false);
 
@@ -100,7 +107,11 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
     //Search for notes
     useEffect(() => {
         if (searchValue === '') return;
-        let results = []
+        let results = [];
+        setSearchResultsPinecone([]);
+
+        changeSinceLastSave.current = true;
+        lastChange.current = new Date().getTime();
 
         //Now let's see if it matches one of the notebook names
         let notebooks = workbooks.filter((workbook) => workbook.title.toLowerCase().includes(searchValue.toLowerCase()));
@@ -138,6 +149,58 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
 
         setSearchResults(results);
     }, [searchValue])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            timeSinceLastChange.current = new Date().getTime() - lastChange.current;
+            if (timeSinceLastChange.current > TIMETOSAVE && changeSinceLastSave.current) {
+                pineconeSearch();
+                changeSinceLastSave.current = false;
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const pineconeSearch = async () => {
+        if (!searchValue) return;
+        if (searchValue.trim() === '') return;
+
+        const url = "/api/pinecone/notes";
+        const headers = {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${authToken}`
+        }
+        const body = {
+            content: searchValue
+        }
+        const response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
+        const data = await response.json();
+        const results = data.results;
+        /*
+            [
+                {id: '123', score: 0.9},
+                {id: '456', score: 0.8},
+            ]
+        */
+
+        //Now let's see if it matches one of the page id's
+        let pages = workbooks.reduce((acc, workbook) => {
+            let pages = workbook.pages.filter((page) => {
+                let isMatch = false;
+                results.forEach((result) => {
+                    if (result.id === page._id.toString()) {
+                        isMatch = true;
+                    }
+                })
+                return isMatch;
+            });
+            //Add the url to the page
+            pages = pages.map((page) => ({ ...page, workbookId: workbook._id }));
+            return [...acc, ...pages];
+        }, []);
+        setSearchResultsPinecone(pages);
+    }
 
 
     return (
@@ -182,14 +245,14 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                         <MdClose className={styles.closeSearch} onClick={() => { setShowSearch(false) }} />
                         <div className={styles.searchInputContainer}>
                             <MdSearch className={styles.searchIcon} />
-                            <input id="search-input" autoFocus autocomplete="one-time-code" type="text" placeholder="Search for notes..." value={searchValue} onChange={(e) => { setSearchValue(e.target.value) }} />
+                            <input id="search-input" autoFocus autoComplete="one-time-code" type="text" placeholder="Search for notes..." value={searchValue} onChange={(e) => { setSearchValue(e.target.value) }} />
                         </div>
                         <div className={styles.searchResults}>
                             {
                                 searchValue !== '' && searchResults.length > 0 &&
                                 <>
                                     {
-                                        searchResults.map((result, index) => (
+                                        searchResults.slice(0, 5).map((result, index) => (
                                             <Link key={index} className={styles.searchResult} onClick={() => { setShowSearch(false) }} href={result.type === 'Page' ? `/notebook/${result.workbookId}/page/${result._id}` : `/notebook/${result._id}`}>
                                                 <span className={styles.searchResult__name}>{result.title}</span>
                                                 <span className={styles.searchResult__type}>{result.type}</span>
@@ -199,7 +262,20 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                 </>
                             }
                             {
-                                searchValue !== '' && searchResults.length === 0 &&
+                                searchValue !== '' && searchResultsPinecone.length > 0 &&
+                                <>
+                                    {
+                                        searchResultsPinecone.map((result, index) => (
+                                            <Link key={index} className={styles.searchResult} onClick={() => { setShowSearch(false) }} href={`/notebook/${result.workbookId}/page/${result._id}`}>
+                                                <span className={styles.searchResult__name}>{result.title}</span>
+                                                <span className={styles.searchResult__type}>Page</span>
+                                            </Link>
+                                        ))
+                                    }
+                                </>
+                            }
+                            {
+                                searchValue !== '' && searchResults.length === 0 && searchResultsPinecone.length === 0 &&
                                 <div className={styles.noResults}>No results found</div>
                             }
                             {

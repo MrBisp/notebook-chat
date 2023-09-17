@@ -6,7 +6,7 @@ import Tiptap from '../tiptap/TipTap';
 import EditorMenu from '../editor-menu/Editor-menu';
 
 const Page = ({ page, initialContent, workbookId }) => {
-    const { updatePage } = useContext(AuthContext);
+    const { updatePage, authToken } = useContext(AuthContext);
     const [content, setContent] = useState(initialContent);
     const [pageTitle, setPageTitle] = useState(page.title);
     const [editingTitle, setEditingTitle] = useState(false);
@@ -18,22 +18,7 @@ const Page = ({ page, initialContent, workbookId }) => {
     const pageTitleRef = useRef(pageTitle);
     const lastChange = useRef(new Date().getTime());
 
-    const TIMETOSAVE = 500;
-
-    const modules = {
-        toolbar: [
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ color: [] }, { background: [] }],
-            ['link', 'image', 'video'],
-            ['code-block'],
-            ['clean']
-        ],
-        clipboard: {
-            matchVisual: false //Keeps Quill from adding empty paragraphs
-        }
-    };
+    const TIMETOSAVE = 1000;
 
     const handleContentChange = (content) => {
         setContent(content);
@@ -50,9 +35,26 @@ const Page = ({ page, initialContent, workbookId }) => {
             subPages: page.subPages
         }
         updatePage(page._id, update, workbookId)
+        updatePinecone();
     }
 
-    //Save the page every 1 seconds
+    const updatePinecone = async () => {
+        console.log('Updating Pinecone...')
+        let url = '/api/pinecone/insert'
+        let headers = {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${authToken}`
+        }
+        let body = {
+            pageId: page._id,
+            content: contentRef.current
+        }
+        let response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
+        let data = await response.json();
+        console.log(data);
+    }
+
+    //Save the page every 1 seconds (Autosave)
     useEffect(() => {
         const interval = setInterval(() => {
             timeSinceLastChange.current = new Date().getTime() - lastChange.current;

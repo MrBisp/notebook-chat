@@ -5,7 +5,6 @@ import withAuth from '../withAuth/WithAuth';
 import { useChat } from 'ai/react'
 import { MdOutlineAssignment, MdMenuBook, MdClose } from 'react-icons/md';
 
-
 const Chat = ({ currentPage, workbook }) => {
     const { workbooks } = useContext(AuthContext);
 
@@ -14,7 +13,6 @@ const Chat = ({ currentPage, workbook }) => {
     const [showSelectPages, setShowSelectPages] = useState(false)
 
     const [errorMessage, setErrorMessage] = useState("");
-    const [aiMessage, setAiMessage] = useState("Thinking...");
 
     const { append, messages, setMessages, input, setInput, handleInputChange, stop, isLoading } = useChat({
         'api': '/api/chat',
