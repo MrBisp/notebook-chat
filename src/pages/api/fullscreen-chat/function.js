@@ -12,6 +12,7 @@ export default async function POST(req, res) {
 
     const addToMessage = " [if I am asking for something that could be in my notes, check in my notes (but of course not for follow-up questions). Focus on answering my question, not reciting my notes! Draw on my notes for extra context when needed]"
     const minSimiliarty = 0.70;
+    const maxTokens = 300;
 
     //Decode the token
     const token = req.headers.authorization.split(' ')[1];
@@ -170,7 +171,7 @@ export default async function POST(req, res) {
         messages,
         temperature: 0.2,
         stream: true,
-        max_tokens: 250,
+        max_tokens: maxTokens,
         functions: functions,
         function_call: 'auto' //This means that the AI will decide when to call the function
     })
@@ -187,7 +188,7 @@ export default async function POST(req, res) {
                 stream: true,
                 messages: [...messages, ...newMessages],
                 temperature: 0.2,
-                max_tokens: 150,
+                max_tokens: maxTokens,
             });
         },
     });
