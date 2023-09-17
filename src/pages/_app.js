@@ -1,11 +1,13 @@
 import '@/styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
-import LoginPage from '../pages/register';
+import poppins from '../../utils/font';
 
 function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider>
-      <Component {...pageProps} />
+      <div className={poppins.className}>
+        <Component {...pageProps} />
+      </div>
     </AuthProvider>
   );
 }

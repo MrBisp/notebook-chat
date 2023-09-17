@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { AuthContext } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import styles from './Home-page.module.css';
-import { MdLightbulb } from 'react-icons/md';
+import poppins from '../../../utils/font';
 
 const HomePage = () => {
     const { user, loading } = useContext(AuthContext);
@@ -31,11 +31,11 @@ const HomePage = () => {
     return (
         <>
             <Head>
-                <title>Chat and notebook</title>
+                <title>Notebook-chat.com - Your personal knowledge partner</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <div className={styles.navbar}>
+            <div className={styles.navbar + ' ' + poppins.className}>
                 <div className={styles.logo}>Notebook Chat</div>
                 <div className={styles.navbarLinks}>
                     <span>Pricing</span>

@@ -11,6 +11,7 @@ export default async function POST(req, res) {
     let pagesForResponse = [];
 
     const addToMessage = " [if I am asking for something that could be in my notes, check in my notes (but of course not for follow-up questions). Focus on answering my question, not reciting my notes! Draw on my notes for extra context when needed]"
+    const minSimiliarty = 0.70;
 
     //Decode the token
     const token = req.headers.authorization.split(' ')[1];
@@ -93,9 +94,8 @@ export default async function POST(req, res) {
         const matches = queryResponse.matches;
 
         //Only keep matches that are above a certain threshold
-        const threshold = 0.80;
         matches.forEach((match, index) => {
-            if (match.score < threshold) {
+            if (match.score < minSimiliarty) {
                 matches.splice(index, 1);
             }
         })

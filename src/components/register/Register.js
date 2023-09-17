@@ -4,6 +4,7 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import poppins from "../../../utils/font";
 
 const RegisterPage = () => {
     const { login } = useContext(AuthContext);
@@ -44,7 +45,7 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className='login-container'>
+        <div className={'login-container ' + poppins.className} >
             <form onSubmit={handleSubmit}>
                 <h1>Register</h1>
                 <label>

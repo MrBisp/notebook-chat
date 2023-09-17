@@ -3,6 +3,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
+import poppins from '../../../utils/font';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -33,7 +34,7 @@ const Login = () => {
     }, [authToken]);
 
     return (
-        <div className='login-container'>
+        <div className={'login-container ' + poppins.className} >
             <h1>Login</h1>
             <h5>
                 Log in to use Notebook Chat!

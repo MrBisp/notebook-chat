@@ -7,6 +7,7 @@ import Chat from "../chat/Chat";
 import { MdHome, MdOutlineAssignment, MdMenuBook, MdChat, MdEditNote } from 'react-icons/md';
 import { MdClose, MdSearch, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
 import { useRouter } from "next/router";
+import poppins from "../../../utils/font";
 
 const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) => {
 
@@ -205,7 +206,7 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
 
     return (
         <>
-            <div className={styles.main} style={{ filter: (showSearch || showModal) ? 'blur(3px)' : 'blur(0px)' }}>
+            <div className={styles.main + " " + poppins.className} style={{ filter: (showSearch || showModal) ? 'blur(3px)' : 'blur(0px)' }}>
                 {isLoading && <div className={styles.loading}>Loading...</div>}
                 {!isLoading &&
                     <>
