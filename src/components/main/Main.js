@@ -316,6 +316,16 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                             </div>
                         </div>
                         <div className={styles.MobileBottomNavbar__item} onClick={() => {
+                            router.push('/chat');
+                        }}>
+                            <div className={styles.MobileBottomNavbar__item__icon}>
+                                <MdChat />
+                            </div>
+                            <div className={styles.MobileBottomNavbar__item__text}>
+                                Chat
+                            </div>
+                        </div>
+                        <div className={styles.MobileBottomNavbar__item} onClick={() => {
                             setShowSearch(!showSearch);
                         }}>
                             <div className={styles.MobileBottomNavbar__item__icon}>
@@ -334,7 +344,7 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                         <MdChat />
                                     </div>
                                     <div className={styles.MobileBottomNavbar__item__text}>
-                                        Chat
+                                        Local chat
                                     </div>
                                 </div>
                             )
