@@ -31,6 +31,19 @@ const ChatFullscreen = ({ }) => {
             setErrorMessage("")
             setIsLoading(false)
             console.log(f);
+
+            const order = fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    tokens: -1,
+                    type: 'fullscreen chat',
+                    userid: user._id
+                })
+            })
         },
         onResponse: () => {
             setIsLoading(false)

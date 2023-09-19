@@ -169,3 +169,11 @@
         transform: translateY(0);
     }
 }
+
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .chatFooter {
+        margin-bottom: 5rem;
+    }
+}

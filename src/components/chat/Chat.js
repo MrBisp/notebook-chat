@@ -6,7 +6,7 @@ import { useChat } from 'ai/react'
 import { MdOutlineAssignment, MdMenuBook, MdClose } from 'react-icons/md';
 
 const Chat = ({ currentPage, workbook }) => {
-    const { workbooks } = useContext(AuthContext);
+    const { workbooks, user, authToken } = useContext(AuthContext);
 
     const [contextOption, setContextOption] = useState('current-page')
     const [contextPages, setContextPages] = useState([])
@@ -23,6 +23,18 @@ const Chat = ({ currentPage, workbook }) => {
         },
         onFinish: () => {
             setErrorMessage("")
+            const order = fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    tokens: -1,
+                    type: 'sidebar chat',
+                    userid: user._id
+                })
+            })
         }
     })
 

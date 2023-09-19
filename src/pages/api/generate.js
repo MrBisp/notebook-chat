@@ -8,7 +8,6 @@ export default async function POST(req) {
         apiKey: process.env.OPENAI_TOKEN
     })
     const openai = new OpenAIApi(config)
-    // Check if the OPENAI_API_KEY is set, if not return 400
 
     console.log('--- Generating autofill ---')
     console.log('body', req.body)

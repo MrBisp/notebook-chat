@@ -6,7 +6,7 @@ import Tiptap from '../tiptap/TipTap';
 import EditorMenu from '../editor-menu/Editor-menu';
 
 const Page = ({ page, initialContent, workbookId }) => {
-    const { updatePage, authToken } = useContext(AuthContext);
+    const { updatePage, authToken, user } = useContext(AuthContext);
     const [content, setContent] = useState(initialContent);
     const [pageTitle, setPageTitle] = useState(page.title);
     const [editingTitle, setEditingTitle] = useState(false);
@@ -52,6 +52,19 @@ const Page = ({ page, initialContent, workbookId }) => {
         let response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
         let data = await response.json();
         console.log(data);
+
+        const order = await fetch('/api/order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                tokens: -1,
+                type: 'pinecone',
+                userid: user._id
+            })
+        })
     }
 
     //Save the page every 1 seconds (Autosave)

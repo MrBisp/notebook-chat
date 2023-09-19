@@ -1,11 +1,13 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useContext } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
 import { TiptapEditorProps } from "./props"
 import { TiptapExtensions } from "./extensions"
 import { useCompletion } from "ai/react"
 import { getPrevText } from "./editor"
+import { AuthContext } from "@/context/AuthContext"
 
 const Tiptap = ({ saveHandler, value, setEditor }) => {
+    const { authToken, user } = useContext(AuthContext)
 
     useEffect(() => {
         if (!editor) return;
@@ -29,7 +31,7 @@ const Tiptap = ({ saveHandler, value, setEditor }) => {
                 })
                 complete(
                     getPrevText(e.editor, {
-                        chars: 5000
+                        chars: 1000
                     })
                 )
                 // complete(e.editor.storage.markdown.getMarkdown());
@@ -50,6 +52,20 @@ const Tiptap = ({ saveHandler, value, setEditor }) => {
                 from: editor.state.selection.from - completion.length,
                 to: editor.state.selection.from
             })
+
+            const order = fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    tokens: -1,
+                    type: 'autofill',
+                    userid: user._id
+                })
+            })
+
         },
         onError: err => {
             alert("Errror. Check console for more")

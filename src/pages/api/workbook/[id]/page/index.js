@@ -23,8 +23,6 @@ export default async (req, res) => {
                     const token = req.headers.authorization.split(' ')[1];
                     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-                    const user = await User.findOne({ _id: decoded.user._id });
-
                     const workbook = await Workbook.findOne({ _id: id });
 
                     if (workbook) {

@@ -1,11 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { MdCode, MdFormatBold, MdFormatItalic, MdFormatStrikethrough, MdExpandMore, MdOutlineFormatUnderlined, MdDeleteOutline, MdCheck, MdFormatListNumbered, MdFormatListBulleted, MdOutlineDelete } from 'react-icons/md';
 import { getUrlFromString } from "/utils/misc"
 import { useCompletion } from 'ai/react'
 import styles from './Editor-menu.module.css'
-import { set } from 'mongoose';
+import { AuthContext } from '@/context/AuthContext';
 
 const EditorMenu = ({ editor }) => {
+
+    const { authToken, user } = useContext(AuthContext)
 
     const inputRef = useRef(null)
 
@@ -26,7 +28,21 @@ const EditorMenu = ({ editor }) => {
     const [textType, setTextType] = useState("Paragraph");
 
     const { completion, complete, isLoading } = useCompletion({
-        api: "/api/generate-custom"
+        api: "/api/generate-custom",
+        onFinish: (_prompt, completion) => {
+            const order = fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    tokens: -1,
+                    type: 'editormenu',
+                    userid: user._id
+                })
+            })
+        }
     })
     const [showResults, setShowResults] = useState(false)
     const [command, setCommand] = useState(null)

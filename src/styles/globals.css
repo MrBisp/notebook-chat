@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
     max-width: 100vw;
+    font-family: var(--p-font-poppins);
 }
 
 *,
