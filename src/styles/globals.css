@@ -412,6 +412,11 @@ pre {
     cursor: pointer;
 }
 
+.workbook-no-pages {
+    padding: 0rem 1rem;
+    color: #9a9a9a;
+}
+
 /* EDITOR */
 .editor {
     width: 100%;
@@ -1034,6 +1039,61 @@ div[data-tippy-root] div {
 
 .create-page {
     background: rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+}
+
+.notebook-page-link-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.notebook-page-link-container .page-dots {
+    position: relative;
+}
+
+.notebook-page-link-container .three-dots {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.notebook-page-link-container .three-dots:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+}
+
+.page-edit {
+    position: absolute;
+    top: 100%;
+    right: -50%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.10);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 5;
+}
+
+.page-edit-option span {
+    font-size: 0.75rem;
+    padding: 1rem 2rem;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.page-edit-option span:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
 }
 
 

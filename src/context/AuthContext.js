@@ -307,12 +307,12 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const updatedWorkbook = await response.json();
-            console.log('Updated workbook: ' + JSON.stringify(updatedWorkbook));
 
             if (updatedWorkbook.success) {
                 setWorkbooks((prevWorkbooks) =>
                     prevWorkbooks.map((workbook) => {
                         if (workbook._id === id) {
+                            console.log('Returning updated workbook: ', updatedWorkbook.workbook);
                             return updatedWorkbook.workbook;
                         }
                         return workbook;
@@ -429,6 +429,38 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const deletePage = async (id, workbookId) => {
+        console.log('Deleting page: ' + id);
+        try {
+            const response = await fetch(`/api/page/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    workbookId: workbookId
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+
+            if (data.success) {
+                //Remove the page from the workbooks state as well
+                setWorkbooks((prevWorkbooks) =>
+                    prevWorkbooks.map((workbook) => {
+                        if (workbook._id === workbookId) {
+                            workbook.pages = workbook.pages.filter((page) => page._id !== id);
+                        }
+                        return workbook;
+                    })
+                );
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const sendNotebookChatMessage = async (messages, context) => {
         try {
             const response = await fetch('/api/notebook-chat', {
@@ -475,6 +507,7 @@ export const AuthProvider = ({ children }) => {
         addWorkbook,
         addPage,
         updatePage,
+        deletePage,
         updateWorkbook,
         deleteWorkbook,
         sendNotebookChatMessage
