@@ -10,9 +10,9 @@ export default async function POST(req, res) {
 
     let pagesForResponse = [];
 
-    const addToMessage = " [if I am asking for something that could be in my notes, check in my notes (but of course not for follow-up questions). Focus on answering my question, not reciting my notes! Draw on my notes for extra context when needed]"
+    const addToMessage = " [if I am asking for something that could be in my notes, check in my notes (but of course not for follow-up questions). Focus on answering my question, not reciting my notes! Draw on my notes for extra context when needed. Give me a short but insightful answer!]"
     const minSimiliarty = 0.70;
-    const maxTokens = 300;
+    const maxTokens = 150;
 
     //Decode the token
     const token = req.headers.authorization.split(' ')[1];

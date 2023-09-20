@@ -14,6 +14,8 @@ const ChatFullscreen = ({ }) => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const [suggestedMessages, setSuggestedMessages] = useState([]);
+
     const router = useRouter();
 
     const { append, messages, setMessages, stop, complete } = useChat({
@@ -21,7 +23,7 @@ const ChatFullscreen = ({ }) => {
         'id': 'fullscreen-chat',
         initialMessages: [{
             role: 'assistant',
-            content: 'Hello, I\'m the AI behind Notebook-Chat. I have access to your notes and can search through them to help you find the information you need. How can I assist you today?'
+            content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
         }],
         onError: err => {
             console.error(err)
@@ -188,17 +190,78 @@ const ChatFullscreen = ({ }) => {
     }
 
     const sendMessageWithButton = async (message) => {
-        switch (message) {
-            case 'start':
-                await sendMessageWithFunction("How do I get started with Notebook-Chat?")
-                break;
-            case 'work':
-                await sendMessageWithFunction("How does Notebook-Chat work?")
-                break;
-            default:
-                break;
-        }
+        await sendMessageWithFunction(message);
+        track('Fullscreen Chat button click', {
+            'Message': message
+        })
     }
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+
+            //First, let's check in localstorage if we have the suggested messages
+            let localSuggestedMessages = JSON.parse(localStorage.getItem('suggested-messages'));
+            if (localSuggestedMessages) {
+
+                //Now lets check if it is more than 24 hours old
+                let now = new Date();
+                let lastUpdated = new Date(localSuggestedMessages.lastUpdated);
+                let diff = now - lastUpdated;
+                let hours = Math.floor(diff / 1000 / 60 / 60);
+                if (hours > 24) {
+                    //It's too old, let's update it
+                    localStorage.removeItem('suggested-messages');
+                } else {
+                    setSuggestedMessages(localSuggestedMessages.messages);
+                    return;
+                }
+            }
+
+            const url = "/api/ai/suggestedMessages";
+            const headers = {
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${authToken}`
+            }
+
+            const suggestedMessages = fetch(url, {
+                method: 'POST',
+                headers: headers,
+            }
+            ).then((response) => response.json())
+                .then((data) => {
+                    console.log(data);
+                    console.log(JSON.parse(data.response));
+
+                    let parsed = JSON.parse(data.response);
+                    let suggestion1 = parsed.question1;
+                    let suggestion2 = parsed.question2;
+                    let suggestion3 = parsed.question3;
+
+                    setSuggestedMessages([suggestion1, suggestion2, suggestion3]);
+
+                    //Save in local storage
+                    localStorage.setItem('suggested-messages', JSON.stringify({
+                        lastUpdated: new Date(),
+                        messages: [suggestion1, suggestion2, suggestion3]
+                    }));
+
+                    //Make a new order
+                    const order = fetch('/api/order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            tokens: -1,
+                            type: 'fullscreen chat button suggestions',
+                            userid: user._id
+                        })
+                    })
+                }
+                );
+        }
+    }, [])
 
     return (
         <div className={styles.mainContainer}>
@@ -206,12 +269,14 @@ const ChatFullscreen = ({ }) => {
                 <div id="chat-fullscreen-scrollable" className={styles.scrollable}>
                     <div className={styles.chatHeader}>
                         <h1>Ask anything, your notes are the limits</h1>
-                        <p>
-                            Just type your question, and I'll find the most relevant information from your notes to give you an accurate answer.
-                        </p>
                         <div className={styles.buttonContainer}>
-                            <button className={styles.question} onClick={() => { sendMessageWithButton("start") }}>✨ How do I get started?</button>
-                            <button className={styles.question} onClick={() => { sendMessageWithButton("work") }}>✨ How does Notebook-Chat work?</button>
+                            {
+                                suggestedMessages.map((message, index) => {
+                                    return (
+                                        <button key={index} onClick={() => { sendMessageWithButton(message) }}>✨ {message}</button>
+                                    )
+                                })
+                            }
                         </div>
                     </div>
                     <div className={styles.chatBody}>
