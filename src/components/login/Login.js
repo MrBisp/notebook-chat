@@ -41,8 +41,8 @@ const Login = () => {
             <h5>
                 Log in to use Notebook Chat!
             </h5>
-            <form onSubmit={() => {
-                handleSubmit();
+            <form onSubmit={(e) => {
+                handleSubmit(e);
                 setLoading(true);
             }}>
                 <div>
