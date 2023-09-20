@@ -500,7 +500,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     const track = (eventName, eventProperties) => {
-        console.log('Tracking event: ' + eventName + ' with properties: ' + JSON.stringify(eventProperties));
 
         const allProperties = {
             ...eventProperties,

@@ -11,6 +11,8 @@ const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const { login, authToken, track } = useContext(AuthContext);
 
+    const [loading, setLoading] = useState(false);
+
     const router = useRouter();
 
     const handleSubmit = async (event) => {
@@ -39,7 +41,10 @@ const Login = () => {
             <h5>
                 Log in to use Notebook Chat!
             </h5>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={() => {
+                handleSubmit();
+                setLoading(true);
+            }}>
                 <div>
                     <label htmlFor="username">Username</label>
                     <input
@@ -59,6 +64,13 @@ const Login = () => {
                     />
                 </div>
                 <button type="submit">Login</button>
+                {
+                    loading && (
+                        <p>
+                            Logging you in...
+                        </p>
+                    )
+                }
             </form>
             {errorMessage && <p>{errorMessage}</p>}
             <span>
