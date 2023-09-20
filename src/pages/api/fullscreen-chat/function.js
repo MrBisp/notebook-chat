@@ -34,9 +34,9 @@ export default async function POST(req, res) {
         returnText = returnText.replace(/<p.*?>/gi, "");
         returnText = returnText.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, " $2 ($1)");
 
-        //-- Remove all li tags, but preserve what's inside of them
-        returnText = returnText.replace(/<li.*>/gi, "");
-        returnText = returnText.replace(/<\/li>/gi, "");
+        // - Same with span
+        returnText = returnText.replace(/<span.*?>/gi, "");
+        returnText = returnText.replace(/<\/span>/gi, "");
 
         //-- remove all inside SCRIPT and STYLE tags
         returnText = returnText.replace(/<script.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/script>/gi, "");
@@ -93,6 +93,10 @@ export default async function POST(req, res) {
             }
         });
         const matches = queryResponse.matches;
+        //If there are no matches, return an empty array
+        if (matches.length === 0) {
+            return [];
+        }
 
         //Only keep matches that are above a certain threshold
         matches.forEach((match, index) => {
@@ -139,7 +143,7 @@ export default async function POST(req, res) {
         content: 'You are a chatbot on the website Notebook-chat.com. ' +
             'Search in user\'s notes to find the most relevant pages to answer their questions.' +
             'Users expect that you search in their notes, unless they ask follow up questions or just say very basic stuff like hi and so on!' +
-            'Please respond with html formatted text when it makes sense!'
+            'Please respond with html formatted text when it makes sense! Give a short but insightful answer!'
     })
 
     //Alter the latest message

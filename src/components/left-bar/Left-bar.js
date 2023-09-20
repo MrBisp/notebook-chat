@@ -63,7 +63,14 @@ const LeftBar = ({ searchFunction, notebook = null }) => {
                 }
             </div>
             <div className={styles.bottomContainer}>
-                <div className={styles.iconContainer} onClick={logout}>
+                <div className={styles.iconContainer} onClick={() => {
+                    //Reset localstorage
+                    localStorage.removeItem('notebook-chat');
+                    localStorage.removeItem('suggested-messages');
+                    localStorage.removeItem('first-message');
+
+                    logout();
+                }}>
                     <MdClose />
                     <span>Logout</span>
                 </div>

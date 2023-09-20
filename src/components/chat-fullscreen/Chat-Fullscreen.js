@@ -21,10 +21,6 @@ const ChatFullscreen = ({ }) => {
     const { append, messages, setMessages, stop, complete } = useChat({
         'api': '/api/fullscreen-chat/function',
         'id': 'fullscreen-chat',
-        initialMessages: [{
-            role: 'assistant',
-            content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
-        }],
         onError: err => {
             console.error(err)
             setErrorMessage(err.message)
@@ -196,6 +192,7 @@ const ChatFullscreen = ({ }) => {
         })
     }
 
+    //Get suggested messages
     useEffect(() => {
         if (typeof window !== 'undefined') {
 
@@ -261,6 +258,110 @@ const ChatFullscreen = ({ }) => {
                 }
                 );
         }
+    }, [])
+
+    //Make the first message
+    useEffect(() => {
+
+        if (typeof window == 'undefined') {
+            setMessages([{
+                role: 'assistant',
+                content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
+            }])
+        }
+
+        //Let's check if the user has any pages in their workbooks
+        if (workbooks.length === 0) {
+            console.log("No workbooks")
+            setMessages([{
+                role: 'assistant',
+                content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
+            }])
+            return;
+        }
+
+        //Loop through the workbooks and pages and get the content
+        const pages = workbooks.reduce((acc, workbook) => {
+            return [...acc, ...workbook.pages];
+        }, []);
+
+        //Let's check if the user has any pages
+        if (pages.length === 0) {
+            console.log("No pages")
+            setMessages([{
+                role: 'assistant',
+                content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
+            }])
+            return;
+        }
+
+        //First, let's check in localstorage if we have a message
+        let localMessages = JSON.parse(localStorage.getItem('first-message'));
+        if (localMessages) {
+            //Now lets check if it is more than 24 hours old
+            let now = new Date();
+            let lastUpdated = new Date(localMessages.lastUpdated);
+            let diff = now - lastUpdated;
+            let hours = Math.floor(diff / 1000 / 60 / 60);
+            if (hours > 24) {
+                //It's too old, let's update it
+                localStorage.removeItem('first-message');
+            } else {
+                setMessages(localMessages.messages);
+                return;
+            }
+        }
+
+        const url = "/api/ai/startConversation";
+        const headers = {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${authToken}`
+        }
+
+        //It's too old, let's update it
+        localStorage.removeItem('first-message');
+
+        const firstMessage = fetch(url, {
+            method: 'POST',
+            headers: headers,
+        }).then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                console.log(JSON.parse(data.response));
+
+                let parsed = JSON.parse(data.response);
+                let firstMessage = parsed.message;
+
+                setMessages([{
+                    role: 'assistant',
+                    content: firstMessage
+                }]);
+
+                //Save in local storage
+                localStorage.setItem('first-message', JSON.stringify({
+                    lastUpdated: new Date(),
+                    messages: [{
+                        role: 'assistant',
+                        content: firstMessage
+                    }]
+                }));
+
+                //Make a new order
+                const order = fetch('/api/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        tokens: -1,
+                        type: 'fullscreen chat first message',
+                        userid: user._id
+                    })
+                })
+
+            }
+            );
     }, [])
 
     return (
