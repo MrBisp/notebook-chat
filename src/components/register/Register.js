@@ -7,7 +7,7 @@ import Link from "next/link";
 import poppins from "../../../utils/font";
 
 const RegisterPage = () => {
-    const { login } = useContext(AuthContext);
+    const { login, track } = useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
@@ -31,6 +31,7 @@ const RegisterPage = () => {
             // Check if the response is successful
             if (data.data.email) {
                 // Log the user in
+                track('User registered', { email: data.data.email });
                 login(data.data.email, data.data.password);
                 // Redirect them to the home page
                 router.push("/notebook");

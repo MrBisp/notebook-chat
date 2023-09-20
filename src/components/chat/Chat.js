@@ -6,7 +6,7 @@ import { useChat } from 'ai/react'
 import { MdOutlineAssignment, MdMenuBook, MdClose } from 'react-icons/md';
 
 const Chat = ({ currentPage, workbook }) => {
-    const { workbooks, user, authToken } = useContext(AuthContext);
+    const { workbooks, user, authToken, track } = useContext(AuthContext);
 
     const [contextOption, setContextOption] = useState('current-page')
     const [contextPages, setContextPages] = useState([])
@@ -34,6 +34,10 @@ const Chat = ({ currentPage, workbook }) => {
                     type: 'sidebar chat',
                     userid: user._id
                 })
+            })
+
+            track('Sidebar chat', {
+                'Messages': messages.length + 1
             })
         }
     })

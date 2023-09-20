@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { set } from 'mongoose';
 
 const Workbook = ({ workbookId, pageId = null }) => {
-    const { workbooks, deleteWorkbook, updateWorkbook, addPage, deletePage } = useContext(AuthContext);
+    const { workbooks, deleteWorkbook, updateWorkbook, addPage, deletePage, track } = useContext(AuthContext);
 
     const [workbook, setWorkbook] = useState(null);
     const [page, setPage] = useState(null);
@@ -53,6 +53,7 @@ const Workbook = ({ workbookId, pageId = null }) => {
         e.preventDefault();
         let newPage = await addPage(workbookId);
         if (newPage) {
+            track('Page created', { page: newPage?.title, notebook: workbook?.title, from: 'Notebook' });
             router.push(`/notebook/${workbookId}/page/${newPage._id}`);
         }
     }

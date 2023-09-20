@@ -28,9 +28,26 @@ export const AuthProvider = ({ children }) => {
         }
     }, [userSet]);
 
+    const getBrowser = () => {
+        const userAgent = window.navigator.userAgent;
+        const browsers = { chrome: /chrome/i, safari: /safari/i, firefox: /firefox/i, ie: /internet explorer/i };
+        for (const key in browsers) {
+            if (browsers[key].test(userAgent)) {
+                return key;
+            }
+        }
+    }
+
+    const getDeviceType = () => {
+        if (window.innerWidth < 768) {
+            return 'Mobile';
+        } else {
+            return 'Desktop';
+        }
+    }
+
 
     const login = async (email, password) => {
-        console.log('Logging in user: ' + email + ' with password: ' + password);
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -40,7 +57,6 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const data = await response.json();
-            console.log(data);
 
             if (!data.authToken) {
                 return false;
@@ -59,8 +75,6 @@ export const AuthProvider = ({ children }) => {
 
     const logUserIn = async () => {
         const storedAuthToken = localStorage.getItem('authToken');
-        console.log('Stored token: ' + storedAuthToken)
-        console.log('Getting user from token...')
 
         if (storedAuthToken) {
             const fetchData = async () => {
@@ -71,8 +85,6 @@ export const AuthProvider = ({ children }) => {
                         },
                     });
                     const data = await response.json();
-
-                    console.log(data);
 
                     if (!data.user) {
                         return;
@@ -487,6 +499,54 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const track = (eventName, eventProperties) => {
+        console.log('Tracking event: ' + eventName + ' with properties: ' + JSON.stringify(eventProperties));
+
+        const allProperties = {
+            ...eventProperties,
+            deviceType: getDeviceType(),
+            browser: getBrowser(),
+        }
+
+        const url = '/api/track';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                eventName: eventName,
+                eventProperties: allProperties,
+                distinctId: getMixpanelId()
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data);
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    const getMixpanelId = () => {
+        if (user) {
+            return user.id;
+        }
+
+        //If the user is not logged in, let's check localstorage
+        const mixpanelFromLocalStorage = localStorage.getItem('mixpanelId');
+
+        if (mixpanelFromLocalStorage) {
+            return mixpanelFromLocalStorage;
+        }
+
+        //If that doesn't exist either, let's generate a new one, and save it in localstorage
+        const newMixpanelId = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+        localStorage.setItem('mixpanelId', newMixpanelId);
+        return newMixpanelId;
+    }
 
 
     const values = {
@@ -510,7 +570,8 @@ export const AuthProvider = ({ children }) => {
         deletePage,
         updateWorkbook,
         deleteWorkbook,
-        sendNotebookChatMessage
+        sendNotebookChatMessage,
+        track
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

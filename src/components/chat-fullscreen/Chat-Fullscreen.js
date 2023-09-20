@@ -7,7 +7,7 @@ import { MdOutlineAssignment, MdMenuBook, MdClose, MdSend } from 'react-icons/md
 import { useRouter } from 'next/router';
 
 const ChatFullscreen = ({ }) => {
-    const { user, authToken, logout, loading, workbooks } = useContext(AuthContext);
+    const { user, authToken, logout, loading, workbooks, track } = useContext(AuthContext);
 
     const [errorMessage, setErrorMessage] = useState('');
     const [makingResponse, setMakingResponse] = useState(false);
@@ -30,7 +30,6 @@ const ChatFullscreen = ({ }) => {
         onFinish: (f) => {
             setErrorMessage("")
             setIsLoading(false)
-            console.log(f);
 
             const order = fetch('/api/order', {
                 method: 'POST',
@@ -43,6 +42,10 @@ const ChatFullscreen = ({ }) => {
                     type: 'fullscreen chat',
                     userid: user._id
                 })
+            })
+
+            track('Fullscreen Chat', {
+                'Messages': messages.length
             })
         },
         onResponse: () => {
@@ -61,7 +64,6 @@ const ChatFullscreen = ({ }) => {
     }
 
     const sendMessageWithFunction = async (buttonMessage = null) => {
-        console.log(buttonMessage)
         if (isLoading) return;
         if (!input && !buttonMessage) {
             setErrorMessage("Please enter a message")
@@ -99,8 +101,6 @@ const ChatFullscreen = ({ }) => {
         setInput('');
         setIsLoading(true);
 
-        console.log('Getting pages from pinecone')
-
         //Now let's append the context
         const pages = await getPagesFromPinecone(newMessage);
         let context = '';
@@ -113,7 +113,6 @@ const ChatFullscreen = ({ }) => {
             role: 'user',
             content: newMessage
         }
-        console.log(context)
 
         //This triggers the API to send a response
         append(newMessageObj, {
@@ -136,8 +135,6 @@ const ChatFullscreen = ({ }) => {
     useEffect(() => {
         let chat = document.getElementById('chat-fullscreen-scrollable');
         chat.scrollTop = chat.scrollHeight;
-
-        console.log('Messages changed', messages)
 
         //Save in local storage
         localStorage.setItem('notebook-chat', JSON.stringify(messages));
@@ -168,7 +165,6 @@ const ChatFullscreen = ({ }) => {
         })
         const data = await response.json();
         const results = data.results;
-        console.log(results);
 
 
         //Now let's see if it matches one of the page id's

@@ -9,7 +9,7 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const { login, authToken } = useContext(AuthContext);
+    const { login, authToken, track } = useContext(AuthContext);
 
     const router = useRouter();
 
@@ -28,8 +28,8 @@ const Login = () => {
 
     useEffect(() => {
         if (authToken) {
-            console.log(authToken)
-            router.replace('/notebook');
+            track('Login', {});
+            router.replace('/chat');
         }
     }, [authToken]);
 

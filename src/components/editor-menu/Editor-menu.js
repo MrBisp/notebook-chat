@@ -7,7 +7,7 @@ import { AuthContext } from '@/context/AuthContext';
 
 const EditorMenu = ({ editor }) => {
 
-    const { authToken, user } = useContext(AuthContext)
+    const { authToken, user, track } = useContext(AuthContext)
 
     const inputRef = useRef(null)
 
@@ -42,6 +42,11 @@ const EditorMenu = ({ editor }) => {
                     userid: user._id
                 })
             })
+
+            track("Generated content (editormenu)", {
+                completion: completion,
+                prompt: _prompt
+            });
         }
     })
     const [showResults, setShowResults] = useState(false)

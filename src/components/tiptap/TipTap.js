@@ -7,7 +7,7 @@ import { getPrevText } from "./editor"
 import { AuthContext } from "@/context/AuthContext"
 
 const Tiptap = ({ saveHandler, value, setEditor }) => {
-    const { authToken, user } = useContext(AuthContext)
+    const { authToken, user, track } = useContext(AuthContext)
 
     useEffect(() => {
         if (!editor) return;
@@ -34,8 +34,7 @@ const Tiptap = ({ saveHandler, value, setEditor }) => {
                         chars: 1000
                     })
                 )
-                // complete(e.editor.storage.markdown.getMarkdown());
-                //va.track("Autocomplete Shortcut Used")
+                track("Autofill", { page: page.title, notebook: workbookId, source: '+++' })
             }
         },
         onCreate: e => {

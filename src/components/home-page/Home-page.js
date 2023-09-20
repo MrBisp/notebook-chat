@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import Link from 'next/link';
 import { AuthContext } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
@@ -7,8 +7,12 @@ import styles from './Home-page.module.css';
 import poppins from '../../../utils/font';
 
 const HomePage = () => {
-    const { user, loading } = useContext(AuthContext);
+    const { user, loading, track } = useContext(AuthContext);
     const [activeFeature, setActiveFeature] = useState(0);
+
+    //Ref if the user has tracked page view before
+    const trackedPageView = useRef(false);
+
 
     const router = useRouter();
 
@@ -16,7 +20,7 @@ const HomePage = () => {
         //Check if the user is logged in after we are done loading
         if (!loading && user) {
             console.log('User is not logged in, redirecting to login page');
-            router.push('/notebooks');
+            router.push('/login');
         }
     }, []);
 
@@ -26,6 +30,13 @@ const HomePage = () => {
         { title: 'Always accessible', description: 'Notebook Chat is available on all your devices, so you can access your notes anywhere, anytime.' },
         { title: 'Stay organized', description: 'Notebook Chat provides you with the ability to efficiently organize your notes by creating notebooks, ensuring your information is well-structured and easily accessible.' }
     ]
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && !trackedPageView.current) {
+            trackedPageView.current = true;
+            track('Pageview', { page: 'Home page', url: window.location.href });
+        }
+    }, []);
 
 
     return (

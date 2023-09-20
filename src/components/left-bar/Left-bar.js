@@ -11,12 +11,13 @@ const LeftBar = ({ searchFunction, notebook = null }) => {
 
     const router = useRouter();
 
-    const { workbooks, deleteWorkbook, updateWorkbook, addPage, logout } = useContext(AuthContext);
+    const { addPage, logout, track } = useContext(AuthContext);
 
     const addPageHandler = async (e) => {
         e.preventDefault();
         let newPage = await addPage(notebook._id);
         if (newPage) {
+            track('Page created', { page: newPage?.title, notebook: notebook?.title, from: 'Left bar' });
             router.push(`/notebook/${notebook._id}/page/${newPage._id}`);
         }
     }

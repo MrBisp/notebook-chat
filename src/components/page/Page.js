@@ -6,7 +6,7 @@ import Tiptap from '../tiptap/TipTap';
 import EditorMenu from '../editor-menu/Editor-menu';
 
 const Page = ({ page, initialContent, workbookId }) => {
-    const { updatePage, authToken, user } = useContext(AuthContext);
+    const { updatePage, authToken, user, track } = useContext(AuthContext);
     const [content, setContent] = useState(initialContent);
     const [pageTitle, setPageTitle] = useState(page.title);
     const [editingTitle, setEditingTitle] = useState(false);
@@ -36,6 +36,7 @@ const Page = ({ page, initialContent, workbookId }) => {
         }
         updatePage(page._id, update, workbookId)
         updatePinecone();
+        track('Page saved', { page: page.title, notebook: workbookId })
     }
 
     const updatePinecone = async () => {
