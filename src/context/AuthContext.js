@@ -57,6 +57,8 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const data = await response.json();
+            console.log('Got this data from login server')
+            console.log(data);
 
             if (!data.authToken) {
                 return false;
