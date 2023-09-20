@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+
     const [authToken, setAuthToken] = useState(null);
     const [user, setUser] = useState(null);
     const [conversations, setConversations] = useState([]);
