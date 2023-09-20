@@ -3,9 +3,11 @@ import jwt from 'jsonwebtoken';
 import { Page } from "models/Workbook";
 import { OpenAIStream, streamToResponse } from 'ai';
 import OpenAI from 'openai';
+import dbConnect from '../../../../utils/dbConnect';
 export const runtime = 'nodejs'
 
 export default async function POST(req, res) {
+    await dbConnect();
     const { messages } = req.body;
 
     let pagesForResponse = [];

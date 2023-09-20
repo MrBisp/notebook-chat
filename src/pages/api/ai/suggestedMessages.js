@@ -2,10 +2,11 @@ import jwt from 'jsonwebtoken';
 import User from "models/User";
 export const runtime = 'nodejs'
 import OpenAI from 'openai';
+import dbConnect from '../../../../utils/dbConnect';
 
 
 export default async function POST(req, res) {
-
+    await dbConnect();
 
     //Decode the token
     const token = req.headers.authorization.split(' ')[1];

@@ -5,8 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const handler = async (req, res) => {
-
-    dbConnect();
+    await dbConnect();
 
     const { method } = req;
 
