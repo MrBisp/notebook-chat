@@ -34,7 +34,7 @@ const Tiptap = ({ saveHandler, value, setEditor }) => {
                         chars: 1000
                     })
                 )
-                track("Autofill", { page: page.title, notebook: workbookId, source: '+++' })
+                track("Autofill", { source: '+++' })
             }
         },
         onCreate: e => {

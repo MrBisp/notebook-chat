@@ -16,6 +16,7 @@ export default async function POST(req, res) {
     const addToMessage = "";
     const minSimiliarty = 0.70;
     const maxTokens = 150;
+    const temperature = 0.9;
 
     //Decode the token
     const token = req.headers.authorization.split(' ')[1];
@@ -140,14 +141,21 @@ export default async function POST(req, res) {
         }
     }
 
+    //Add a system message as the second message
+    messages.unshift({
+        role: 'assistant',
+        content: 'Sure! I will absolutely not make any bulletpoints and response in the way you have suggested. And give short responses (max 100 words!) Ready to start the conversation? 😊'
+    })
+
     //Add a system message to the start of the messages array
     messages.unshift({
-        role: 'system',
-        content: 'You are a chatbot on the website Notebook-chat.com. ' +
-            'When relevant, Search in user\'s notes to find the most relevant pages to answer their questions.' +
-            'Users expect that you search in their notes, unless they ask follow up questions or just say very basic stuff like hi and so on!' +
-            'Please respond with html formatted text when it makes sense!' +
-            'Give a short but insightful answer! Be passionate, supportive, but challenge the user! You will not directly quote or recite notes, but use them as context, so you can be more useful.'
+        role: 'user',
+        content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
+            'Here are som examples:' +
+            '"Let\'s brainstorm some ways to make the booking process easier and more efficient for people! 💡 To start, let\'s consider the current process and figure out where the pain points are. Can you walk me through the booking process, from the perspective of a typical user?"' +
+            '"Absolutely, that\'s what I\'m here for! 😉 I can ask insightful questions and give straightforward answers. I\'m ready to help you have a conversation that is as meaningful and productive as possible. What would you like to discuss?"' +
+            '"It\'s great that you\'re taking the time to think about your business strategy! Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? I\'d be happy to help you think through this decision."' +
+            '"I would love to help you think through this! Would you mind walking me through how it works today? 😊 "'
     })
 
     //Alter the latest message
@@ -177,7 +185,7 @@ export default async function POST(req, res) {
     const initialResponse = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo-0613',
         messages,
-        temperature: 0.2,
+        temperature: temperature,
         stream: true,
         max_tokens: maxTokens,
         functions: functions,

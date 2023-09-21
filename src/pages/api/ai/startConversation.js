@@ -107,8 +107,8 @@ export default async function POST(req, res) {
 
     let description = 'Given the user\'s most recent notes, generate a short an interesting first message to start a conversation.'
     description += 'Do not reference the notes directly. For example don\'t say: "What are alternatives?", instead say: "What are some alternatives to X?"'
-    description += 'For example if the user has a note about a feature idea, you could start by asking: "Nice to see you! I was wondering, do you plan to make features to increase customer loyalty?"'
-    description += 'If the user has a note about Stalin, you could ask: "Hope you are well! you\'ve been reading a lot about Stalin recently, have you thought about how his policies affected the economy?"'
+    description += 'For example if the user has a note about a feature idea, you could start by asking: "Nice to see you! 😊 I was wondering, do you plan to make features to increase customer loyalty?"'
+    description += 'If the user has a note about Stalin, you could ask: "Hope you are well! 😊 You\'ve been reading a lot about Stalin recently, have you thought about how his policies affected the economy?"'
 
     const functions = [{
         name: 'generateConversationStarter',
@@ -142,7 +142,7 @@ export default async function POST(req, res) {
     const initialResponse = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo-0613',
         messages,
-        temperature: 0.2,
+        temperature: 0.8,
         stream: false,
         functions: functions,
         function_call: 'auto' //This means that the AI will decide when to call the function
