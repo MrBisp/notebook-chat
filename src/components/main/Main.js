@@ -4,14 +4,14 @@ import LeftBar from '../../components/left-bar/Left-bar';
 import { AuthContext } from '../../context/AuthContext';
 import Link from "next/link";
 import Chat from "../chat/Chat";
-import { MdHome, MdOutlineAssignment, MdMenuBook, MdChat, MdEditNote } from 'react-icons/md';
+import { MdHome, MdOutlineAssignment, MdMenuBook, MdChat, MdEditNote, MdLogout } from 'react-icons/md';
 import { MdClose, MdSearch, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
 import { useRouter } from "next/router";
 import poppins from "../../../utils/font";
 
 const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) => {
 
-    const { authToken } = useContext(AuthContext);
+    const { authToken, logout } = useContext(AuthContext);
 
     const [showLeft, setShowLeft] = useState(true);
     const [showRight, setShowRight] = useState(true);
@@ -346,6 +346,23 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                     </div>
                                     <div className={styles.MobileBottomNavbar__item__text}>
                                         Local chat
+                                    </div>
+                                </div>
+                            )
+                        }
+                        {
+                            !page && (
+                                <div className={styles.MobileBottomNavbar__item} onClick={() => {
+                                    localStorage.removeItem('notebook-chat');
+                                    localStorage.removeItem('suggested-messages');
+                                    localStorage.removeItem('first-message');
+                                    logout();
+                                }}>
+                                    <div className={styles.MobileBottomNavbar__item__icon}>
+                                        <MdLogout />
+                                    </div>
+                                    <div className={styles.MobileBottomNavbar__item__text}>
+                                        Log out
                                     </div>
                                 </div>
                             )

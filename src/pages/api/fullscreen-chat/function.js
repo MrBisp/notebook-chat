@@ -154,7 +154,7 @@ export default async function POST(req, res) {
         },
         {
             role: 'assistant',
-            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short responses (max 100 words!) Ready to start the conversation? 😊'
+            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short responses (max 100 words!). And I will answer with questions. Ready to start the conversation? 😊'
         }
     )
 
