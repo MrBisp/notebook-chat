@@ -137,11 +137,11 @@ export default async function POST(req, res) {
     const messages = [
         {
             role: 'system',
-            content: 'Generate suggested conversation starts by calling the function'
+            content: 'Generate suggested conversation starts by calling the function with the 3 questions'
         },
         {
             role: 'user',
-            content: 'Give me suggested conversation starts (call the function!!!) based on my notes: ' + pagesAsString
+            content: 'Give me 3 suggested conversation starts (call the function!) based on my notes: ' + pagesAsString
         }
     ]
 
@@ -157,6 +157,9 @@ export default async function POST(req, res) {
         functions: functions,
         function_call: 'auto' //This means that the AI will decide when to call the function
     })
+
+    console.log('Suggested messages:')
+    console.log(initialResponse.choices[0])
 
     const response = initialResponse.choices[0].message.function_call.arguments;
     console.log("Response: ", response);
