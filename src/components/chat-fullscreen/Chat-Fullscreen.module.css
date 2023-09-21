@@ -207,7 +207,9 @@
 /* MOBILE */
 @media (max-width: 768px) {
     .chatFooter {
-        margin-bottom: 5rem;
+        position: fixed;
+        bottom: 3rem;
+        width: calc(100% - 2rem);
     }
 
     .buttonContainer {

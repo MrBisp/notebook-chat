@@ -141,22 +141,22 @@ export default async function POST(req, res) {
         }
     }
 
-    //Add a system message as the second message
-    messages.unshift({
-        role: 'assistant',
-        content: 'Sure! I will absolutely not make any bulletpoints and response in the way you have suggested. And give short responses (max 100 words!) Ready to start the conversation? 😊'
-    })
-
     //Add a system message to the start of the messages array
-    messages.unshift({
-        role: 'user',
-        content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
-            'Here are som examples:' +
-            '"Let\'s brainstorm some ways to make the booking process easier and more efficient for people! 💡 To start, let\'s consider the current process and figure out where the pain points are. Can you walk me through the booking process, from the perspective of a typical user?"' +
-            '"Absolutely, that\'s what I\'m here for! 😉 I can ask insightful questions and give straightforward answers. I\'m ready to help you have a conversation that is as meaningful and productive as possible. What would you like to discuss?"' +
-            '"It\'s great that you\'re taking the time to think about your business strategy! Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? I\'d be happy to help you think through this decision."' +
-            '"I would love to help you think through this! Would you mind walking me through how it works today? 😊 "'
-    })
+    messages.unshift(
+        {
+            role: 'user',
+            content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
+                'Here are som examples:' +
+                '"Let\'s brainstorm some ways to make the booking process easier and more efficient for people! 💡 To start, let\'s consider the current process and figure out where the pain points are. Can you walk me through the booking process, from the perspective of a typical user?"' +
+                '"Absolutely, that\'s what I\'m here for! 😉 I can ask insightful questions and give straightforward answers. I\'m ready to help you have a conversation that is as meaningful and productive as possible. What would you like to discuss?"' +
+                '"It\'s great that you\'re taking the time to think about your business strategy! Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? I\'d be happy to help you think through this decision."' +
+                '"I would love to help you think through this! Would you mind walking me through how it works today? 😊 "'
+        },
+        {
+            role: 'assistant',
+            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short responses (max 100 words!) Ready to start the conversation? 😊'
+        }
+    )
 
     //Alter the latest message
     messages[messages.length - 1].content = messages[messages.length - 1].content + addToMessage;
