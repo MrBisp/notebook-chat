@@ -12,7 +12,8 @@ export default async function POST(req, res) {
 
     let pagesForResponse = [];
 
-    const addToMessage = " [if I am asking for something that could be in my notes, check in my notes (but of course not for follow-up questions). Focus on answering my question, not reciting my notes! Draw on my notes for extra context when needed. Give me a short but insightful answer!]"
+    //const addToMessage = " [if I am asking for something that could be in my notes, check in my notes (but of course not for follow-up questions). Focus on answering my question, not reciting my notes! Draw on my notes for extra context when needed. Give me a short but insightful answer!]"
+    const addToMessage = "";
     const minSimiliarty = 0.70;
     const maxTokens = 150;
 
@@ -143,9 +144,10 @@ export default async function POST(req, res) {
     messages.unshift({
         role: 'system',
         content: 'You are a chatbot on the website Notebook-chat.com. ' +
-            'Search in user\'s notes to find the most relevant pages to answer their questions.' +
+            'When relevant, Search in user\'s notes to find the most relevant pages to answer their questions.' +
             'Users expect that you search in their notes, unless they ask follow up questions or just say very basic stuff like hi and so on!' +
-            'Please respond with html formatted text when it makes sense! Give a short but insightful answer!'
+            'Please respond with html formatted text when it makes sense!' +
+            'Give a short but insightful answer! Be passionate, supportive, but challenge the user! You will not directly quote or recite notes, but use them as context, so you can be more useful.'
     })
 
     //Alter the latest message
