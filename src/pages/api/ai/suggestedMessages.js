@@ -103,7 +103,7 @@ export default async function POST(req, res) {
     }
 
 
-    console.log("Pages as string: ", pagesAsString)
+    //console.log("Pages as string: ", pagesAsString)
 
 
     let description = 'Given the user\'s most recent notes, generate questions the user can ask to start a conversation, that are related to their notes.'
@@ -137,11 +137,11 @@ export default async function POST(req, res) {
     const messages = [
         {
             role: 'system',
-            content: 'Generate suggested conversation starts'
+            content: 'Generate suggested conversation starts by calling the function'
         },
         {
             role: 'user',
-            content: 'Give me suggested conversation starts based on my notes: ' + pagesAsString
+            content: 'Give me suggested conversation starts (call the function!!!) based on my notes: ' + pagesAsString
         }
     ]
 
