@@ -26,7 +26,7 @@
     align-items: center;
     justify-content: center;
     min-height: 80vh;
-    background: linear-gradient(180deg, rgba(255, 73, 41, 0.1), rgba(212, 212, 26, 0.1), rgba(0, 0, 0, 0.025));
+    background: white
 }
 
 .hero h1 {
@@ -46,8 +46,6 @@
 }
 
 .hero img {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
     width: 100%;
     max-width: 56rem;
     margin: 1rem;
@@ -58,7 +56,7 @@
     font-weight: 700;
     text-decoration: none;
     color: #fff;
-    background: linear-gradient(90deg, #ff4929, #d4d41a);
+    background: #ff4040;
     padding: 1rem 2rem;
     border-radius: 8px;
     transition: all 0.2s ease-in-out;

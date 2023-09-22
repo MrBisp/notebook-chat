@@ -312,9 +312,6 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                             <div className={styles.MobileBottomNavbar__item__icon}>
                                 <MdHome />
                             </div>
-                            <div className={styles.MobileBottomNavbar__item__text}>
-                                Home
-                            </div>
                         </div>
                         <div className={styles.MobileBottomNavbar__item} onClick={() => {
                             router.push('/chat');
@@ -322,18 +319,12 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                             <div className={styles.MobileBottomNavbar__item__icon}>
                                 <MdChat />
                             </div>
-                            <div className={styles.MobileBottomNavbar__item__text}>
-                                Chat
-                            </div>
                         </div>
                         <div className={styles.MobileBottomNavbar__item} onClick={() => {
                             setShowSearch(!showSearch);
                         }}>
                             <div className={styles.MobileBottomNavbar__item__icon}>
                                 <MdSearch />
-                            </div>
-                            <div className={styles.MobileBottomNavbar__item__text}>
-                                Search
                             </div>
                         </div>
                         {
@@ -343,9 +334,6 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                 }}>
                                     <div className={styles.MobileBottomNavbar__item__icon}>
                                         <MdChat />
-                                    </div>
-                                    <div className={styles.MobileBottomNavbar__item__text}>
-                                        Local chat
                                     </div>
                                 </div>
                             )
@@ -360,9 +348,6 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                 }}>
                                     <div className={styles.MobileBottomNavbar__item__icon}>
                                         <MdLogout />
-                                    </div>
-                                    <div className={styles.MobileBottomNavbar__item__text}>
-                                        Log out
                                     </div>
                                 </div>
                             )

@@ -60,69 +60,23 @@ const HomePage = () => {
                     <h1>Your Personal Knowledge Partner</h1>
                     <h2>Notebook Chat allows you to chat about your notes using AI with deep understanding.</h2>
                     <Link href="/register">Get Brain-superpowers</Link>
-                    <img src="/hero.png" alt="hero" />
+                    <img src="/hero-macbook.png" alt="hero" />
                 </div>
                 <div className={styles.container} style={{ "background": "rgba(0, 0, 0, 0.025)" }}>
                     <div className={styles.features}>
-                        <h3>A simple notetaking app. With a twist.</h3>
-                        <p className={styles.featuresText}>
-                            Use Notebook Chat to take notes, and then use the power of AI to get insights, brainstorm and get feedback.
+                        <span className={styles.smallTextAboveHeader}>Features</span>
+                        <h2>A simple notes app with a twist</h2>
+                        <p>
+                            Focus on writing notes,
                         </p>
 
-                        <div className={styles.featureSection}>
-                            <div className={styles.featureTabs}>
-                                {features.map((feature, index) => (
-                                    <div key={index} className={`${styles.featureTab} ${activeFeature === index ? styles.active : ''}`} onClick={() => setActiveFeature(index)}>
-                                        <h4>{feature.title}</h4>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className={styles.activeFeature}>
-                                <h4>{features[activeFeature].title}</h4>
-                                <p>{features[activeFeature].description}</p>
-                            </div>
-                        </div>
+
 
                     </div>
+                    <div className={styles.spacer}></div>
                 </div>
-                <div className={styles.container}>
-                    <div className={styles.howItWorks}>
-                        <h3>How it works</h3>
-                        <div className={styles.howItWorksSection}>
-                            <div className={styles.howItWorksStep}>
-                                <div className={styles.howItWorksStepNumber}>1</div>
-                                <div className={styles.howItWorksStepText}>
-                                    <h4>Take notes</h4>
-                                    <p>
-                                        Take notes using the simple editor.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className={styles.howItWorksStep}>
-                                <div className={styles.howItWorksStepNumber}>2</div>
-                                <div className={styles.howItWorksStepText}>
-                                    <h4>Collaborate with the AI</h4>
-                                    <p>
-                                        Use the AI to get insights, brainstorm and get feedback.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className={styles.howItWorksStep}>
-                                <div className={styles.howItWorksStepNumber}>3</div>
-                                <div className={styles.howItWorksStepText}>
-                                    <h4>Ask the AI questions</h4>
-                                    <p>
-                                        Recall your notes by asking the AI questions.
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-                <div className={styles.spacer}></div>
             </div>
+
         </>
     )
 }
