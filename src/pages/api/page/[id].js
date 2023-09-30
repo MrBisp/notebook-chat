@@ -2,6 +2,7 @@ import dbConnect from "utils/dbConnect";
 import User from "models/User";
 import { Page, Workbook } from "models/Workbook";
 import jwt from "jsonwebtoken";
+import { Pinecone } from '@pinecone-database/pinecone';
 
 export default async (req, res) => {
     await dbConnect();
@@ -73,6 +74,15 @@ export default async (req, res) => {
                     workbook.lastEdited = Date.now();
                     await workbook.save();
                 }
+
+                //Now remove the page from pinecone
+                const pinecone = new Pinecone({
+                    apiKey: process.env.PINECONE_API_KEY,
+                    environment: process.env.PINECONE_ENVIRONMENT
+                })
+                const index = pinecone.index(process.env.PINECONE_INDEX);
+                await index.deleteOne(id);
+
             } catch (error) {
                 console.log(error)
                 res.status(400).json({ success: false, error: error });
