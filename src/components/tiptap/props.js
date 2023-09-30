@@ -18,6 +18,7 @@ export const TiptapEditorProps = {
     handlePaste: (view, event) => {
         console.log("Pasting something!")
 
+        //Handle images
         let items = event.clipboardData.items;
 
         let blob = null;
