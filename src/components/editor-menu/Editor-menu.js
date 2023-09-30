@@ -436,7 +436,7 @@ const EditorMenu = ({ editor }) => {
                     showLink &&
                     <>
                         <div className={styles.submenu}>
-                            <form>
+                            <form className={styles.link}>
                                 <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
                                 {editor.getAttributes("link").href ? (
                                     <button
