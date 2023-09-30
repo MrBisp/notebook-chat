@@ -16,20 +16,30 @@ export const TiptapEditorProps = {
         }
     },
     handlePaste: (view, event) => {
-        if (
-            event.clipboardData &&
-            event.clipboardData.files &&
-            event.clipboardData.files[0]
-        ) {
-            event.preventDefault()
-            const file = event.clipboardData.files[0]
-            const pos = view.state.selection.from
+        console.log("Pasting something!")
 
-            startImageUpload(file, view, pos)
-            //Paste in image as base64 encoded
-            return true
+        let items = event.clipboardData.items;
+
+        let blob = null;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+                blob = items[i].getAsFile();
+            }
         }
-        return false
+
+        console.log(blob)
+
+        if (blob !== null) {
+            event.preventDefault();
+            console.log("Blob is not null")
+            const file = blob;
+            const pos = view.state.selection.from;
+            startImageUpload(file, view, pos);
+
+            return true;
+        }
+        return false;
+
     },
     handleDrop: (view, event, _slice, moved) => {
         if (

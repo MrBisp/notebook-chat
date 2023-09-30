@@ -5,6 +5,7 @@ import { TiptapExtensions } from "./extensions"
 import { useCompletion } from "ai/react"
 import { getPrevText } from "./editor"
 import { AuthContext } from "@/context/AuthContext"
+import { ImageResizer } from "./components/image-resizer";
 
 const Tiptap = ({ saveHandler, value, setEditor }) => {
     const { authToken, user, track } = useContext(AuthContext)
@@ -127,6 +128,7 @@ const Tiptap = ({ saveHandler, value, setEditor }) => {
             }}
             className="editor"
         >
+            {editor?.isActive("image") && <ImageResizer editor={editor} />}
             <EditorContent editor={editor} />
         </div>
     );

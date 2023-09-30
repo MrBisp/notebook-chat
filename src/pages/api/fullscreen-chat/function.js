@@ -109,7 +109,6 @@ export default async function POST(req, res) {
             }
         })
 
-        //TODO: Get the pages from the database
         const pages = await Page.find({ _id: { $in: matches.map((match) => match.id) } });
 
         pagesForResponse = pages;

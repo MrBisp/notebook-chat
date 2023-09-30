@@ -50,19 +50,20 @@ export default UploadImagesPlugin
 
 function findPlaceholder(state, id) {
     const decos = uploadKey.getState(state)
-    const found = decos.find(null, null, spec => spec.id == id)
-    return found.length ? found[0].from : null
+    const found = decos?.find(null, null, spec => spec.id == id)
+    return found?.length ? found[0].from : null
 }
 
 export function startImageUpload(file, view, pos) {
+    console.log("Starting image upload...");
     // check if the file is an image
     if (!file.type.includes("image/")) {
-        toast.error("File type not supported.")
+        console.log("File type not supported.")
         return
 
         // check if the file size is less than 20MB
     } else if (file.size / 1024 / 1024 > 20) {
-        toast.error("File size too big (max 20MB).")
+        console.log("File size too big (max 20MB).")
         return
     }
 
@@ -76,6 +77,7 @@ export function startImageUpload(file, view, pos) {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => {
+        console.log("Reader loaded.")
         tr.setMeta(uploadKey, {
             add: {
                 id,
@@ -87,12 +89,13 @@ export function startImageUpload(file, view, pos) {
     }
 
     handleImageUpload(file).then(src => {
+        console.log("Handling image upload...")
         const { schema } = view.state
 
         let pos = findPlaceholder(view.state, id)
         // If the content around the placeholder has been deleted, drop
         // the image
-        if (pos == null) return
+        //if (pos == null) return
 
         // Otherwise, insert it at the placeholder's position, and remove
         // the placeholder
@@ -110,6 +113,7 @@ export function startImageUpload(file, view, pos) {
 }
 
 export const handleImageUpload = file => {
+    console.log("Handling image upload...")
     // upload to Vercel Blob
     return new Promise(resolve => {
         toast.promise(
@@ -121,6 +125,7 @@ export const handleImageUpload = file => {
                 },
                 body: file
             }).then(async res => {
+                console.log(res);
                 // Successfully uploaded image
                 if (res.status === 200) {
                     const { url } = await res.json()
@@ -128,6 +133,7 @@ export const handleImageUpload = file => {
                     let image = new Image()
                     image.src = url
                     image.onload = () => {
+                        console.log("Image loaded. Url: ", url);
                         resolve(url)
                     }
                     // No blob store configured

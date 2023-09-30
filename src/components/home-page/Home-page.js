@@ -28,7 +28,9 @@ const HomePage = () => {
         { title: 'Deep knowledge', description: 'Notebook Chat uses the latest AI to understand your notes, and recall them when you need them. It\'s basically like having infinite memory.' },
         { title: 'Simple to use', description: 'Do you want customizable tables, expandable texts, and other fancy stuff? Then Notebook Chat is not for you. Notebook Chat is simple, and that\'s the way we like it.' },
         { title: 'Always accessible', description: 'Notebook Chat is available on all your devices, so you can access your notes anywhere, anytime.' },
-        { title: 'Stay organized', description: 'Notebook Chat provides you with the ability to efficiently organize your notes by creating notebooks, ensuring your information is well-structured and easily accessible.' }
+        { title: 'Stay organized', description: 'Notebook Chat provides you with the ability to efficiently organize your notes by creating notebooks, ensuring your information is well-structured and easily accessible.' },
+        { title: 'Knowledge partner', description: 'The AI will use your notes to ask you questions, and help you think through your ideas. It\'s like having a personal knowledge partner.' },
+        { title: 'Autofill', description: 'Feel stuck? Simply input \'+++\', and the AI will continue writing for you.' },
     ]
 
     useEffect(() => {
@@ -65,10 +67,20 @@ const HomePage = () => {
                 <div className={styles.container} style={{ "background": "rgba(0, 0, 0, 0.025)" }}>
                     <div className={styles.features}>
                         <span className={styles.smallTextAboveHeader}>Features</span>
-                        <h2>A simple notes app with a twist</h2>
+                        <h2>More than just a notes app</h2>
                         <p>
-                            Focus on writing notes,
+                            Notebook-Chat's AI understands you, and helps you recall your notes, discuss ideas, and stay organized.
                         </p>
+
+                        <div className={styles.featureList}>
+                            {features.map((feature, index) => (
+                                <div key={index} className={styles.feature} onClick={() => setActiveFeature(index)}>
+                                    <h3>{feature.title}</h3>
+                                    <p>{feature.description}</p>
+                                </div>
+                            ))}
+
+                        </div>
 
 
 
