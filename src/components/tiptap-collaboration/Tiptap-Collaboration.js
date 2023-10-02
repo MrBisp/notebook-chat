@@ -15,12 +15,12 @@ export default function App({ id }) {
     return (
         <>
             <h1>Test editor</h1>
-            <Editor ydoc={ydoc} />
+            <Editor ydoc={ydoc} provider={provider} />
         </>
     );
 }
 
-export function Editor({ ydoc }) {
+export function Editor({ ydoc, provider }) {
     const editorOne = useEditor({
         extensions: [
             StarterKit.configure({ history: false }),
