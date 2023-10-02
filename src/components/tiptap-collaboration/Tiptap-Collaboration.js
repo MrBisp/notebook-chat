@@ -5,12 +5,15 @@ import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
 import StarterKit from "@tiptap/starter-kit";
+import Router from "next/router";
 
-const chapterId = "123456123123aaaa";
+const chapterId = Router.query.id;
+
 const ydoc = new Y.Doc();
 const provider = new WebrtcProvider(chapterId, ydoc);
 
 export default function App() {
+
     return (
         <>
             <h1>Test editor</h1>
