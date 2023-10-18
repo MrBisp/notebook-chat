@@ -1,6 +1,7 @@
 import dbConnect from "utils/dbConnect";
 import { Workbook, Page } from "models/Workbook";
 import jwt from "jsonwebtoken";
+import { Pinecone } from '@pinecone-database/pinecone';
 
 export default async (req, res) => {
     await dbConnect();
@@ -49,8 +50,16 @@ export default async (req, res) => {
             //Delete the workbook and all pages
             const wBeforeDelete = await Workbook.findOne({ _id: id });
             const pages_ids = wBeforeDelete.pages;
-            const pages = await Page.deleteMany({ id: { $in: pages_ids } });
+            const pages = await Page.deleteMany({ _id: { $in: pages_ids } });
             const wDelete = await Workbook.deleteOne({ _id: id });
+
+            //Now, delete from pinecone
+            const pinecone = new Pinecone({
+                apiKey: process.env.PINECONE_API_KEY,
+                environment: process.env.PINECONE_ENVIRONMENT
+            })
+            const index = pinecone.index(process.env.PINECONE_INDEX);
+            await index.deleteMany(pages_ids);
 
             if (!wDelete) {
                 res.status(400).json({ success: false });

@@ -114,8 +114,8 @@ const Chat = ({ currentPage, workbook }) => {
 
     useEffect(() => {
         if (contextOption === 'current-page') {
-            document.getElementById('currentPage').classList.add(styles.active);
-            document.getElementById('choosePages').classList.remove(styles.active);
+            document.getElementById('currentPage')?.classList.add(styles.active);
+            document.getElementById('choosePages')?.classList.remove(styles.active);
 
             setContextPages([currentPage]);
         } else {
@@ -130,8 +130,9 @@ const Chat = ({ currentPage, workbook }) => {
 
     //Update workbook when context changes
     useEffect(() => {
+        if (!workbook) return;
         //First, let's find the workbook that the current page belongs to based on the prop
-        let updatedWorkbook = workbooks.find(w => w._id === workbook._id);
+        let updatedWorkbook = workbooks.find(w => w._id === workbook?._id);
 
         //Now let's update the pages in contextPages
         let updatedPages = [];
@@ -177,32 +178,38 @@ const Chat = ({ currentPage, workbook }) => {
                 <div className={styles.scrollable} id="notebook-chat-scrollable">
                     <div className={styles.top}>
                         <h1 className={styles.header}>Chat</h1>
-                        <span className={styles.answerFromText}>Answering user context from</span>
-                        <div className={styles.contextBox} id='currentPage' onClick={() => { console.log("Setting current page"); setContextOption('current-page') }}>
-                            <MdOutlineAssignment />
-                            <span>Current page</span>
-                        </div>
-                        <div className={styles.contextBox} id='choosePages' onClick={() => { setContextOption('choose-pages'); setShowSelectPages(true) }}>
-                            <MdMenuBook />
-                            <span>Choose pages</span>
-                        </div>
-                        <div className={styles.currentContext}>
-                            {
-                                contextPages.length > 0 &&
-                                contextPages.map((page, index) => {
-                                    if (page?.title) {
-                                        return (
-                                            <span key={index} className={styles.contextPage}>{index + 1 == contextPages.length ? page.title : page.title + ', '}</span>
-                                        )
-                                    }
-                                })
-                            }
-                            {
-                                contextPages.length === 0 &&
-                                <span className={styles.contextPage}>No pages selected</span>
-                            }
+                        {
+                            workbook && (
+                                <>
+                                    <span className={styles.answerFromText}>Answering user context from</span>
+                                    <div className={styles.contextBox} id='currentPage' onClick={() => { console.log("Setting current page"); setContextOption('current-page') }}>
+                                        <MdOutlineAssignment />
+                                        <span>Current page</span>
+                                    </div>
+                                    <div className={styles.contextBox} id='choosePages' onClick={() => { setContextOption('choose-pages'); setShowSelectPages(true) }}>
+                                        <MdMenuBook />
+                                        <span>Choose pages</span>
+                                    </div>
+                                    <div className={styles.currentContext}>
+                                        {
+                                            contextPages.length > 0 &&
+                                            contextPages.map((page, index) => {
+                                                if (page?.title) {
+                                                    return (
+                                                        <span key={index} className={styles.contextPage}>{index + 1 == contextPages.length ? page.title : page.title + ', '}</span>
+                                                    )
+                                                }
+                                            })
+                                        }
+                                        {
+                                            contextPages.length === 0 &&
+                                            <span className={styles.contextPage}>No pages selected</span>
+                                        }
+                                    </div>
+                                </>
+                            )
+                        }
 
-                        </div>
                     </div>
                     <div className={styles.messages} id="messagesContainer">
                         <div className={styles.messagesInner}>

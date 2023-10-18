@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [workbooks, setWorkbooks] = useState([]);
+    const [modalContent, setModalContent] = useState(null);
 
     const [loading, setLoading] = useState(true);
     const [userSet, setUserSet] = useState(false);
@@ -92,6 +93,8 @@ export const AuthProvider = ({ children }) => {
                     if (!data.user) {
                         return;
                     }
+
+                    console.log('Successfully logged in user: ' + JSON.stringify(data.user));
 
                     setUser(data.user);
                     setConversations(data.user.conversations);
@@ -403,14 +406,13 @@ export const AuthProvider = ({ children }) => {
 
 
     const updatePage = async (id, data, workbookId) => {
-        //console.log('Updating page: ' + id + ' with data: ' + JSON.stringify(data));
         try {
             //Only update the data that is sent with the request
             const updateData = {};
             if (data.title) updateData.title = data.title;
             if (data.content) updateData.content = data.content;
             if (data.subPages) updateData.subPages = data.subPages;
-            updateData.workbookId = workbookId;
+            updateData.workbookId = workbookId ? workbookId : null;
             const response = await fetch(`/api/page/${id}`, {
                 method: "PUT",
                 body: JSON.stringify(updateData),
@@ -420,10 +422,11 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const updatedPage = await response.json();
-            //console.log('Updated page: ' + JSON.stringify(updatedPage));
+            console.log('Updated page: ' + JSON.stringify(updatedPage));
 
             //Update the workbooks state as well
             if (updatedPage.success) {
+                if (!workbookId) return;
                 setWorkbooks((prevWorkbooks) =>
                     prevWorkbooks.map((workbook) => {
                         if (workbook._id === workbookId) {
@@ -573,7 +576,9 @@ export const AuthProvider = ({ children }) => {
         updateWorkbook,
         deleteWorkbook,
         sendNotebookChatMessage,
-        track
+        track,
+        modalContent,
+        setModalContent
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

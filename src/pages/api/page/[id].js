@@ -1,5 +1,6 @@
 import dbConnect from "utils/dbConnect";
 import User from "models/User";
+import UserPageAccess from "models/UserPageAccess";
 import { Page, Workbook } from "models/Workbook";
 import jwt from "jsonwebtoken";
 import { Pinecone } from '@pinecone-database/pinecone';
@@ -8,31 +9,61 @@ export default async (req, res) => {
     await dbConnect();
 
     const {
-        method,
-        query: { id }
+        method, query: { id }
     } = req;
 
-    const page = Page.findOne({ _id: id });
+    const page = await Page.findOne({ _id: id });
 
-    if (page) {
-        const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        //Get user and populate with both workbooks and populate the workbooks with the pages
-        const user = await User.findOne({ _id: decoded.user }).populate({
-            path: 'workbooks',
-            populate: {
-                path: 'pages'
-            }
-        });
-
-        if (!user) {
-            res.status(401).json({ success: false });
-        }
+    if (!page) {
+        res.status(404).json({ success: false, error: "Page not found" });
+        return;
     }
+
+    //console.log(req.headers.authorization)
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+
+    //Get user and populate with both workbooks and populate the workbooks with the pages
+    const userPageAccess = await UserPageAccess.find({
+        user: decoded.user._id,
+        page: id
+    }).exec();
+
+    //console.log(userPageAccess);
+
+
+    //If the user has access to the page, then continue
+    if (userPageAccess.length === 0) {
+        res.status(401).json({ success: false, error: "User does not have access to this page" });
+        return;
+    }
+
+
     switch (method) {
+        case "GET":
+            try {
+                //Get the page
+                const page = await Page.findById(id);
+                res.status(200).json({
+                    success: true,
+                    page: page,
+                    accessLevel: userPageAccess[0].accessLevel
+                });
+            } catch (error) {
+                res.status(400).json({ success: false, error: error });
+            }
+            break;
         case "PUT":
             try {
+                const allowedPermissions = ["write", "owner"]
+                //First check if the user has write access to the page
+                if (!allowedPermissions.includes(userPageAccess[0].accessLevel)) {
+                    res.status(401).json({ success: false, error: "User does not have write access to this page" });
+                    return;
+                }
+
+
                 //Update the page with changes from req.body.data
                 const updates = {}
                 if (req.body.title) {
@@ -51,10 +82,12 @@ export default async (req, res) => {
                 res.status(200).json({ success: true, page: updatedPage });
 
                 //Now update the workbook
-                const workbook = await Workbook.findOne({ _id: req.body.workbookId });
-                if (workbook) {
-                    workbook.lastEdited = Date.now();
-                    await workbook.save();
+                if (req.body.workbookId) {
+                    const workbook = await Workbook.findOne({ _id: req.body.workbookId });
+                    if (workbook) {
+                        workbook.lastEdited = Date.now();
+                        await workbook.save();
+                    }
                 }
 
             } catch (error) {
@@ -64,6 +97,11 @@ export default async (req, res) => {
             break;
         case "DELETE":
             try {
+                if (userPageAccess[0].accessLevel !== "owner") {
+                    res.status(401).json({ success: false, error: "User does not have write access to this page" });
+                    return;
+                }
+
                 //Delete the page
                 const deletedPage = await Page.findByIdAndDelete(id);
                 res.status(200).json({ success: true });

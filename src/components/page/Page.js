@@ -5,7 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 import Tiptap from '../tiptap/TipTap';
 import EditorMenu from '../editor-menu/Editor-menu';
 
-const Page = ({ page, initialContent, workbookId }) => {
+const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) => {
     const { updatePage, authToken, user, track } = useContext(AuthContext);
     const [content, setContent] = useState(initialContent);
     const [pageTitle, setPageTitle] = useState(page.title);
@@ -22,13 +22,13 @@ const Page = ({ page, initialContent, workbookId }) => {
 
     const handleContentChange = (content) => {
         setContent(content);
+
         changeSinceLastSave.current = true;
         lastChange.current = new Date().getTime();
         contentRef.current = content;
     }
 
     const savePage = async () => {
-        console.log('Saving page...')
         let update = {
             title: pageTitleRef.current,
             content: contentRef.current,
@@ -36,7 +36,7 @@ const Page = ({ page, initialContent, workbookId }) => {
         }
         updatePage(page._id, update, workbookId)
         updatePinecone();
-        track('Page saved', { page: page.title, notebook: workbookId })
+        track('Page saved', { page: page.title, notebook: workbookId ? workbookId : '[No notebook]' })
     }
 
     const updatePinecone = async () => {
@@ -111,7 +111,7 @@ const Page = ({ page, initialContent, workbookId }) => {
 
     return (
         <div className='page'>
-            <EditorMenu editor={editor} />
+            <EditorMenu editor={editor} accessLevel={accessLevel} page={page} />
             <input
                 type="text"
                 value={pageTitle}
@@ -119,7 +119,7 @@ const Page = ({ page, initialContent, workbookId }) => {
                 onBlur={handleTitleBlur}
                 className='page_title_input'
             />
-            <Tiptap saveHandler={handleContentChange} value={content} key={page._id} setEditor={setEditorFromRef} />
+            <Tiptap saveHandler={handleContentChange} value={content} key={page._id} setEditor={setEditorFromRef} pageId={page._id} />
         </div>
     )
 }

@@ -21,6 +21,7 @@ body {
     max-width: 100vw;
     overflow-x: hidden;
     position: relative;
+    background: #FAF5EA;
 }
 
 a {
@@ -399,7 +400,7 @@ pre {
 
 .page {
     width: 100%;
-    padding: 1rem;
+    padding: 0rem 1rem 1rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -412,6 +413,7 @@ pre {
     line-height: 2.5rem;
     color: #000000;
     max-width: 600px;
+    background-color: transparent;
     display: inline-block;
     margin: 0 auto;
     width: 100%;
@@ -885,6 +887,21 @@ div[data-tippy-root] div {
     overflow-x: hidden;
 }
 
+.modal-content-inner {
+    padding: 0rem 1.5rem 1.5rem;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.modal-content-inner .link-container input {
+    width: auto;
+}
+
+#linkCopiedText {
+    font-size: 0.75rem;
+}
+
 .modal-option {
     display: flex;
     flex-direction: column;
@@ -1183,6 +1200,7 @@ div[data-tippy-root] div {
     top: -1.4em;
     user-select: none;
     white-space: nowrap;
+    width: auto !important;
 }
 
 

@@ -15,6 +15,7 @@ import { InputRule } from "@tiptap/core"
 import UpdatedImage from "./updated-image";
 import UploadImagesPlugin from "../plugins/upload-images";
 
+
 const CustomImage = TiptapImage.extend({
     addProseMirrorPlugins() {
         return [UploadImagesPlugin()];
@@ -22,8 +23,11 @@ const CustomImage = TiptapImage.extend({
 });
 
 
+
+
 export const TiptapExtensions = [
     StarterKit.configure({
+        history: false,
         bulletList: {
             HTMLAttributes: {
                 class: "bulletlist"

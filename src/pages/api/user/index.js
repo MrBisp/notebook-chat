@@ -28,7 +28,13 @@ export default async (req, res) => {
                 );
 
                 console.log('User created successfully');
-                res.status(201).json({ success: true, data: { email, password } });
+                res.status(201).json({
+                    success: true, data: {
+                        email,
+                        password,
+                        id: user._id
+                    }
+                });
             } catch (error) {
                 console.log(error)
                 res.status(400).json({ success: false, error: error });

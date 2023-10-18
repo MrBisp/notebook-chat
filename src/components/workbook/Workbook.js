@@ -159,7 +159,7 @@ const Workbook = ({ workbookId, pageId = null }) => {
                     {
                         workbook && page && (
                             <div className='workbook-container'>
-                                <Page page={page} workbookId={workbook._id} initialContent={page.content} key={page._id} />
+                                <Page page={page} workbookId={workbook._id} initialContent={page.content} key={page._id} accessLevel={'owner'} />
                             </div>
                         )
                     }

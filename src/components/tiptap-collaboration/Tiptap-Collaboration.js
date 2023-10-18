@@ -1,48 +1,63 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
-import { WebrtcProvider } from "y-webrtc";
-import * as Y from "yjs";
 import StarterKit from "@tiptap/starter-kit";
+import { HocuspocusProvider } from "@hocuspocus/provider";
 
 export default function App({ id }) {
 
-    const chapterId = id;
-    const ydoc = new Y.Doc();
-    const provider = new WebrtcProvider(chapterId, ydoc);
+    const [chapterId, setChapterId] = useState(id);
+    const [provider, setProvider] = useState(null);
+
+    useEffect(() => {
+        if (!chapterId) {
+            return;
+        }
+
+        const provider = new HocuspocusProvider({
+            url: "ws://127.0.0.1:1234/",
+            name: chapterId,
+        });
+        setProvider(provider);
+
+        return () => {
+            provider.disconnect();
+        };
+    }, [chapterId]);
+
+    useEffect(() => {
+        setChapterId(id);
+    }, [id]);
 
     return (
         <>
-            <h1>Test editor</h1>
-            <Editor ydoc={ydoc} provider={provider} />
+            <h1>Test editor ({id}) ({chapterId})</h1>
+            {
+                provider && (
+                    <Editor provider={provider} />
+                )
+            }
         </>
     );
 }
 
-export function Editor({ ydoc, provider }) {
+export function Editor({ provider }) {
     const editorOne = useEditor({
         extensions: [
             StarterKit.configure({ history: false }),
             Collaboration.configure({
-                document: ydoc
+                document: provider.document
             }),
             CollaborationCursor.configure({
                 provider: provider,
                 user: {
-                    name: 'Cyndi Lauper',
-                    color: '#f783ac',
-                },
-            }),
-        ],
-        content: `
-        <p>
-          Annotations can be used to add additional information to the content, for example comments. They live on a different level than the actual editor content.
-        </p>
-        <p>
-          This example allows you to add plain text, but you’re free to add more complex data, for example JSON from another tiptap instance. :-)
-        </p>
-      `
+                    color: '#BEBEBE',
+                    name: "User 1"
+                }
+            })
+        ]
     });
 
 
@@ -51,7 +66,7 @@ export function Editor({ ydoc, provider }) {
             {editorOne && (
                 <>
                     <h1>Editor 1</h1>
-                    <EditorContent className="editor-content" editor={editorOne} />
+                    <EditorContent editor={editorOne} />
                 </>
             )}
         </>

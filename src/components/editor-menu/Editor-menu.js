@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect, useContext } from 'react';
+import { useState, useRef, useEffect, useContext, Fragment } from 'react';
 import { MdCode, MdFormatBold, MdFormatItalic, MdFormatStrikethrough, MdExpandMore, MdOutlineFormatUnderlined, MdDeleteOutline, MdCheck, MdFormatListNumbered, MdFormatListBulleted, MdOutlineDelete } from 'react-icons/md';
 import { getUrlFromString } from "/utils/misc"
 import { useCompletion } from 'ai/react'
 import styles from './Editor-menu.module.css'
 import { AuthContext } from '@/context/AuthContext';
 
-const EditorMenu = ({ editor }) => {
+const EditorMenu = ({ editor, accessLevel, page }) => {
 
-    const { authToken, user, track } = useContext(AuthContext)
+    const { authToken, user, track, setModalContent } = useContext(AuthContext)
 
     const inputRef = useRef(null)
 
@@ -52,6 +52,44 @@ const EditorMenu = ({ editor }) => {
     const [showResults, setShowResults] = useState(false)
     const [command, setCommand] = useState(null)
     const [highlightingText, setHighlightingText] = useState(false)
+
+    const showShareScreen = async () => {
+        const url = '/api/invitation'
+        const body = {
+            pageId: page._id,
+            expiration: new Date(Date.now() + 24 * 60 * 60 * 1000 * 7)
+        }
+        const headers = {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${authToken}`
+        }
+        const request = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+        })
+        const response = await request.json()
+        console.log(response)
+        const link = response.link;
+
+        const html = <Fragment>
+            <div className='modal-content-inner'>
+                <h3>Share note</h3>
+                <p>Share this note with others by sending them the link below.</p>
+                <div className='link-container'>
+                    <input type="text" value={link} disabled />
+                    <button onClick={() => {
+                        navigator.clipboard.writeText(link)
+                        document.getElementById("linkCopiedText").innerHTML = "Copied!"
+
+                    }}>Copy</button>
+                </div>
+                <div id="linkCopiedText"></div>
+            </div>
+        </Fragment>
+
+        setModalContent(html)
+    }
 
     useEffect(() => {
         if (!showLink) return;
@@ -265,200 +303,213 @@ const EditorMenu = ({ editor }) => {
     }, [highlightingText])
 
     return (
-        <div className={styles.editorMenu}>
-            {
-                highlightingText && (
+        <>
+            <div className={styles.editorMenu}>
+                <div className={styles.tools}>
+                    {
+                        highlightingText && (
+                            <div className={styles.expandable} onClick={() => {
+                                setShowAI(!showAI)
+                                setShowHeading(false)
+                                setShowLink(false)
+                                setShowTable(false)
+                            }}>
+                                <button>AI 🪄 <MdExpandMore /></button>
+                                {showAI && (
+                                    <>
+                                        <div className={styles.submenu}>
+                                            {AICommands.map((command, i) => (
+                                                <button key={i}
+                                                    onClick={() => {
+                                                        command.command()
+                                                    }}
+                                                    className="sub-button"
+                                                >
+                                                    {command.name}
+                                                </button>
+                                            ))}
+
+                                        </div>
+                                    </>
+                                )}
+                                {
+                                    showResults && (
+                                        <div className={styles.result} onClick={(e) => e.preventDefault()}>
+                                            <span className={styles.label}>Your generated content</span>
+                                            <p className={styles.completion}>
+                                                {completion == "" ? "Loading..." : completion}
+                                            </p>
+                                            {
+                                                !isLoading && (
+                                                    <div className={styles.bottom}>
+                                                        <button
+                                                            className={styles.delete}
+                                                            onClick={() => {
+                                                                setShowResults(false)
+                                                            }}
+                                                        >
+                                                            <MdOutlineDelete />
+                                                            <p className={styles.cancel}>Cancel</p>
+                                                        </button>
+                                                        <button
+                                                            className={styles.check}
+                                                            onClick={() => {
+                                                                setShowResults(false)
+                                                                editor?.chain().focus().run();
+                                                                if (command == "Expand") {
+                                                                    AICommands[0].insertFunction(completion)
+                                                                } else if (command == "Summarize") {
+                                                                    AICommands[1].insertFunction(completion)
+                                                                } else if (command == "Get feedback") {
+                                                                    AICommands[2].insertFunction(completion)
+                                                                } else if (command == "Rewrite") {
+                                                                    AICommands[3].insertFunction(completion)
+                                                                }
+                                                            }}
+                                                        >
+                                                            <MdCheck />
+                                                            <p className="text-base">Insert</p>
+                                                        </button>
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        )
+                    }
+
+
                     <div className={styles.expandable} onClick={() => {
-                        setShowAI(!showAI)
-                        setShowHeading(false)
+                        setShowHeading(!showHeading)
+                        setShowAI(false)
                         setShowLink(false)
                         setShowTable(false)
                     }}>
-                        <button>AI 🪄 <MdExpandMore /></button>
-                        {showAI && (
+                        <button>{textType} <MdExpandMore /></button>
+                        {showHeading && (
                             <>
                                 <div className={styles.submenu}>
-                                    {AICommands.map((command, i) => (
-                                        <button key={i}
+                                    <button key="text"
+                                        onClick={() => {
+                                            editor?.chain().focus().toggleNode("paragraph", "paragraph").run();
+                                            setTextType("paragraph")
+                                        }}
+                                        className={textType == 'Paragraph' ? styles.active : "sub-button"}
+                                    >Normal text</button>
+                                    {headings.map((heading, i) => (
+                                        <button
+                                            key={i}
                                             onClick={() => {
-                                                command.command()
+                                                editor?.chain().focus().toggleHeading({ level: heading }).run();
+                                                setTextType(`Heading ${heading}`)
                                             }}
-                                            className="sub-button"
+                                            className={textType == 'Heading ' + heading ? styles.active : "sub-button"}
                                         >
-                                            {command.name}
+                                            Heading {heading}
                                         </button>
                                     ))}
-
                                 </div>
                             </>
                         )}
+                    </div>
+                    <div className={styles.button_group}>
+                        <button
+                            onClick={() => {
+                                editor?.chain().focus().run();
+                                editor?.chain().toggleBold().run();
+                            }}
+                        >
+                            <MdFormatBold />
+                        </button>
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.chain().toggleItalic().run();
+                        }}
+                            className={italic ? styles.active : ""}
+                        ><MdFormatItalic /></button>
+
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.chain().toggleStrike().run();
+                        }}
+                            className={strike ? styles.active : ""}
+                        ><MdFormatStrikethrough /></button>
+
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.chain().toggleUnderline().run();
+                        }}
+                            className={underline ? styles.active : ""}
+                        ><MdOutlineFormatUnderlined /></button>
+                    </div>
+
+                    <div className={styles.button_group}>
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.chain().toggleBulletList().run();
+                        }}
+                            className={ul ? styles.active : ""}
+                        ><MdFormatListBulleted /></button>
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.chain().toggleOrderedList().run();
+                        }}
+                            className={ol ? styles.active : ""}
+                        ><MdFormatListNumbered /></button>
+                    </div>
+
+                    <div className={styles.button_group}>
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.chain().toggleCodeBlock().run();
+                        }}
+                            className={code ? styles.active : ""}
+                        ><MdCode /> </button>
+                    </div>
+
+
+                    <div className={styles.expandable} onClick={() => setShowLink(!showLink)}>
+                        <button>Link <MdExpandMore /></button>
                         {
-                            showResults && (
-                                <div className={styles.result} onClick={(e) => e.preventDefault()}>
-                                    <span className={styles.label}>Your generated content</span>
-                                    <p className={styles.completion}>
-                                        {completion == "" ? "Loading..." : completion}
-                                    </p>
-                                    {
-                                        !isLoading && (
-                                            <div className={styles.bottom}>
-                                                <button
-                                                    className={styles.delete}
-                                                    onClick={() => {
-                                                        setShowResults(false)
-                                                    }}
-                                                >
-                                                    <MdOutlineDelete />
-                                                    <p className={styles.cancel}>Cancel</p>
-                                                </button>
-                                                <button
-                                                    className={styles.check}
-                                                    onClick={() => {
-                                                        setShowResults(false)
-                                                        editor?.chain().focus().run();
-                                                        if (command == "Expand") {
-                                                            AICommands[0].insertFunction(completion)
-                                                        } else if (command == "Summarize") {
-                                                            AICommands[1].insertFunction(completion)
-                                                        } else if (command == "Get feedback") {
-                                                            AICommands[2].insertFunction(completion)
-                                                        } else if (command == "Rewrite") {
-                                                            AICommands[3].insertFunction(completion)
-                                                        }
-                                                    }}
-                                                >
-                                                    <MdCheck />
-                                                    <p className="text-base">Insert</p>
-                                                </button>
-                                            </div>
-                                        )
-                                    }
+                            showLink &&
+                            <>
+                                <div className={styles.submenu}>
+                                    <form>
+                                        <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
+                                        {editor.getAttributes("link").href ? (
+                                            <button
+                                                onClick={() => {
+                                                    editor.chain().focus().unsetLink().run()
+                                                    setShowLink(false)
+                                                }}
+                                            ><MdDeleteOutline /></button>
+                                        ) : (
+                                            <button
+                                                onClick={() => {
+                                                    const url = getUrlFromString(inputRef.current.value)
+                                                    url && setLink(url)
+                                                }}
+                                            ><MdCheck /></button>
+                                        )}
+                                    </form>
                                 </div>
-                            )
+                            </>
                         }
                     </div>
-                )
-            }
-
-
-            <div className={styles.expandable} onClick={() => {
-                setShowHeading(!showHeading)
-                setShowAI(false)
-                setShowLink(false)
-                setShowTable(false)
-            }}>
-                <button>{textType} <MdExpandMore /></button>
-                {showHeading && (
-                    <>
-                        <div className={styles.submenu}>
-                            <button key="text"
-                                onClick={() => {
-                                    editor?.chain().focus().toggleNode("paragraph", "paragraph").run();
-                                    setTextType("paragraph")
-                                }}
-                                className={textType == 'Paragraph' ? styles.active : "sub-button"}
-                            >Normal text</button>
-                            {headings.map((heading, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => {
-                                        editor?.chain().focus().toggleHeading({ level: heading }).run();
-                                        setTextType(`Heading ${heading}`)
-                                    }}
-                                    className={textType == 'Heading ' + heading ? styles.active : "sub-button"}
-                                >
-                                    Heading {heading}
-                                </button>
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
-            <div className={styles.button_group}>
-                <button
-                    onClick={() => {
-                        editor?.chain().focus().run();
-                        editor?.chain().toggleBold().run();
-                    }}
-                >
-                    <MdFormatBold />
-                </button>
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleItalic().run();
-                }}
-                    className={italic ? styles.active : ""}
-                ><MdFormatItalic /></button>
-
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleStrike().run();
-                }}
-                    className={strike ? styles.active : ""}
-                ><MdFormatStrikethrough /></button>
-
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleUnderline().run();
-                }}
-                    className={underline ? styles.active : ""}
-                ><MdOutlineFormatUnderlined /></button>
-            </div>
-
-            <div className={styles.button_group}>
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleBulletList().run();
-                }}
-                    className={ul ? styles.active : ""}
-                ><MdFormatListBulleted /></button>
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleOrderedList().run();
-                }}
-                    className={ol ? styles.active : ""}
-                ><MdFormatListNumbered /></button>
-            </div>
-
-            <div className={styles.button_group}>
-                <button onClick={() => {
-                    editor?.chain().focus().run();
-                    editor?.chain().toggleCodeBlock().run();
-                }}
-                    className={code ? styles.active : ""}
-                ><MdCode /> </button>
-            </div>
-
-
-            <div className={styles.expandable} onClick={() => setShowLink(!showLink)}>
-                <button>Link <MdExpandMore /></button>
+                </div>
                 {
-                    showLink &&
-                    <>
-                        <div className={styles.submenu}>
-                            <form>
-                                <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
-                                {editor.getAttributes("link").href ? (
-                                    <button
-                                        onClick={() => {
-                                            editor.chain().focus().unsetLink().run()
-                                            setShowLink(false)
-                                        }}
-                                    ><MdDeleteOutline /></button>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            const url = getUrlFromString(inputRef.current.value)
-                                            url && setLink(url)
-                                        }}
-                                    ><MdCheck /></button>
-                                )}
-                            </form>
+                    accessLevel == "owner" && (
+                        <div className={styles.sharingLinkContainer}>
+                            <div className={styles.sharingLink}>
+                                <button onClick={async () => await showShareScreen()}>Share</button>
+                            </div>
                         </div>
-                    </>
+                    )
                 }
             </div>
-        </div>
+        </>
     )
 }
 

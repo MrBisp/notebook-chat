@@ -10,9 +10,12 @@
 .right {
     display: flex;
     background: rgba(0, 0, 0, 0.1);
-    position: relative;
     transition-duration: 0.3s;
     transition-timing-function: ease-in-out;
+    z-index: 101;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
 }
 
 .left {
@@ -27,6 +30,9 @@
     display: flex;
     flex-grow: 2;
     padding: 0 2rem;
+    background: #FAF5EA;
+    transform: translateZ(0);
+    /* makes the child (editor menu being relative positioned when using position: fixed */
 }
 
 .toggleShow {
@@ -162,7 +168,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    background: rgba(50, 0, 0, 0.5);
+    background: radial-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7));
     animation: ease-in-out 0.3s showSearch;
 }
 
