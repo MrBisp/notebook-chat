@@ -9,7 +9,7 @@ import Main from '@/components/main/Main';
 
 
 const WorkbookPage = () => {
-    const { workbooks, addWorkbook } = useContext(AuthContext);
+    const { workbooks, addWorkbook, pagesSharedWithUser } = useContext(AuthContext);
 
     const router = useRouter();
 
@@ -84,6 +84,28 @@ const WorkbookPage = () => {
                                         </div>
                                     </div>
                                 </>
+                            )
+                        }
+                        {
+                            pagesSharedWithUser.length > 0 && (
+                                <div className='card' onClick={() => { router.push(`/notebook/shared`) }}>
+                                    <div className='left'>
+                                        <h3>Shared with you</h3>
+                                        <p>You have access to {pagesSharedWithUser.length} pages that others have shared with you.</p>
+                                    </div>
+                                    <div className='right'>
+                                        <span className='page-previews'>
+                                            {
+                                                pagesSharedWithUser.slice(0, 3).map((page, index) => (
+                                                    <span key={index} className='page-preview'>
+                                                        <span className='page-preview-title'>{page.title}</span>
+                                                        <div className='page-preview-content' dangerouslySetInnerHTML={{ __html: page.content }}></div>
+                                                    </span>
+                                                ))
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
                             )
                         }
                     </div>

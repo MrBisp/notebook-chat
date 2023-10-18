@@ -17,6 +17,8 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [userSet, setUserSet] = useState(false);
 
+    const [pagesSharedWithUser, setPagesSharedWithUser] = useState([]);
+
     const router = useRouter();
 
     //Get user data from server on page load
@@ -553,6 +555,34 @@ export const AuthProvider = ({ children }) => {
         return newMixpanelId;
     }
 
+    //Get pages shared with user
+    useEffect(() => {
+        console.log('Getting pages shared with user')
+        if (!user) return;
+        const fetchData = async () => {
+            try {
+                const response = await fetch('/api/page/shared-with-user/', {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
+                const data = await response.json();
+
+                if (!data.pages) {
+                    return;
+                }
+
+                console.log('Got pages shared with user: ' + JSON.stringify(data.pages));
+
+                setPagesSharedWithUser(data.pages);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchData();
+    }, [user]);
+
+
 
     const values = {
         authToken,
@@ -578,7 +608,8 @@ export const AuthProvider = ({ children }) => {
         sendNotebookChatMessage,
         track,
         modalContent,
-        setModalContent
+        setModalContent,
+        pagesSharedWithUser
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

@@ -11,7 +11,7 @@ import poppins from "../../../utils/font";
 
 const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = false, singlePage }) => {
 
-    const { authToken, logout, modalContent } = useContext(AuthContext);
+    const { authToken, logout, modalContent, setModalContent } = useContext(AuthContext);
 
     const [showLeft, setShowLeft] = useState(true);
     const [showRight, setShowRight] = useState(true);
@@ -217,6 +217,13 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
             setShowModal(true);
         }
     }, [modalContent])
+
+    useEffect(() => {
+        //Remove modal content when modal is closed
+        if (!showModal) {
+            setModalContent(null);
+        }
+    }, [showModal])
 
 
     return (

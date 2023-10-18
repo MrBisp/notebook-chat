@@ -36,14 +36,13 @@ const Invitation = ({ invitation, errorInvitation }) => {
     }
 
     const acceptHandler = async () => {
-        track('Invitation accepted', { page: page.title, url: window.location.href, invitation: invitation._id });
         if (user) {
             setIsLoading("Giving you access to the page...");
             //Associate the user with the page
             const url = '/api/userpageaccess';
             const data = {
                 invitationId: invitation._id,
-                user: user._id,
+                user: user.id,
             };
             const options = {
                 method: 'POST',
@@ -186,9 +185,20 @@ const Invitation = ({ invitation, errorInvitation }) => {
                             <p className={styles.description}>
                                 Someone thinks that you are the perfect person to collaborate with on this note.
                             </p>
-                            <p>
-                                Create a free account to start collaborating in seconds! Or view it in read-only mode if you don't want to create an account.
-                            </p>
+                            {
+                                user && (
+                                    <p>
+                                        You are logged in as {user.email}. Click the button below to accept the invitation.
+                                    </p>
+                                )
+                            }
+                            {
+                                !user && (
+                                    <p>
+                                        Create a free account to start collaborating in seconds! Or view it in read-only mode if you don't want to create an account.
+                                    </p>
+                                )
+                            }
                             <div className={styles.buttons}>
                                 <button className={styles.acceptbutton} onClick={acceptHandler}>Accept invitation</button>
                                 <button className={styles.viewonly} onClick={viewOnlyHandler}>View in read-only mode</button>
@@ -269,7 +279,11 @@ const Invitation = ({ invitation, errorInvitation }) => {
                                 <div className={styles.buttons}>
                                     <button className={styles.acceptbutton} onClick={() => {
                                         setViewOnlyMode(false);
-                                        setShowRegister(true);
+                                        if (user) {
+                                            acceptHandler();
+                                        } else {
+                                            setShowRegister(true);
+                                        }
                                     }}>Edit note</button>
                                 </div>
                             </div>

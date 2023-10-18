@@ -54,6 +54,7 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
     const [highlightingText, setHighlightingText] = useState(false)
 
     const showShareScreen = async () => {
+        console.log("Showing share screen")
         const url = '/api/invitation'
         const body = {
             pageId: page._id,

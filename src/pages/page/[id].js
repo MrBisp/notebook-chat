@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Main from '@/components/main/Main';
 
 const PageRoute = () => {
-    const { authToken } = useContext(AuthContext);
+    const { authToken, pagesSharedWithUser } = useContext(AuthContext);
 
     const router = useRouter();
     const { id } = router.query;
@@ -40,7 +40,7 @@ const PageRoute = () => {
     return (
         <>
             <Head>
-                <title>Notebook chat</title>
+                <title>{page?.title ? page.title : 'Notebook Chat'}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>

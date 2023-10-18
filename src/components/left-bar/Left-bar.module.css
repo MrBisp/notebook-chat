@@ -3,7 +3,7 @@
     height: 100%;
     display: flex;
     /*background-color: rgb(250, 245, 234);*/
-    background-color: rgb(245, 240, 229);
+    background-color: var(--primaryDark);
     flex-direction: column;
     justify-content: space-between;
 }
