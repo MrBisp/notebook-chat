@@ -123,12 +123,12 @@ const WorkbookPage = () => {
                                 <div className='modal-content'>
                                     <div className='modal-option'>
                                         <span className='modal-option-label'>Title</span>
-                                        <input className='modal-option-input' value={workbookTitle} onChange={(e) => setWorkbookTitle(e.target.value)}></input>
+                                        <input className='modal-option-input' placeholder={"Example: 'School', 'Work', 'Business ideas'"} value={workbookTitle} onChange={(e) => setWorkbookTitle(e.target.value)}></input>
                                     </div>
                                 </div>
                                 <div className='modal-footer'>
                                     <button className='modal-button-cancel' onClick={() => { setShowAddWorkbook(false); }}>Cancel</button>
-                                    <button className='modal-button' onClick={addWorkbookHandler}>Create workbook</button>
+                                    <button className='modal-button' onClick={addWorkbookHandler}>Create notenook</button>
                                 </div>
 
                             </div>
