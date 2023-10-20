@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
                         return;
                     }
 
-                    console.log('Successfully logged in user: ' + JSON.stringify(data.user));
+                    //console.log('Successfully logged in user: ' + JSON.stringify(data.user));
 
                     setUser(data.user);
                     setConversations(data.user.conversations);

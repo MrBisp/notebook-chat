@@ -17,7 +17,7 @@ export default function App({ id }) {
         }
 
         const provider = new HocuspocusProvider({
-            url: "ws://127.0.0.1:1234/",
+            url: process.env.NEXT_PUBLIC_WEBSOCKET_URL,
             name: chapterId,
         });
         setProvider(provider);

@@ -23,12 +23,15 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
     const handleContentChange = (content) => {
         setContent(content);
 
+        //console.log('Content changed...')
+
         changeSinceLastSave.current = true;
         lastChange.current = new Date().getTime();
         contentRef.current = content;
     }
 
     const savePage = async () => {
+        //console.log('Saving page...')
         let update = {
             title: pageTitleRef.current,
             content: contentRef.current,

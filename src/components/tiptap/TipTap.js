@@ -10,7 +10,6 @@ import { AuthContext } from "@/context/AuthContext"
 import { ImageResizer } from "./components/image-resizer";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { generateJSON } from '@tiptap/html'
-import { TiptapTransformer } from "@hocuspocus/transformer";
 
 const Tiptap = ({ saveHandler, value, setEditor, pageId }) => {
     const { authToken, user, track } = useContext(AuthContext)
@@ -38,7 +37,7 @@ const Tiptap = ({ saveHandler, value, setEditor, pageId }) => {
 
 
         const provider = new HocuspocusProvider({
-            url: "ws://127.0.0.1:1234/",
+            url: process.env.NEXT_PUBLIC_WEBSOCKET_URL,
             name: pageId,
             token: authToken,
             parameters: {
@@ -102,11 +101,11 @@ function EditorEditor({ provider, saveHandler, value, setEditor, pageId, allExte
         extensions: allExtensions,
         editorProps: TiptapEditorProps,
         onCreate: e => {
+            console.log('onCreate')
             setEditor(e.editor);
         },
         onUpdate: e => {
             if (!hasInsertedStarterHTML.current) return;
-
 
             saveHandler(e.editor.getHTML());
             const selection = e.editor.state.selection
@@ -165,6 +164,7 @@ function EditorEditor({ provider, saveHandler, value, setEditor, pageId, allExte
     const prev = useRef("")
 
     provider.on("synced", (state) => {
+        console.log('synced')
         const currentContent = editor?.getHTML();
         if (!currentContent) return;
 

@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     const { method } = req;
 
-    console.log('Shared with user: ', req.headers.authorization);
+    //console.log('Shared with user: ', req.headers.authorization);
 
     switch (method) {
         case "GET":

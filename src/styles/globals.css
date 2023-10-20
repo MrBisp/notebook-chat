@@ -2,11 +2,11 @@
     --red: #ff4040;
     --black: #101828;
     --gray-500: #667085;
-    --primary: rgb(138, 113, 106);
-    --primaryDark: rgb(245, 240, 229);
-    --background: rgb(250, 245, 234);
-    --button: rgb(152, 174, 182);
-    --buttonHover: rgba(152, 174, 182, 0.8);
+    --primary: #8a716a;
+    --primaryDark: #f5f0e5;
+    --background: #faf5ea;
+    --button: #F1CA5C;
+    --buttonHover: rgba(241, 202, 92, 0.8);
 }
 
 * {

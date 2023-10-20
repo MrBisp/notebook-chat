@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 const handler = async (req, res) => {
     await dbConnect();
 
+    console.log('Hocus Pocus auth handler')
+
     const { method } = req;
 
     switch (method) {

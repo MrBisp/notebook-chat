@@ -91,7 +91,6 @@ const Workbook = ({ workbookId, pageId = null }) => {
             method: 'GET',
             headers: headers
         }).then((res) => {
-            console.log(res);
             if (res.status === 200) {
                 return res.json();
             } else {
