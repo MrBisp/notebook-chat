@@ -14,6 +14,7 @@ const Invitation = ({ invitation, errorInvitation }) => {
     const [viewOnlyMode, setViewOnlyMode] = useState(false);
     const [isLoading, setIsLoading] = useState(null);
     const [showRegister, setShowRegister] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
 
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
@@ -21,6 +22,8 @@ const Invitation = ({ invitation, errorInvitation }) => {
     const [error, setError] = useState(null);
     const [errorRegister, setErrorRegister] = useState(null);
     const [loadingRegister, setLoadingRegister] = useState("");
+    const [errorLogin, setErrorLogin] = useState(null);
+    const [loadingLogin, setLoadingLogin] = useState("");
 
     const router = useRouter();
 
@@ -145,6 +148,79 @@ const Invitation = ({ invitation, errorInvitation }) => {
         }
     }
 
+    const loginHandler = async (e) => {
+        e.preventDefault();
+        setLoadingLogin("Logging you in...");
+
+        if (!email || !password) {
+            setErrorLogin("Please enter email and password");
+            setLoadingLogin(null);
+            return;
+        }
+        if (loadingLogin) return;
+
+        try {
+            // Log the user in
+            await login(email, password);
+        } catch (error) {
+            console.error("An unexpected error happened occurred:", error);
+            setErrorLogin("An unexpected error happened occurred:", error.message);
+            setLoadingLogin(null);
+            return;
+        }
+    }
+
+    useEffect(() => {
+        if (!user) return;
+        if (!loadingLogin) return;
+
+        loginHandlerPart2();
+    }, [user]);
+
+
+
+    const loginHandlerPart2 = async () => {
+        try {
+            setLoadingLogin("Giving you access to the page...");
+
+            //Associate the user with the page
+            const url = '/api/userpageaccess';
+            const data = {
+                invitationId: invitation._id,
+                user: user.id,
+            };
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            };
+
+            const response = await fetch(url, options);
+            const data2 = await response.json();
+            if (!data2.success) {
+                console.log("Something went wrong...");
+                console.log(data2);
+                setErrorLogin(data2.message);
+                setLoadingLogin(null);
+                return;
+            }
+
+            setLoadingLogin("Redirecting you to the page...");
+
+            //Redirect to the page
+            track('Invitation accepted, and user already logged in', { page: page.title, url: window.location.href, invitation: invitation._id });
+            router.push(`/page/${page._id}`);
+
+        } catch (error) {
+            console.error("An unexpected error happened occurred:", error);
+            setErrorLogin("An unexpected error happened occurred:", error.message);
+            setLoadingLogin(null);
+            return;
+        }
+    }
+
     //Ref if the user has tracked page view before
     const trackedPageView = useRef(false);
 
@@ -179,7 +255,7 @@ const Invitation = ({ invitation, errorInvitation }) => {
                     <div className={styles.page} dangerouslySetInnerHTML={{ __html: page?.content }}></div>
                 </div>
                 {
-                    !viewOnlyMode && !errorInvitation && !isLoading && !showRegister && (
+                    !viewOnlyMode && !errorInvitation && !isLoading && !showRegister && !showLogin && (
                         <div className={styles.content}>
                             <h1 className={styles.title}>You have been invited to collaborate on a shared note!</h1>
                             <p className={styles.description}>
@@ -246,6 +322,10 @@ const Invitation = ({ invitation, errorInvitation }) => {
                                     Password:
                                     <input type="password" onChange={(e) => setPassword(e.target.value)} />
                                 </label>
+                                <span className={styles.showLoginButton} onClick={() => {
+                                    setShowRegister(false);
+                                    setShowLogin(true);
+                                }}>Already have an account? Log in</span>
                                 <button className={styles.acceptbutton} type="submit">Create account</button>
                             </form>
                             <span className={styles.cancel} onClick={() => setShowRegister(false)}>Cancel</span>
@@ -260,6 +340,44 @@ const Invitation = ({ invitation, errorInvitation }) => {
                                 errorRegister && (
                                     <div className={styles.error}>
                                         {errorRegister}
+                                    </div>
+                                )
+                            }
+                        </div>
+                    )
+                }
+
+                {
+                    showLogin && (
+                        <div className={styles.content} style={{ 'animation': 'none' }}>
+                            <h1 className={styles.title}>Log in to get access</h1>
+                            <form className={styles.form} onSubmit={loginHandler}>
+                                <label>
+                                    Email:
+                                    <input type="email" onChange={(e) => setEmail(e.target.value)} />
+                                </label>
+                                <label>
+                                    Password:
+                                    <input type="password" onChange={(e) => setPassword(e.target.value)} />
+                                </label>
+                                <span className={styles.showLoginButton} onClick={() => {
+                                    setShowRegister(true);
+                                    setShowLogin(false);
+                                }}>Don't have an account? Create one</span>
+                                <button className={styles.acceptbutton} type="submit">Log in</button>
+                            </form>
+                            <span className={styles.cancel} onClick={() => setShowLogin(false)}>Cancel</span>
+                            {
+                                loadingLogin && (
+                                    <div className={styles.loading}>
+                                        {loadingLogin}
+                                    </div>
+                                )
+                            }
+                            {
+                                errorLogin && (
+                                    <div className={styles.error}>
+                                        {errorLogin}
                                     </div>
                                 )
                             }

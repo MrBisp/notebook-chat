@@ -91,26 +91,19 @@ export const TiptapExtensions = [
         }
     }).configure({
         HTMLAttributes: {
-            class: "mt-4 mb-6 border-t border-stone-300"
+            class: "hr"
         }
     }),
     TiptapLink.configure({
         HTMLAttributes: {
             class:
-                "text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer"
+                "link"
         }
-    }),
-    UpdatedImage.configure({
-        HTMLAttributes: {
-            class: "rounded-lg border border-stone-200",
-        },
-        allowBase64: true,
-        inline: false,
     }),
     CustomImage.configure({
         allowBase64: true,
         HTMLAttributes: {
-            class: "rounded-lg border border-stone-200",
+            class: "customimg",
         },
     }),
     Placeholder.configure({
@@ -131,17 +124,18 @@ export const TiptapExtensions = [
     }),
     TaskList.configure({
         HTMLAttributes: {
-            class: "not-prose pl-2"
+            class: "tasklist"
         }
     }),
     TaskItem.configure({
         HTMLAttributes: {
-            class: "flex items-start my-4"
+            class: "taskitem"
         },
         nested: true
     }),
     Markdown.configure({
-        html: true,
-        transformCopiedText: true
+        html: false,
+        transformCopiedText: false,
+        transformPastedText: false
     })
 ]

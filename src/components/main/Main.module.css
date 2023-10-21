@@ -3,7 +3,9 @@
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    max-width: 100vw;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 .left,
@@ -32,6 +34,7 @@
     padding: 0 2rem;
     background: #FAF5EA;
     transform: translateZ(0);
+    width: 50%;
     /* makes the child (editor menu being relative positioned when using position: fixed */
 }
 

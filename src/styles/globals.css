@@ -85,6 +85,7 @@ pre {
 
 ::-webkit-scrollbar {
     width: 0.35rem;
+    height: 0.1rem;
 }
 
 ::-webkit-scrollbar-track {
@@ -95,6 +96,7 @@ pre {
     background: #b9b9b9;
     border-radius: 12px;
 }
+
 
 /* LOGIN */
 .login-container {
@@ -449,6 +451,10 @@ pre {
     padding: 0rem 0rem;
 }
 
+.all-pages-header.shared {
+    flex-direction: column;
+}
+
 .all-pages-header h1 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -456,6 +462,26 @@ pre {
     padding: 1rem 0rem 1rem 1rem;
     text-align: left;
     width: 100%;
+}
+
+.all-pages-header p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #444444;
+    padding: 1rem 0rem 1rem 1rem;
+    text-align: left;
+    width: 100%;
+    display: inline-block;
+}
+
+.all-pages-header.shared h1 {
+    padding: 1rem 0rem 0rem 1rem;
+    margin-bottom: 0;
+}
+
+.all-pages-header.shared p {
+    padding: 0rem 0rem 1rem 1rem;
+    margin-top: 0;
 }
 
 .all-pages-header .settings {
@@ -643,6 +669,60 @@ div[data-tippy-root] div {
     z-index: 1000;
     display: flex;
     flex-direction: row;
+}
+
+.tiptap hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.9);
+    width: 100%;
+    margin: 0.5rem 0rem;
+}
+
+ul.tasklist {
+    list-style: none;
+    padding-left: 1rem;
+}
+
+li.taskitem {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 0.5rem 0rem;
+}
+
+li.taskitem p {
+    margin-bottom: 0;
+}
+
+.tasklist label {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+.tasklist input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid #b9b9b9;
+    border-radius: 2px;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+.taskitem[data-checked="true"] p {
+    opacity: 0.5;
+}
+
+
+.taskitem[data-checked="true"] input[type="checkbox"][checked="checked"] {
+    background: #8a716a;
+    border: 1px solid #8a716a;
 }
 
 .tippy-content .bubblemenu {
@@ -1095,7 +1175,7 @@ div[data-tippy-root] div {
 .main-container__right {
     width: auto;
     height: 100vh;
-    overflow: scroll;
+    overflow: hidden;
     flex-grow: 1
 }
 

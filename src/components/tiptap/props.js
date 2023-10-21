@@ -27,16 +27,33 @@ export const TiptapEditorProps = {
             }
         }
 
-        console.log(blob)
-
         if (blob !== null) {
             event.preventDefault();
             console.log("Blob is not null")
             const file = blob;
             const pos = view.state.selection.from;
             startImageUpload(file, view, pos);
-
             return true;
+        } else {
+
+            //const pastedText = event.clipboardData.getData('text/html');
+            //Get only text
+            const pastedText = event.clipboardData.getData('text/plain');
+            if (pastedText) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = pastedText;
+
+                // Remove color styles
+                const elementsWithStyle = tempDiv.querySelectorAll('[style]');
+
+                const cleanedText = tempDiv.innerText;
+                // Insert cleaned text into the editor
+                // Depending on your tiptap setup, you might need a different method here
+                // Adjust as needed based on your tiptap version and configuration
+                view.dispatch(view.state.tr.insertText(cleanedText, view.state.selection.from, view.state.selection.to));
+                event.preventDefault();
+                return true;
+            }
         }
         return false;
 
