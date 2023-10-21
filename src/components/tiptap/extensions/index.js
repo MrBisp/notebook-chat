@@ -136,6 +136,6 @@ export const TiptapExtensions = [
     Markdown.configure({
         html: true,
         transformCopiedText: false,
-        transformPastedText: false
+        transformPastedText: true
     })
 ]
