@@ -244,9 +244,9 @@ const Invitation = ({ invitation, errorInvitation }) => {
     return (
         <>
             <Head>
-                <title>Notebook-chat.com - Your personal knowledge partner</title>
+                <title>Invitation to collaborate on a note! | Notebook-chat.com</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon-192.png" />
                 <meta name="robots" content="noindex" />
             </Head>
             <div className={styles.container}>

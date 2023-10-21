@@ -46,7 +46,7 @@ const HomePage = () => {
             <Head>
                 <title>Notebook-chat.com - Your personal knowledge partner</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon-192.png" />
             </Head>
             <div className={styles.navbar + ' ' + poppins.className}>
                 <div className={styles.logo}>Notebook Chat</div>

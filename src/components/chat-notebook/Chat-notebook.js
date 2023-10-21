@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, Fragment } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import styles from './Chat-notebook.module.css';
 import { MdMenuBook, MdOutlineAssignment, MdClose } from 'react-icons/md'; //Possibly change to MdMenuBook MdOutlineAssignment MdOutlineListAlt MdOutlineMargin MdOutlineTextSnippet
@@ -162,12 +162,16 @@ const ChatNotebook = ({ currentPage, workbook }) => {
                                             <div key={index} className={message.role}>
                                                 <div className={styles.message} data-sender={message.role}>
                                                     {
-                                                        message.role === 'assistant' && <div className={styles.messagecontent} dangerouslySetInnerHTML={{ __html: message.content }}></div>
+                                                        message.role === 'assistant' && (
+                                                            <>
+                                                                <div className={styles.messagecontent} dangerouslySetInnerHTML={{ __html: message.content }}></div>
+                                                                <div>hello</div>
+                                                            </>
+                                                        )
                                                     }
                                                     {
                                                         message.role === 'user' && <div className={styles.messagecontent}>{message.content}</div>
                                                     }
-
                                                 </div>
                                             </div>
                                         )

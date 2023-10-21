@@ -31,7 +31,7 @@ const WorkbookPage = () => {
             <Head>
                 <title>Notebook chat</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon-192.png" />
             </Head>
             <main>
                 <div className="main-container">
