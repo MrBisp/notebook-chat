@@ -1176,7 +1176,6 @@ li.taskitem p {
 .main-container__right {
     width: auto;
     height: 100vh;
-    overflow: hidden;
     flex-grow: 1
 }
 
