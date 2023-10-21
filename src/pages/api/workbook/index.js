@@ -22,11 +22,9 @@ export default async (req, res) => {
                 const newWorkbook = new Workbook({
                     title: title
                 });
-
                 await newWorkbook.save();
 
                 user.workbooks.push(newWorkbook._id);
-
                 await user.save();
 
                 console.log('Successfully created new workbook')
@@ -35,7 +33,6 @@ export default async (req, res) => {
                 console.log(error)
                 res.status(400).json({ success: false, error: error });
             }
-
             break;
         default:
             console.log('We only support POST requests')

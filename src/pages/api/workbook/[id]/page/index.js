@@ -1,6 +1,7 @@
 import dbConnect from "utils/dbConnect";
 import User from "models/User";
 import { Workbook, Page } from "models/Workbook";
+import UserPageAccess from "models/UserPageAccess";
 import jwt from "jsonwebtoken";
 
 export default async (req, res) => {
@@ -14,7 +15,7 @@ export default async (req, res) => {
     switch (method) {
         //Add a new page to the workbook
         case "POST":
-            console.log('Trying to add a new page', req.body)
+            //console.log('Trying to add a new page', req.body)
             const title = req.body.title || '';
             const parentPageId = req.body.parentPageId || null;
 
@@ -22,6 +23,19 @@ export default async (req, res) => {
                 if (parentPageId == null) {
                     const token = req.headers.authorization.split(' ')[1];
                     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+                    if (!decoded?.user?._id) {
+                        res.status(400).json({ success: false, error: 'Invalid user' });
+                    }
+
+                    //Check if the user contains the workbook (user.workbooks._id)
+                    const user = decoded.user;
+
+                    if (!user.workbooks.includes(id)) {
+                        res.status(401).json({ success: false, error: 'User does not have access to this workbook' });
+                        return;
+                    }
+
 
                     const workbook = await Workbook.findOne({ _id: id });
 
@@ -31,17 +45,21 @@ export default async (req, res) => {
                             subPages: [],
                             content: req.body.content || ' '
                         });
-
-                        console.log('New page', newPage)
-
                         await newPage.save();
 
                         workbook.pages.push(newPage._id);
-
                         workbook.lastEdited = new Date();
-
                         await workbook.save();
 
+                        //Now, add the page to the user's page access
+                        const userPageAccess = new UserPageAccess({
+                            user: user._id,
+                            page: newPage._id,
+                            accessLevel: 'owner'
+                        });
+                        await userPageAccess.save();
+
+                        //Everything is good
                         res.status(200).json({ success: true, page: newPage });
                     }
                 } else {

@@ -32,7 +32,6 @@ const handler = async (req, res) => {
 
                 console.log('Successfully found user')
                 res.status(200).json({ user: { id: user.id, email: user.email, conversations: user.conversations, token: user.token, workbooks: user.workbooks } });
-
             } catch (error) {
                 console.log(error)
                 res.status(400).json({ success: false, message: "Something went wrong..." });

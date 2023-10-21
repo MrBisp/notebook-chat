@@ -9,9 +9,9 @@ import { MdClose, MdSearch, MdKeyboardDoubleArrowLeft } from 'react-icons/md';
 import { useRouter } from "next/router";
 import poppins from "../../../utils/font";
 
-const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) => {
+const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = false, singlePage }) => {
 
-    const { authToken, logout } = useContext(AuthContext);
+    const { authToken, logout, modalContent, setModalContent } = useContext(AuthContext);
 
     const [showLeft, setShowLeft] = useState(true);
     const [showRight, setShowRight] = useState(true);
@@ -70,6 +70,15 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
             setPage(currentPage);
         }
     }, [notebook])
+
+    useEffect(() => {
+        if (!showChatSinglePage) return;
+
+        if (singlePage) {
+            setPage(singlePage);
+        }
+    }, [showChatSinglePage, singlePage])
+
 
     //Set the showLeft and showRight states from localstorage
     useEffect(() => {
@@ -203,6 +212,19 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
         setSearchResultsPinecone(pages);
     }
 
+    useEffect(() => {
+        if (modalContent) {
+            setShowModal(true);
+        }
+    }, [modalContent])
+
+    useEffect(() => {
+        //Remove modal content when modal is closed
+        if (!showModal) {
+            setModalContent(null);
+        }
+    }, [showModal])
+
 
     return (
         <>
@@ -229,7 +251,7 @@ const Main = ({ middle, modalContent = "", workbookId = null, pageId = null }) =
                                     </span>
                                     <div className={styles.content}>
                                         <div className={'main-container__chat'} id="chat-notebook">
-                                            <Chat currentPage={page} workbook={notebook} key={page._id} />
+                                            <Chat currentPage={page} workbook={notebook ? notebook : null} key={page._id} />
                                         </div>
                                     </div>
                                 </div>

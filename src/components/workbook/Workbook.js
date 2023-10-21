@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import withAuth from '../../components/withAuth/WithAuth';
-import WorkbookPages from '../../components/workbook-pages/Workbook-pages';
 import Page from '../page/Page';
 import Link from 'next/link';
 import { MdClose, MdChat, MdKeyboardDoubleArrowLeft, MdMoreVert } from 'react-icons/md';
+import WorkbookPages from '../workbook-pages/WorkbookPages';
 import { useRouter } from 'next/router';
 import { set } from 'mongoose';
 
 const Workbook = ({ workbookId, pageId = null }) => {
-    const { workbooks, deleteWorkbook, updateWorkbook, addPage, deletePage, track } = useContext(AuthContext);
+    const { workbooks, deleteWorkbook, updateWorkbook, addPage, deletePage, track, user, authToken } = useContext(AuthContext);
 
     const [workbook, setWorkbook] = useState(null);
     const [page, setPage] = useState(null);
@@ -24,7 +24,7 @@ const Workbook = ({ workbookId, pageId = null }) => {
     const [showChat, setShowChat] = useState(false);
     const [showPages, setShowPages] = useState(true);
 
-    const [showPageEdit, setShowPageEdit] = useState(false);
+    const [accessLevel, setAccessLevel] = useState(null);
 
     const router = useRouter();
 
@@ -78,6 +78,31 @@ const Workbook = ({ workbookId, pageId = null }) => {
         }
     }, [workbooks])
 
+    useEffect(() => {
+        if (!pageId || !user) return;
+
+        //Get access level
+        const url = `/api/userpageaccess?pageId=${pageId}`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        }
+        fetch(url, {
+            method: 'GET',
+            headers: headers
+        }).then((res) => {
+            if (res.status === 200) {
+                return res.json();
+            } else {
+                throw new Error('Something went wrong');
+            }
+        }).then((data) => {
+            setAccessLevel(data.data.accessLevel);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }, [pageId])
+
 
     return (
         <main>
@@ -96,57 +121,13 @@ const Workbook = ({ workbookId, pageId = null }) => {
 
                                     </>
                                 }
-                                {
-                                    !workbook && <p>No workbook found!</p>
-                                }
                                 {workbook && pages && pages.length > 0 && (
-                                    <>
-                                        {
-                                            pages.map((page) =>
-                                                <>
-                                                    <Link href={`/notebook/${workbook._id}/page/${page._id}`} key={page._id} className="notebook-page-link">
-                                                        <div key={page._id} className='notebook-page-link-container'>
-                                                            <h3>{page.title}</h3>
-                                                            <div className="page-dots">
-                                                                <MdMoreVert className='three-dots'
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-                                                                        showPageEdit == page._id ? setShowPageEdit(false) : setShowPageEdit(page._id);
-                                                                    }}
-                                                                />
-                                                                {
-                                                                    showPageEdit == page._id && (
-                                                                        <div className='page-edit'>
-                                                                            <div className='page-edit-option' style={{ 'color': 'red' }} onClick={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                                const delPage = confirm('Are you sure, you want to delete this page?');
-                                                                                if (delPage) {
-                                                                                    //Delete page
-                                                                                    deletePage(page._id, workbook._id)
-                                                                                    setShowPageEdit(false);
-                                                                                } else {
-                                                                                    return;
-                                                                                }
-                                                                            }}>
-                                                                                <span>Delete page</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    )
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </Link>
-                                                </>
-                                            )
-                                        }
-                                    </>
+                                    <WorkbookPages pages={pages} workbook={workbook} />
                                 )}
                                 {
                                     pages && Object.keys(pages).length === 0 && (
                                         <>
-                                            <p className='workbook-no-pages'>You don't have any pages in this workbook yet. Creating one takes less than 10 seconds.</p>
+                                            <p className='workbook-no-pages'>You don't have any pages in this notebook yet. Creating one takes less than 2 seconds.</p>
                                         </>
                                     )
                                 }
@@ -157,10 +138,15 @@ const Workbook = ({ workbookId, pageId = null }) => {
                         )
                     }
                     {
-                        workbook && page && (
+                        workbook && page && accessLevel && (
                             <div className='workbook-container'>
-                                <Page page={page} workbookId={workbook._id} initialContent={page.content} key={page._id} />
+                                <Page page={page} workbookId={workbook._id} initialContent={page.content} key={page._id} accessLevel={accessLevel} />
                             </div>
+                        )
+                    }
+                    {
+                        workbook && page && !accessLevel && (
+                            <p>Loading...</p>
                         )
                     }
                 </div>

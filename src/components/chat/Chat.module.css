@@ -4,7 +4,7 @@
     height: 100%;
     width: 100%;
     min-width: 20vw;
-    background: #F9FAFB;
+    background: var(--primaryDark);
 }
 
 .header {
@@ -99,15 +99,14 @@
     display: inline-block;
     margin: 1rem;
     box-shadow: none;
-    opacity: 0.8;
-    background: #43a047;
+    background: var(--button);
     color: #ffffff;
     border-radius: 10px;
     padding: 1rem;
 }
 
 .newMessageButton:hover {
-    opacity: 1;
+    background: var(--buttonHover);
 }
 
 .bottom button:hover {
@@ -131,14 +130,14 @@
 /* ALign messages to the right */
 .message[data-sender="user"] {
     align-self: flex-end;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .message[data-sender="assistant"] {
     align-self: flex-start;
-    background: #F4F8F7;
+    background: var(--primaryDark);
     max-width: 80%;
-    color: #438C71;
+    color: var(--primary);
 }
 
 .message[data-sender="system"] {
@@ -228,21 +227,21 @@
 }
 
 .contextBox.active {
-    border: 1px solid #438C71;
+    border: 1px solid var(--primary);
 }
 
 .contextBox.active svg {
-    color: #438C71;
+    color: var(--primary);
 }
 
 .contextBox.active span {
-    color: #438C71;
+    color: var(--primary);
 }
 
 .currentContext {
     width: 100%;
     padding: 0rem 1rem;
-    color: #438C71;
+    color: var(--primary);
     text-align: center;
 }
 

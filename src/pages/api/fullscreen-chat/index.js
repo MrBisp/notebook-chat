@@ -2,13 +2,6 @@ import { OpenAIStream, streamToResponse } from 'ai';
 import OpenAI from 'openai';
 export const runtime = 'nodejs'
 
-/*const configuration = new Configuration({
-    apiKey: process.env.OPENAI_TOKEN
-});
-
-const openai = new OpenAIApi(configuration)
-*/
-
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_TOKEN
 })

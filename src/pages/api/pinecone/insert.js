@@ -2,6 +2,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import jwt from 'jsonwebtoken';
 import dbConnect from '../../../../utils/dbConnect';
 import { Page, Workbook } from "models/Workbook";
+import UserPageAccess from 'models/UserPageAccess'
 import User from '../../../../models/User'
 
 export default async function handler(req, res) {
@@ -16,42 +17,17 @@ export default async function handler(req, res) {
         return;
     }
 
-    const user = await User.findOne({ _id: decoded.user._id })
-        .populate({
-            path: 'workbooks',
-            populate: {
-                path: 'pages',
-            },
-        })
-        .exec();
+    //Check that the user has write access to the page (or is the owner)
+    const pageId = req.body.pageId;
+    const userId = decoded.user._id;
 
-    if (!user) {
-        res.status(401).json({ success: false });
-    }
+    const userpageaccess = await UserPageAccess.findOne({ page: pageId, user: userId });
+    const accessLevel = userpageaccess.accessLevel;
 
-    //Check that the user is the owner of the page
-    const page = await Page.findOne({ _id: req.body.pageId });
-    if (!page) {
-        res.status(404).json({ success: false, message: "Page not found" });
+    if (accessLevel != "write" && accessLevel != "owner") {
+        res.status(401).json({ success: false, message: "Not authorized (accessLevel)" });
         return;
     }
-
-    let isPageInUserWorkbooks = false;
-
-    for (const workbook of user.workbooks) {
-        for (const pageInWorkbook of workbook.pages) {
-            if (pageInWorkbook._id.toString() === page._id.toString()) {
-                isPageInUserWorkbooks = true;
-                break;
-            }
-        }
-    }
-
-    if (!isPageInUserWorkbooks) {
-        res.status(401).json({ success: false, message: "Not authorized (page)" });
-        return;
-    }
-
 
     //User is allowed to edit the page
     //Embed the page using OpenAI embeddings
@@ -77,7 +53,7 @@ export default async function handler(req, res) {
     })
     const index = pinecone.index(process.env.PINECONE_INDEX);
     const metadata = {
-        userId: user._id
+        userId: userId
     }
     const records = [
         {
