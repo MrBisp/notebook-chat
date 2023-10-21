@@ -69,5 +69,8 @@
   "description": "Notebook chat",
   "main": "next.config.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": "18.x"
+  }
 }
