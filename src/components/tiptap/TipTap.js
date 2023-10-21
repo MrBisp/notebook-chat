@@ -61,7 +61,7 @@ const Tiptap = ({ saveHandler, value, setEditor, pageId }) => {
                 CollaborationCursor.configure({
                     provider: provider,
                     user: {
-                        color: '#BEBEBE',
+                        color: '#F1CA5C',
                         name: user.email,
                     },
                 }),
