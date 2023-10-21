@@ -478,7 +478,7 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                                 showLink &&
                                 <>
                                     <div className={styles.submenu}>
-                                        <form className={styles.link}>
+                                        <form>
                                             <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
                                             {editor.getAttributes("link").href ? (
                                                 <button
@@ -503,33 +503,15 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                     </div>
                 </div>
                 {
-                    showLink &&
-                    <>
-                        <div className={styles.submenu}>
-                            <form className={styles.link}>
-                                <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
-                                {editor.getAttributes("link").href ? (
-                                    <button
-                                        onClick={() => {
-                                            editor.chain().focus().unsetLink().run()
-                                            setShowLink(false)
-                                        }}
-                                    ><MdDeleteOutline /></button>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            const url = getUrlFromString(inputRef.current.value)
-                                            url && setLink(url)
-                                        }}
-                                    ><MdCheck /></button>
-                                )}
-                            </form>
+                    accessLevel == "owner" && (
+                        <div className={styles.sharingLink}>
+                            <button onClick={async () => await showShareScreen()}>Share</button>
                         </div>
-                    </>
+                    )
                 }
             </div>
         </>
     )
 }
 
-export default EditorMenu
+export default EditorMenu;
