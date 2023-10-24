@@ -33,6 +33,15 @@
     font-size: 1.25rem;
 }
 
+.bg h1,
+.bg h2,
+.bg h3,
+.bg h4,
+.bg h5,
+.bg h6 {
+    margin-top: 3.5rem;
+}
+
 .content {
     position: relative;
     z-index: 1;

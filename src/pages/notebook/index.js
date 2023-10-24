@@ -130,7 +130,6 @@ const WorkbookPage = () => {
                                     <button className='modal-button-cancel' onClick={() => { setShowAddWorkbook(false); }}>Cancel</button>
                                     <button className='modal-button' onClick={addWorkbookHandler}>Create notebook</button>
                                 </div>
-
                             </div>
                         </div>
                     </>
