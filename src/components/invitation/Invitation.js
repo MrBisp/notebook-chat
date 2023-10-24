@@ -35,6 +35,8 @@ const Invitation = ({ invitation, errorInvitation }) => {
 
     const viewOnlyHandler = () => {
         track('Invitation view only', { page: page.title, url: window.location.href, invitation: invitation._id });
+        setShowLogin(false);
+        setShowRegister(false);
         setViewOnlyMode(true);
     }
 
@@ -329,6 +331,7 @@ const Invitation = ({ invitation, errorInvitation }) => {
                                 <button className={styles.acceptbutton} type="submit">Create account</button>
                             </form>
                             <span className={styles.cancel} onClick={() => setShowRegister(false)}>Cancel</span>
+                            <button className={styles.viewonly} onClick={viewOnlyHandler}>View in read-only mode</button>
                             {
                                 loadingRegister && (
                                     <div className={styles.loading}>
