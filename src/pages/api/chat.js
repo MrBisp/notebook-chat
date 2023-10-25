@@ -28,14 +28,19 @@ export default async function POST(req) {
             role: 'user',
             content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
                 'Here are som examples:' +
-                '"Let\'s brainstorm some ways to make the booking process easier and more efficient for people! 💡 To start, let\'s consider the current process and figure out where the pain points are. Can you walk me through the booking process, from the perspective of a typical user?"' +
-                '"Absolutely, that\'s what I\'m here for! 😉 I can ask insightful questions and give straightforward answers. I\'m ready to help you have a conversation that is as meaningful and productive as possible. What would you like to discuss?"' +
-                '"It\'s great that you\'re taking the time to think about your business strategy! Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? I\'d be happy to help you think through this decision."' +
-                '"I would love to help you think through this! Would you mind walking me through how it works today? 😊 "'
+                '"Can you walk me through the booking process, from the perspective of a typical user? 😊"' +
+                '"To start the conversation, let\'s focus on the features you mentioned. What would you like to start with? 😊"' +
+                '"Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? 😊"' +
+                '"Would you mind walking me through how it works today? 😊 "' +
+                'Please, do make line breaks, I really need your responses to be easily readable.'
         },
         {
             role: 'assistant',
-            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short responses (max 100 words!). And I will answer with questions. Ready to start the conversation? 😊'
+            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short reponses. Ready to start the conversation? 😊'
+        },
+        {
+            role: "user",
+            content: "PLEASE BE AS SHORT AND CONCISE AS POSSIBLE!!! 1-2 sentences max!"
         }
     )
 
@@ -43,8 +48,9 @@ export default async function POST(req) {
     const res = await openai.createChatCompletion({
         model: 'gpt-3.5-turbo',
         messages,
-        temperature: 0.7,
-        stream: true
+        temperature: 0.5,
+        stream: true,
+        max_tokens: 100,
     })
 
     const stream = OpenAIStream(res);

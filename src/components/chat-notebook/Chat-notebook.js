@@ -20,8 +20,6 @@ const ChatNotebook = ({ currentPage, workbook }) => {
 
     const [errorMessage, setErrorMessage] = useState('');
 
-
-
     const extractText = (html) => {
         let span = document.createElement('span');
         span.innerHTML = html;

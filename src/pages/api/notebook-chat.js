@@ -28,13 +28,25 @@ export default async function handler(req, res) {
     let messages = req.body.messages;
 
     //Set first message
-    //Make a new message and add it as the very first
-    let newMessageObject = {
-        content: req.body.systemMessage,
-        role: 'system'
-    }
-    //Add the system message to the messages array as the very first
-    messages.unshift(newMessageObject);
+    messages.unshift(
+        {
+            role: 'user',
+            content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
+                'Here are som examples:' +
+                '"Let\'s brainstorm some ways to make the booking process easier and more efficient for people! 💡 To start, let\'s consider the current process and figure out where the pain points are. Can you walk me through the booking process, from the perspective of a typical user?"' +
+                '"Absolutely, that\'s what I\'m here for! 😉 I can ask insightful questions and give straightforward answers. I\'m ready to help you have a conversation that is as meaningful and productive as possible. What would you like to discuss?"' +
+                '"It\'s great that you\'re taking the time to think about your business strategy! Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? I\'d be happy to help you think through this decision."' +
+                '"I would love to help you think through this! Would you mind walking me through how it works today? 😊 "'
+        },
+        {
+            role: 'assistant',
+            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short responses (max 100 words!). And I will answer with questions. Ready to start the conversation? 😊'
+        },
+        {
+            role: "user",
+            content: "PLEASE BE AS SHORT AND CONCISE AS POSSIBLE!!! 1-2 sentences max!"
+        }
+    )
 
     //Let's only keep messages as long as they are less than the max length
     let totalLength = 0;
@@ -67,7 +79,7 @@ export default async function handler(req, res) {
         model: req.body.model,
         messages: messages,
         temperature: 0.2,
-        max_tokens: 1024,
+        max_tokens: 100,
     });
 
     let tokens = response.data.usage.total_tokens;
