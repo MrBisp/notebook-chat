@@ -30,7 +30,6 @@ export const TiptapEditorProps = {
 
         if (blob !== null) {
             event.preventDefault();
-            console.log("Blob is not null")
             const file = blob;
             const pos = view.state.selection.from;
             startImageUpload(file, view, pos);

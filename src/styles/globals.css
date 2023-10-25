@@ -551,6 +551,12 @@ pre {
     margin-top: 0;
 }
 
+.editor p.is-empty {
+    /* truncate*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .editor h1,
 .editor h2,
 .editor h3 {
@@ -566,6 +572,7 @@ pre {
 .editor img {
     max-width: 100%;
     height: auto;
+    margin-bottom: 1rem;
 }
 
 .editor img.ProseMirror-selectednode {
@@ -984,7 +991,25 @@ li.taskitem p {
     overflow-x: hidden;
 }
 
-.modal-content-inner .link-container input {
+.link-container input[type="text"] {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #b9b9b9;
+    outline: none;
+}
+
+.link-container button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #b9b9b9;
+    outline: none;
+    background: none;
+    color: var(--primary);
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.link-container .modal-content-inner .link-container input {
     width: auto;
 }
 

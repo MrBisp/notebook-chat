@@ -93,20 +93,15 @@ export function startImageUpload(file, view, pos) {
         const { schema } = view.state
 
         let pos = findPlaceholder(view.state, id)
-        // If the content around the placeholder has been deleted, drop
-        // the image
-        //if (pos == null) return
-
-        // Otherwise, insert it at the placeholder's position, and remove
-        // the placeholder
 
         // When BLOB_READ_WRITE_TOKEN is not valid or unavailable, read
         // the image locally
         const imageSrc = typeof src === "object" ? reader.result : src
 
         const node = schema.nodes.image.create({ src: imageSrc })
+        const paragraphNode = schema.nodes.paragraph.create()
         const transaction = view.state.tr
-            .replaceWith(pos, pos, node)
+            .replaceWith(pos, pos, [node, paragraphNode])
             .setMeta(uploadKey, { remove: { id } })
         view.dispatch(transaction)
     })
@@ -133,7 +128,6 @@ export const handleImageUpload = file => {
                     let image = new Image()
                     image.src = url
                     image.onload = () => {
-                        console.log("Image loaded. Url: ", url);
                         resolve(url)
                     }
                     // No blob store configured
