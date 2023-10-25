@@ -1,6 +1,6 @@
 import dbConnect from "utils/dbConnect";
 import User from "models/User";
-import Workbook from "models/Workbook";
+import { Workbook, Page } from "models/Workbook";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -10,11 +10,12 @@ const handler = async (req, res) => {
     const { method } = req;
 
     switch (method) {
-        case "GET":
+        case "POST":
+            console.log('Trying to login')
             try {
-                console.log('Trying to get user from Bearer token')
                 const token = req.headers.authorization.split(' ')[1];
                 const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
                 const user = await User.findById(decoded.user._id).populate({
                     path: 'workbooks',
                     populate: {
@@ -30,17 +31,17 @@ const handler = async (req, res) => {
                     return res.status(401).json({ success: false, message: 'User not found' });
                 }
 
-                console.log('Successfully found user')
-                console.log(user);
-                console.log(user.token)
-                res.status(200).json({ user: { id: user.id, email: user.email, workbooks: user.workbooks } });
+                const authToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
+
+                console.log('Successfully logged in');
+                res.status(200).json({ user: { id: user.id, email: user.email }, authToken });
             } catch (error) {
                 console.log(error)
-                res.status(400).json({ success: false, message: "Something went wrong..." });
+                res.status(400).json({ success: false, message: error.message });
             }
             break;
         default:
-            res.status(400).json({ success: false, message: "We only support GET requests" });
+            res.status(400).json({ success: false, message: "We only support POST requests" });
             break;
     }
 };

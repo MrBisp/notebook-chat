@@ -96,10 +96,9 @@ export const AuthProvider = ({ children }) => {
                         return;
                     }
 
-                    //console.log('Successfully logged in user: ' + JSON.stringify(data.user));
+                    console.log('Successfully logged in user: ' + JSON.stringify(data.user));
 
                     setUser(data.user);
-                    setConversations(data.user.conversations);
                     setWorkbooks(data.user.workbooks);
                 } catch (error) {
                     console.error(error);
@@ -255,26 +254,26 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const updateUserToken = async (data) => {
-        console.log('Updating user: ' + user.id + ' with data: ' + JSON.stringify(data));
+    const updateUserToken = async () => {
         try {
-            const response = await fetch(`/api/user/${user.id}`, {
-                method: "PUT",
-                body: JSON.stringify({
-                    token: data.token,
-                }),
+            const response = await fetch('/api/auth/updateAuthToken', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${authToken}`,
                 },
             });
-            const updatedUser = await response.json();
-            console.log('Updated user: ' + JSON.stringify(updatedUser));
+            const data = await response.json();
+            console.log('Got this data from login server')
+            //console.log(data);
 
-            if (updatedUser.success) {
-                setUser(updatedUser.user);
+            if (!data.authToken) {
+                return false;
             }
 
+            localStorage.setItem('authToken', data.authToken);
+            setAuthToken(data.authToken);
+
+            return true;
         } catch (error) {
             console.error(error);
         }
@@ -304,6 +303,9 @@ export const AuthProvider = ({ children }) => {
 
             if (data.workbook) {
                 setWorkbooks((prevWorkbooks) => [...prevWorkbooks, data.workbook]);
+
+                //Update user token
+                await updateUserToken();
             }
             return data.workbook;
         } catch (error) {
@@ -400,6 +402,7 @@ export const AuthProvider = ({ children }) => {
                     })
                 );
             }
+
             return data.page;
         } catch (error) {
             console.error(error);

@@ -27,7 +27,7 @@ const handler = async (req, res) => {
                 if (match) {
                     const authToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
                     console.log('Successfully logged in');
-                    res.status(200).json({ user: { id: user.id, email: user.email, conversations: user.conversations }, authToken });
+                    res.status(200).json({ user: { id: user.id, email: user.email }, authToken });
                 } else {
                     res.status(401).json({ success: false, message: 'Incorrect password' });
                 }

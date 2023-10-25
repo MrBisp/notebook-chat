@@ -31,7 +31,11 @@ export default async (req, res) => {
                     //Check if the user contains the workbook (user.workbooks._id)
                     const user = decoded.user;
 
-                    if (!user.workbooks.includes(id)) {
+                    console.log('User', user)
+                    console.log(id)
+                    console.log(user.workbooks.includes(id))
+
+                    if (!user.workbooks.some(workbook => workbook._id === id)) {
                         res.status(401).json({ success: false, error: 'User does not have access to this workbook' });
                         return;
                     }
