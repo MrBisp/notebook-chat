@@ -7,7 +7,7 @@ import { AuthContext } from '@/context/AuthContext';
 
 const EditorMenu = ({ editor, accessLevel, page }) => {
 
-    const { authToken, user, track, setModalContent } = useContext(AuthContext)
+    const { authToken, user, track, setModalContent, setShowCommands, setCommands, setCommandTitle } = useContext(AuthContext)
 
     const inputRef = useRef(null)
 
@@ -86,6 +86,39 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                     }}>Copy</button>
                 </div>
                 <div id="linkCopiedText"></div>
+            </div>
+        </Fragment>
+
+        setModalContent(html)
+    }
+
+    const showLinkModal = () => {
+        const html = <Fragment>
+            <div className='modal-content-inner'>
+                <h3>Insert link</h3>
+                <p>Paste a link below.</p>
+                <form className='link-container'>
+                    <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
+                    {editor.getAttributes("link").href ? (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                editor.chain().focus().unsetLink().run()
+                                setModalContent(null)
+                            }}
+                        ><MdDeleteOutline /></button>
+                    ) : (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                const url = getUrlFromString(inputRef.current.value)
+                                console.log(url)
+                                url && editor.chain().focus().setLink({ href: url }).run()
+                                setModalContent(null)
+                            }}
+                        ><MdCheck /></button>
+                    )}
+                </form>
             </div>
         </Fragment>
 
@@ -384,37 +417,64 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
 
 
                         <div className={styles.expandable} onClick={() => {
+                            setShowCommands(true);
+                            setCommandTitle("Set text type")
+                            setCommands([
+                                {
+                                    title: "Normal text",
+                                    shortCut: "0",
+                                    f: () => {
+                                        editor?.chain().focus().toggleNode("paragraph", "paragraph").run();
+                                        setTextType("paragraph")
+                                    }
+                                },
+                                {
+                                    title: "Heading 1",
+                                    shortCut: "1",
+                                    f: () => {
+                                        editor?.chain().focus().toggleHeading({ level: 1 }).run();
+                                    }
+                                },
+                                {
+                                    title: "Heading 2",
+                                    shortCut: "2",
+                                    f: () => {
+                                        editor?.chain().focus().toggleHeading({ level: 2 }).run();
+                                    }
+                                },
+                                {
+                                    title: "Heading 3",
+                                    shortCut: "3",
+                                    f: () => {
+                                        editor?.chain().focus().toggleHeading({ level: 3 }).run();
+                                    }
+                                },
+                                {
+                                    title: "Heading 4",
+                                    shortCut: "4",
+                                    f: () => {
+                                        editor?.chain().focus().toggleHeading({ level: 4 }).run();
+                                    }
+                                }, {
+                                    title: "Heading 5",
+                                    shortCut: "5",
+                                    f: () => {
+                                        editor?.chain().focus().toggleHeading({ level: 5 }).run();
+                                    }
+                                }, {
+                                    title: "Heading 6",
+                                    shortCut: "6",
+                                    f: () => {
+                                        editor?.chain().focus().toggleHeading({ level: 6 }).run();
+                                    }
+                                }
+                            ])
                             setShowHeading(!showHeading)
                             setShowAI(false)
                             setShowLink(false)
                             setShowTable(false)
                         }}>
                             <button>{textType} <MdExpandMore /></button>
-                            {showHeading && (
-                                <>
-                                    <div className={styles.submenu}>
-                                        <button key="text"
-                                            onClick={() => {
-                                                editor?.chain().focus().toggleNode("paragraph", "paragraph").run();
-                                                setTextType("paragraph")
-                                            }}
-                                            className={textType == 'Paragraph' ? styles.active : "sub-button"}
-                                        >Normal text</button>
-                                        {headings.map((heading, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => {
-                                                    editor?.chain().focus().toggleHeading({ level: heading }).run();
-                                                    setTextType(`Heading ${heading}`)
-                                                }}
-                                                className={textType == 'Heading ' + heading ? styles.active : "sub-button"}
-                                            >
-                                                Heading {heading}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
                         </div>
                         <div className={styles.button_group}>
                             <button
@@ -472,33 +532,10 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                         </div>
 
 
-                        <div className={styles.expandable} onClick={() => setShowLink(!showLink)}>
+                        <div className={styles.expandable} onClick={() => {
+                            showLinkModal()
+                        }}>
                             <button>Link <MdExpandMore /></button>
-                            {
-                                showLink &&
-                                <>
-                                    <div className={styles.submenu}>
-                                        <form>
-                                            <input type="text" placeholder="Paste a link" defaultValue={editor.getAttributes("link").href || ""} onClick={e => e.stopPropagation()} ref={inputRef} />
-                                            {editor.getAttributes("link").href ? (
-                                                <button
-                                                    onClick={() => {
-                                                        editor.chain().focus().unsetLink().run()
-                                                        setShowLink(false)
-                                                    }}
-                                                ><MdDeleteOutline /></button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => {
-                                                        const url = getUrlFromString(inputRef.current.value)
-                                                        url && setLink(url)
-                                                    }}
-                                                ><MdCheck /></button>
-                                            )}
-                                        </form>
-                                    </div>
-                                </>
-                            }
                         </div>
                     </div>
                 </div>

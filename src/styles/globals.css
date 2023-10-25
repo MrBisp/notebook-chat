@@ -996,6 +996,7 @@ li.taskitem p {
     border-radius: 8px;
     border: 1px solid #b9b9b9;
     outline: none;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .link-container button {

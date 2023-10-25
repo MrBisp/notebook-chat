@@ -11,7 +11,9 @@ import poppins from "../../../utils/font";
 
 const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = false, singlePage }) => {
 
-    const { authToken, logout, modalContent, setModalContent } = useContext(AuthContext);
+    const { authToken, logout, modalContent, setModalContent, showCommmands, setShowCommands, commands, commandTitle } = useContext(AuthContext);
+
+    const router = useRouter();
 
     const [showLeft, setShowLeft] = useState(true);
     const [showRight, setShowRight] = useState(true);
@@ -36,7 +38,67 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
     const [isMobile, setIsMobile] = useState(false);
     const [showMobileChat, setShowMobileChat] = useState(false);
 
-    const router = useRouter();
+    const [focusedCommandIndex, setFocusedCommandIndex] = useState(null);
+
+    useEffect(() => {
+        if (!commands) return;
+        const handleKeyDown = (event) => {
+            const key = event.key;
+            const command = commands.find((c) => c.shortCut === key);
+
+            if (command) {
+                event.preventDefault();  // Still preventing any default behavior for this key, if any
+                command.f();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [commands]);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (showCommmands) {
+                if (event.key === 'ArrowUp') {
+                    setFocusedCommandIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : commands.length - 1));
+                    event.preventDefault();
+                } else if (event.key === 'ArrowDown') {
+                    setFocusedCommandIndex(prevIndex => (prevIndex < commands.length - 1 ? prevIndex + 1 : 0));
+                    event.preventDefault();
+                } else if (event.key === 'Enter' && focusedCommandIndex !== null) {
+                    commands[focusedCommandIndex].f();
+                    event.preventDefault();
+                }
+
+                const key = event.key;
+                const command = commands.find((c) => c.shortCut === key);
+
+                if (command) {
+                    event.preventDefault();  // Still preventing any default behavior for this key, if any
+                    executeCommand(command);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [showCommmands, focusedCommandIndex, commands]);
+
+    const executeCommand = (command) => {
+        if (command) {
+            console.log("Running command")
+            command.f();
+            setShowCommands(false);
+        }
+    }
+
+
 
     useEffect(() => {
         if (window.innerWidth < 768) {
@@ -106,6 +168,7 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
             if (e.keyCode === 27) {
                 setShowSearch(false);
                 setShowModal(false);
+                setShowCommands(false);
             }
         }
         window.addEventListener('keydown', closeSearch);
@@ -187,12 +250,6 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
         const response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
         const data = await response.json();
         const results = data.results;
-        /*
-            [
-                {id: '123', score: 0.9},
-                {id: '456', score: 0.8},
-            ]
-        */
 
         //Now let's see if it matches one of the page id's
         let pages = workbooks.reduce((acc, workbook) => {
@@ -216,6 +273,9 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
         if (modalContent) {
             setShowModal(true);
         }
+        if (!modalContent && showModal) {
+            setShowModal(false);
+        }
     }, [modalContent])
 
     useEffect(() => {
@@ -224,6 +284,7 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
             setModalContent(null);
         }
     }, [showModal])
+
 
 
     return (
@@ -313,7 +374,6 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
                 showModal &&
                 <div className={styles.modal} onClick={() => { setShowModal(false) }}>
                     <div className={styles.modalContent} onClick={(e) => { e.stopPropagation() }}>
-                        <MdClose className={styles.closeModal} onClick={() => { setShowModal(false) }} />
                         {modalContent}
                     </div>
                 </div>
@@ -322,6 +382,29 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
                 showMobileChat && (
                     <div className={styles.mobileChat}>
                         <Chat currentPage={page} workbook={notebook} key={page._id} />
+                    </div>
+                )
+            }
+            {
+                showCommmands && (
+                    <div className={styles.commandsBg} onClick={() => { setShowCommands(false) }}>
+                        <div className={styles.commandsContent} onClick={(e) => { e.stopPropagation() }}>
+                            <div className={styles.commandsTitle}>{commandTitle}</div>
+                            <div className={styles.commands}>
+                                {
+                                    commands.map((command, index) => (
+                                        <div key={index}
+                                            className={`${styles.command} ${index === focusedCommandIndex ? styles.focused : ''}`}
+                                            onClick={() => executeCommand(command)}
+                                            onMouseEnter={() => setFocusedCommandIndex(index)}
+                                        >
+                                            <div className={styles.command__title}>{command.title}</div>
+                                            <div className={styles.command__shortcut}>{command.shortCut}</div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
                     </div>
                 )
             }

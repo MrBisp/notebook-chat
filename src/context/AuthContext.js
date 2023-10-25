@@ -19,6 +19,10 @@ export const AuthProvider = ({ children }) => {
 
     const [pagesSharedWithUser, setPagesSharedWithUser] = useState([]);
 
+    const [commands, setCommands] = useState([]);
+    const [commandTitle, setCommandTitle] = useState('');
+    const [showCommmands, setShowCommands] = useState(false);
+
     const router = useRouter();
 
     //Get user data from server on page load
@@ -95,8 +99,6 @@ export const AuthProvider = ({ children }) => {
                     if (!data.user) {
                         return;
                     }
-
-                    console.log('Successfully logged in user: ' + JSON.stringify(data.user));
 
                     setUser(data.user);
                     setWorkbooks(data.user.workbooks);
@@ -612,7 +614,13 @@ export const AuthProvider = ({ children }) => {
         track,
         modalContent,
         setModalContent,
-        pagesSharedWithUser
+        pagesSharedWithUser,
+        commands,
+        setCommands,
+        showCommmands,
+        setShowCommands,
+        commandTitle,
+        setCommandTitle
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
