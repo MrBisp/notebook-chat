@@ -43,7 +43,6 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
     }
 
     const updatePinecone = async () => {
-        console.log('Updating Pinecone...')
         let url = '/api/pinecone/insert'
         let headers = {
             'Content-Type': 'application/json',
@@ -55,7 +54,6 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
         }
         let response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
         let data = await response.json();
-        console.log(data);
 
         const order = await fetch('/api/order', {
             method: 'POST',

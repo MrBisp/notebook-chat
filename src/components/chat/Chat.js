@@ -130,7 +130,6 @@ const Chat = ({ currentPage, workbook }) => {
 
     //Update workbook when context changes
     useEffect(() => {
-        console.log("Updating current workbook...")
         if (!workbook) return;
         //First, let's find the workbook that the current page belongs to based on the prop
         let updatedWorkbook = workbooks.find(w => w._id === workbook?._id);

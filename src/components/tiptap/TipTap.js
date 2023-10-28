@@ -101,7 +101,6 @@ function EditorEditor({ provider, saveHandler, value, setEditor, pageId, allExte
         extensions: allExtensions,
         editorProps: TiptapEditorProps,
         onCreate: e => {
-            console.log('onCreate')
             setEditor(e.editor);
         },
         onUpdate: e => {
@@ -164,7 +163,6 @@ function EditorEditor({ provider, saveHandler, value, setEditor, pageId, allExte
     const prev = useRef("")
 
     provider.on("synced", (state) => {
-        console.log('synced')
         const currentContent = editor?.getHTML();
         if (!currentContent) return;
 

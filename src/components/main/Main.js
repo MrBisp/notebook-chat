@@ -40,26 +40,10 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
 
     const [focusedCommandIndex, setFocusedCommandIndex] = useState(null);
 
+    //Keyboard shortcuts
     useEffect(() => {
-        if (!commands) return;
-        const handleKeyDown = (event) => {
-            const key = event.key;
-            const command = commands.find((c) => c.shortCut === key);
+        if (!window) return;
 
-            if (command) {
-                event.preventDefault();  // Still preventing any default behavior for this key, if any
-                command.f();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [commands]);
-
-    useEffect(() => {
         const handleKeyDown = (event) => {
             if (showCommmands) {
                 if (event.key === 'ArrowUp') {
@@ -73,6 +57,8 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
                     event.preventDefault();
                 }
 
+                console.log("Current focused command", focusedCommandIndex)
+
                 const key = event.key;
                 const command = commands.find((c) => c.shortCut === key);
 
@@ -82,21 +68,34 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
                 }
             }
         };
+        if (!commands || commands.length === 0) {
+            window.removeEventListener('keydown', handleKeyDown);
+            return;
+        }
 
         window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [showCommmands, focusedCommandIndex, commands]);
+    }, [showCommmands, commands, focusedCommandIndex]); //focusedCommandIndex makes sure that the correct command is executed when pressing enter
 
     const executeCommand = (command) => {
         if (command) {
-            console.log("Running command")
+            console.log("Running command", command)
             command.f();
             setShowCommands(false);
         }
     }
+
+    //Scroll down
+    useEffect(() => {
+        if (focusedCommandIndex === null) return;
+        const element = document.querySelector(`.${styles.command}.${styles.focused}`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        }
+    }, [focusedCommandIndex])
 
 
     useEffect(() => {
