@@ -85,7 +85,7 @@ pre {
 
 ::-webkit-scrollbar {
     width: 0.35rem;
-    height: 0.1rem;
+    height: 0.4rem;
 }
 
 ::-webkit-scrollbar-track {
@@ -95,6 +95,10 @@ pre {
 ::-webkit-scrollbar-thumb {
     background: #b9b9b9;
     border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a9a9a9;
 }
 
 
@@ -991,6 +995,61 @@ li.taskitem p {
     overflow-x: hidden;
 }
 
+.modal-content-inner-ai-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-content-inner-ai-buttons button {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    margin: 0.5rem;
+}
+
+.modal-custom-prompt-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: stretch;
+    width: 100%;
+}
+
+.modal-custom-prompt-container input {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #b9b9b9;
+    outline: none;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100%;
+}
+
+.modal-custom-prompt-container button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #b9b9b9;
+    outline: none;
+    background: none;
+    color: var(--primary);
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.modal-content-preview {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    /* limits the content to 3 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.5rem;
+}
+
 .link-container input[type="text"] {
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -1200,7 +1259,7 @@ li.taskitem p {
 }
 
 .main-container__right {
-    width: auto;
+    width: 10%;
     height: 100vh;
     flex-grow: 1
 }

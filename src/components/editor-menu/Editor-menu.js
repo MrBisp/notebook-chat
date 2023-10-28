@@ -49,6 +49,8 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                 completion: completion,
                 prompt: _prompt
             });
+
+            setModalContent(AIModalContent(completion, true))
         }
     })
     const [showResults, setShowResults] = useState(false)
@@ -56,7 +58,6 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
     const [highlightingText, setHighlightingText] = useState(false)
 
     const showShareScreen = async () => {
-        console.log("Showing share screen")
         const url = '/api/invitation'
         const body = {
             pageId: page._id,
@@ -332,17 +333,59 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
         }
     ]
 
-    const AIModalContent = (completion) => {
+    const AIModalContent = (completion, showButtons = false, customPrompt = false) => {
         const html = <Fragment>
             <div className='modal-content-inner'>
-                <h3>{modalTitle}</h3>
-                {completion == "" ? "Loading..." : completion}
+                <h3>AI generation</h3>
+                {!completion && (
+                    <p className='modal-content-preview'>{editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)}</p>
+                )}
+                {customPrompt && (
+                    <div className='modal-custom-prompt-container'>
+                        <input type="text" placeholder="Enter a prompt to generate..." id="customPromptInput" />
+                        <button onClick={() => {
+                            let selectedText = editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
+                            let prompt = document.getElementById("customPromptInput").value
+                            prompt = 'The user has provided this prompt: ' + prompt + '. The selected text is: ' + selectedText
+                            complete(prompt)
+                            setModalTitle("Generating")
+                            setModalContent(AIModalContent('Generating'))
+                        }}>Generate</button>
+                    </div>
+                )}
+                {completion == "" && !customPrompt ? "Loading..." : completion}
+
+                {showButtons && (
+                    <div className='modal-content-inner-ai-buttons'>
+                        <button onClick={() => {
+                            setModalContent(null);
+                        }}>
+                            Cancel
+                        </button>
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            editor?.commands.insertContent(completion);
+                            setModalContent(null)
+                        }}>
+                            Insert instead of
+                        </button>
+                        <button onClick={() => {
+                            editor?.chain().focus().run();
+                            //Add a new line before the completion, but keep the selected text
+                            editor?.commands.insertContentAt(editor.state.selection.to, "\n\n" + completion)
+                            setModalContent(null);
+                        }}>
+                            Insert after
+                        </button>
+                    </div>
+                )}
             </div>
         </Fragment>
 
         return html;
     }
 
+    //Update the modal content when the completion changes (when the AI is streamed)
     useEffect(() => {
         if (completion == "") return;
         setModalContent(AIModalContent(completion))
@@ -369,7 +412,8 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                                             title: "Custom command",
                                             shortCut: "0",
                                             f: () => {
-                                                setModalContent()
+                                                setModalTitle("Custom command")
+                                                setModalContent(AIModalContent('', false, true))
                                             }
                                         },
                                         {
@@ -387,80 +431,34 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                                                 prompt += "\n\n" + "The text leading up to it was: " + prevText
                                                 complete(prompt)
                                                 setModalTitle("Expanding")
-                                                setModalContent(AIModalContent('Expanding'))
+                                                setModalContent(AIModalContent(''))
                                             }
                                         },
                                         {
                                             title: "Summarize",
                                             shortCut: "2",
                                             f: () => {
-                                                return;
+                                                let selectedText = editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
+                                                let prompt = "Summarize the following text: " + selectedText
+                                                complete(prompt)
+                                                setModalTitle("Summarizing")
+                                                setModalContent(AIModalContent(''))
+                                            }
+                                        },
+                                        {
+                                            title: "Rewrite",
+                                            shortCut: "3",
+                                            f: () => {
+                                                let selectedText = editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
+                                                let prompt = "Rewrite the following text: " + selectedText
+                                                complete(prompt)
+                                                setModalTitle("Rewriting")
+                                                setModalContent(AIModalContent(''))
                                             }
                                         }
                                     ])
                                 }}>
                                     <button>AI 🪄 <MdExpandMore /></button>
-                                    {showAI && (
-                                        <>
-                                            <div className={styles.submenu}>
-                                                {AICommands.map((command, i) => (
-                                                    <button key={i}
-                                                        onClick={() => {
-                                                            command.command()
-                                                        }}
-                                                        className="sub-button"
-                                                    >
-                                                        {command.name}
-                                                    </button>
-                                                ))}
-
-                                            </div>
-                                        </>
-                                    )}
-                                    {
-                                        showResults && (
-                                            <div className={styles.result} onClick={(e) => e.preventDefault()}>
-                                                <span className={styles.label}>Your generated content</span>
-                                                <p className={styles.completion}>
-                                                    {completion == "" ? "Loading..." : completion}
-                                                </p>
-                                                {
-                                                    !isLoading && (
-                                                        <div className={styles.bottom}>
-                                                            <button
-                                                                className={styles.delete}
-                                                                onClick={() => {
-                                                                    setShowResults(false)
-                                                                }}
-                                                            >
-                                                                <MdOutlineDelete />
-                                                                <p className={styles.cancel}>Cancel</p>
-                                                            </button>
-                                                            <button
-                                                                className={styles.check}
-                                                                onClick={() => {
-                                                                    setShowResults(false)
-                                                                    editor?.chain().focus().run();
-                                                                    if (command == "Expand") {
-                                                                        AICommands[0].insertFunction(completion)
-                                                                    } else if (command == "Summarize") {
-                                                                        AICommands[1].insertFunction(completion)
-                                                                    } else if (command == "Get feedback") {
-                                                                        AICommands[2].insertFunction(completion)
-                                                                    } else if (command == "Rewrite") {
-                                                                        AICommands[3].insertFunction(completion)
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <MdCheck />
-                                                                <p className="text-base">Insert</p>
-                                                            </button>
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
-                                        )
-                                    }
                                 </div>
                             )
                         }

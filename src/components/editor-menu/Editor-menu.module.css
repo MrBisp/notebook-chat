@@ -5,7 +5,6 @@
     justify-content: space-between;
     flex-wrap: nowrap;
     width: calc(100% + 2rem + 2rem - 2rem);
-    max-width: none;
     background-color: rgb(245, 240, 229);
     box-shadow: none;
     padding: 0.5rem;
@@ -204,6 +203,8 @@
     padding: 0.25rem 0.5rem;
     width: 100%;
 }
+
+
 
 /* MOBILE DESIGN */
 @media (max-width: 768px) {
