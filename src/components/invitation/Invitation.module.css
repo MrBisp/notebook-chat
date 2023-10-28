@@ -58,7 +58,10 @@
 .bg h3,
 .bg h4,
 .bg h5,
-.bg h6,
+.bg h6 {
+    margin-top: 3.5rem;
+}
+
 .bg a {
     text-decoration: underline;
 }
