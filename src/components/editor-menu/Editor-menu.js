@@ -27,6 +27,8 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
     const headings = [1, 2, 3, 4, 5, 6];
     const [textType, setTextType] = useState("Paragraph");
 
+    const [modalTitle, setModalTitle] = useState("")
+
     const { completion, complete, isLoading } = useCompletion({
         api: "/api/generate-custom",
         onFinish: (_prompt, completion) => {
@@ -330,6 +332,22 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
         }
     ]
 
+    const AIModalContent = (completion) => {
+        const html = <Fragment>
+            <div className='modal-content-inner'>
+                <h3>{modalTitle}</h3>
+                {completion == "" ? "Loading..." : completion}
+            </div>
+        </Fragment>
+
+        return html;
+    }
+
+    useEffect(() => {
+        if (completion == "") return;
+        setModalContent(AIModalContent(completion))
+    }, [completion]);
+
     //Hide the AI menu when the user is highlighting text
     useEffect(() => {
         if (!highlightingText)
@@ -344,10 +362,42 @@ const EditorMenu = ({ editor, accessLevel, page }) => {
                         {
                             highlightingText && (
                                 <div className={styles.expandable} onClick={() => {
-                                    setShowAI(!showAI)
-                                    setShowHeading(false)
-                                    setShowLink(false)
-                                    setShowTable(false)
+                                    setShowCommands(true);
+                                    setCommandTitle("AI 🪄")
+                                    setCommands([
+                                        {
+                                            title: "Custom command",
+                                            shortCut: "0",
+                                            f: () => {
+                                                setModalContent()
+                                            }
+                                        },
+                                        {
+                                            title: "Expand",
+                                            shortCut: "1",
+                                            f: () => {
+                                                let selectedText = editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
+
+                                                //Then get the text before the selected text
+                                                const preLength = 300;
+                                                let prevText = editor.state.doc.textBetween(Math.max(0, editor.state.selection.from - preLength), editor.state.selection.from)
+
+                                                //Then send it to the API
+                                                let prompt = "Expand the following text: " + selectedText
+                                                prompt += "\n\n" + "The text leading up to it was: " + prevText
+                                                complete(prompt)
+                                                setModalTitle("Expanding")
+                                                setModalContent(AIModalContent('Expanding'))
+                                            }
+                                        },
+                                        {
+                                            title: "Summarize",
+                                            shortCut: "2",
+                                            f: () => {
+                                                return;
+                                            }
+                                        }
+                                    ])
                                 }}>
                                     <button>AI 🪄 <MdExpandMore /></button>
                                     {showAI && (

@@ -7,6 +7,8 @@ import jwt from "jsonwebtoken";
 export default async (req, res) => {
     await dbConnect();
 
+    console.log('Trying to add a page...')
+
     const {
         method,
         query: { id }
@@ -25,6 +27,7 @@ export default async (req, res) => {
                     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
                     if (!decoded?.user?._id) {
+                        console.log('Invalid user')
                         res.status(400).json({ success: false, error: 'Invalid user' });
                     }
 
@@ -35,7 +38,7 @@ export default async (req, res) => {
                     console.log(id)
                     console.log(user.workbooks.includes(id))
 
-                    if (!user.workbooks.some(workbook => workbook._id === id)) {
+                    if (!user.workbooks.includes(id)) {
                         res.status(401).json({ success: false, error: 'User does not have access to this workbook' });
                         return;
                     }

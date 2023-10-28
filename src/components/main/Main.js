@@ -69,7 +69,7 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
                     setFocusedCommandIndex(prevIndex => (prevIndex < commands.length - 1 ? prevIndex + 1 : 0));
                     event.preventDefault();
                 } else if (event.key === 'Enter' && focusedCommandIndex !== null) {
-                    commands[focusedCommandIndex].f();
+                    executeCommand(commands[focusedCommandIndex]);
                     event.preventDefault();
                 }
 
@@ -97,7 +97,6 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
             setShowCommands(false);
         }
     }
-
 
 
     useEffect(() => {
@@ -387,7 +386,7 @@ const Main = ({ middle, workbookId = null, pageId = null, showChatSinglePage = f
             }
             {
                 showCommmands && (
-                    <div className={styles.commandsBg} onClick={() => { setShowCommands(false) }}>
+                    <div className={styles.commandsBg} onClick={() => { setShowCommands(false); }}>
                         <div className={styles.commandsContent} onClick={(e) => { e.stopPropagation() }}>
                             <div className={styles.commandsTitle}>{commandTitle}</div>
                             <div className={styles.commands}>

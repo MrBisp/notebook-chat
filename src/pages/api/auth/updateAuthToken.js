@@ -16,15 +16,7 @@ const handler = async (req, res) => {
                 const token = req.headers.authorization.split(' ')[1];
                 const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-                const user = await User.findById(decoded.user._id).populate({
-                    path: 'workbooks',
-                    populate: {
-                        path: 'pages',
-                        populate: {
-                            path: 'subPages',
-                        }
-                    }
-                });
+                const user = await User.findById(decoded.user._id);
 
                 if (!user) {
                     console.log('User not found')

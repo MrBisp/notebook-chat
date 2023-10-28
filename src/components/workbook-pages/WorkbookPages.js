@@ -16,7 +16,7 @@ const WorkbookPages = ({ pages, workbook }) => {
                         <Link href={
                             workbook ? `/notebook/${workbook._id}/page/${page._id}` : `/page/${page._id}`
                         } key={page._id} className="notebook-page-link">
-                            <div key={page._id} className='notebook-page-link-container'>
+                            <div key={page._id} className={'notebook-page-link-container'}>
                                 <h3>{page.title}</h3>
                                 {
                                     workbook ? (

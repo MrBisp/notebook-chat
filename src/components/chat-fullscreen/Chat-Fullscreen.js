@@ -226,8 +226,6 @@ const ChatFullscreen = ({ }) => {
             }
             ).then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
-                    console.log(JSON.parse(data.response));
 
                     let parsed = JSON.parse(data.response);
                     let suggestion1 = parsed.question1;
@@ -272,7 +270,6 @@ const ChatFullscreen = ({ }) => {
 
         //Let's check if the user has any pages in their workbooks
         if (workbooks.length === 0) {
-            console.log("No workbooks")
             setMessages([{
                 role: 'assistant',
                 content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
@@ -287,7 +284,6 @@ const ChatFullscreen = ({ }) => {
 
         //Let's check if the user has any pages
         if (pages.length === 0) {
-            console.log("No pages")
             setMessages([{
                 role: 'assistant',
                 content: 'Hello, I\'m the AI behind Notebook-Chat. How can I assist you today?'
@@ -326,8 +322,6 @@ const ChatFullscreen = ({ }) => {
             headers: headers,
         }).then((response) => response.json())
             .then((data) => {
-                console.log(data);
-                console.log(JSON.parse(data.response));
 
                 let parsed = JSON.parse(data.response);
                 let firstMessage = parsed.message;

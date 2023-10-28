@@ -9,8 +9,6 @@ export const AuthProvider = ({ children }) => {
 
     const [authToken, setAuthToken] = useState(null);
     const [user, setUser] = useState(null);
-    const [conversations, setConversations] = useState([]);
-    const [selectedConversation, setSelectedConversation] = useState(null);
     const [workbooks, setWorkbooks] = useState([]);
     const [modalContent, setModalContent] = useState(null);
 
@@ -65,8 +63,6 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const data = await response.json();
-            console.log('Got this data from login server')
-            console.log(data);
 
             if (!data.authToken) {
                 return false;
@@ -111,7 +107,6 @@ export const AuthProvider = ({ children }) => {
             };
             fetchData();
         } else {
-            console.log('No token found')
             setLoading(false);
         }
     };
@@ -119,142 +114,10 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setAuthToken(null);
         setUser(null);
-        setConversations([]);
-        setSelectedConversation(null);
         localStorage.removeItem('authToken');
         router.push('/login');
     };
 
-    const addConversation = async () => {
-        try {
-            const response = await fetch('/api/conversations?user_id=' + user.id, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            });
-            const data = await response.json();
-            console.log("New conversation: " + JSON.stringify(data));
-            console.log(data.conversation)
-
-            if (data.conversation) {
-                if (conversations.length === 0) setConversations([data.conversation]);
-                else {
-                    setConversations((prevConversations) => [
-                        ...prevConversations,
-                        data.conversation,
-                    ]);
-                }
-                setSelectedConversation(data.conversation);
-            }
-            return data.conversation;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const deleteConversation = async (id) => {
-        console.log('Deleting conversation: ' + id);
-        try {
-            const response = await fetch(`/api/conversations/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
-                body: JSON.stringify({ user_id: user.id })
-            });
-            const data = await response.json();
-            console.log(data);
-
-            if (data.success) {
-
-                //If the selected conversion is the one being deleted, set selected conversation to null
-                if (selectedConversation && selectedConversation.id === id) {
-                    setSelectedConversation(null);
-                }
-
-                setConversations((prevConversations) =>
-                    prevConversations.filter((conversation) => conversation.id !== id)
-                );
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const updateConversation = async (id, data) => {
-        console.log('Updating conversation: ' + id + ' with data: ' + JSON.stringify(data));
-        try {
-            const response = await fetch(`/api/conversations/${id}`, {
-                method: "PUT",
-                body: JSON.stringify({
-                    messages: data.messages,
-                    systemMessage: data.systemMessage,
-                    model: data.model,
-                    name: data.name,
-                    user_id: user.id
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            });
-            const updatedConversation = await response.json();
-            console.log('Updated conversation: ' + JSON.stringify(updatedConversation));
-
-            if (updatedConversation.success) {
-                setConversations((prevConversations) =>
-                    prevConversations.map((conversation) => {
-                        if (conversation.id === id) {
-                            return updatedConversation.conversation;
-                        }
-                        return conversation;
-                    })
-                );
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const addMessage = async (id, message) => {
-        console.log('Adding message to conversation: ' + id + ' message: ' + JSON.stringify(message));
-        try {
-            const response = await fetch(`/api/conversations/${id}/messages`, {
-                method: "POST",
-                body: JSON.stringify({
-                    role: message.role,
-                    content: message.content,
-                    user_id: user.id,
-                    token: message.token,
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            });
-            const data = await response.json();
-
-
-            if (data.success) {
-                console.log('Added message to conversation: ' + JSON.stringify(data));
-                setConversations((prevConversations) =>
-                    prevConversations.map((conversation) => {
-                        if (conversation.id === id) {
-                            return data.conversation;
-                        }
-                        return conversation;
-                    })
-                );
-
-                setSelectedConversation(data.conversation);
-            }
-            return data.success;
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     const updateUserToken = async () => {
         try {
@@ -265,8 +128,6 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const data = await response.json();
-            console.log('Got this data from login server')
-            //console.log(data);
 
             if (!data.authToken) {
                 return false;
@@ -281,13 +142,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const selectConversation = (id) => {
-        const conversation = conversations.find((conversation) => conversation.id === id);
-        setSelectedConversation(conversation);
-    };
-
     const addWorkbook = async (title) => {
-        console.log('Adding notebook: ' + title);
         try {
             const response = await fetch('/api/workbook', {
                 method: "POST",
@@ -300,8 +155,6 @@ export const AuthProvider = ({ children }) => {
                 })
             });
             const data = await response.json();
-            console.log("New notebook: " + JSON.stringify(data));
-            console.log(data.workbook)
 
             if (data.workbook) {
                 setWorkbooks((prevWorkbooks) => [...prevWorkbooks, data.workbook]);
@@ -317,7 +170,6 @@ export const AuthProvider = ({ children }) => {
 
 
     const updateWorkbook = async (id, data) => {
-        console.log('Updating workbook: ' + id + ' with data: ' + JSON.stringify(data));
         try {
             const response = await fetch(`/api/workbook/${id}`, {
                 method: "PUT",
@@ -336,7 +188,6 @@ export const AuthProvider = ({ children }) => {
                 setWorkbooks((prevWorkbooks) =>
                     prevWorkbooks.map((workbook) => {
                         if (workbook._id === id) {
-                            console.log('Returning updated workbook: ', updatedWorkbook.workbook);
                             return updatedWorkbook.workbook;
                         }
                         return workbook;
@@ -350,7 +201,6 @@ export const AuthProvider = ({ children }) => {
     };
 
     const deleteWorkbook = async (id) => {
-        console.log('Deleting workbook: ' + id);
         try {
             const response = await fetch(`/api/workbook/${id}`, {
                 method: "DELETE",
@@ -360,7 +210,6 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({ user_id: user.id })
             });
             const data = await response.json();
-            console.log(data);
 
             if (data.success) {
                 setWorkbooks((prevWorkbooks) =>
@@ -375,8 +224,9 @@ export const AuthProvider = ({ children }) => {
 
     //id is workbook id
     const addPage = async (id, title = "New page", parentPageId = null) => {
-        console.log('Adding page: ' + title + ' to workbook: ' + id);
         try {
+            console.log('/api/workbook/' + id + '/page')
+            console.log(authToken)
             const response = await fetch('/api/workbook/' + id + '/page', {
                 method: "POST",
                 headers: {
@@ -391,8 +241,6 @@ export const AuthProvider = ({ children }) => {
                 })
             });
             const data = await response.json();
-            console.log("New page: " + JSON.stringify(data));
-            console.log(data.page)
 
             if (data.page) {
                 setWorkbooks((prevWorkbooks) =>
@@ -429,7 +277,6 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             const updatedPage = await response.json();
-            console.log('Updated page: ' + JSON.stringify(updatedPage));
 
             //Update the workbooks state as well
             if (updatedPage.success) {
@@ -455,7 +302,6 @@ export const AuthProvider = ({ children }) => {
     };
 
     const deletePage = async (id, workbookId) => {
-        console.log('Deleting page: ' + id);
         try {
             const response = await fetch(`/api/page/${id}`, {
                 method: "DELETE",
@@ -468,7 +314,6 @@ export const AuthProvider = ({ children }) => {
                 })
             });
             const data = await response.json();
-            console.log(data);
 
             if (data.success) {
                 //Remove the page from the workbooks state as well
@@ -502,8 +347,6 @@ export const AuthProvider = ({ children }) => {
                 })
             });
             const data = await response.json();
-            console.log("New message: " + JSON.stringify(data));
-            console.log(data.message)
 
             return data.message;
         } catch (error) {
@@ -534,7 +377,7 @@ export const AuthProvider = ({ children }) => {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log('Success:', data);
+                //console.log('Success:', data);
             }
             )
             .catch((error) => {
@@ -562,7 +405,6 @@ export const AuthProvider = ({ children }) => {
 
     //Get pages shared with user
     useEffect(() => {
-        console.log('Getting pages shared with user')
         if (!user) return;
         const fetchData = async () => {
             try {
@@ -577,8 +419,6 @@ export const AuthProvider = ({ children }) => {
                     return;
                 }
 
-                console.log('Got pages shared with user: ' + JSON.stringify(data.pages));
-
                 setPagesSharedWithUser(data.pages);
             } catch (error) {
                 console.error(error);
@@ -592,16 +432,9 @@ export const AuthProvider = ({ children }) => {
     const values = {
         authToken,
         user,
-        conversations,
-        selectedConversation,
         login,
         logout,
         loading,
-        addConversation,
-        selectConversation,
-        deleteConversation,
-        updateConversation,
-        addMessage,
         updateUserToken,
         workbooks,
         addWorkbook,
