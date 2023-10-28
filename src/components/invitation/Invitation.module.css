@@ -50,6 +50,7 @@
 
 .bg p {
     font-size: 1.25rem;
+    min-height: 1.5rem;
 }
 
 .bg h1,
@@ -57,8 +58,9 @@
 .bg h3,
 .bg h4,
 .bg h5,
-.bg h6 {
-    margin-top: 3.5rem;
+.bg h6,
+.bg a {
+    text-decoration: underline;
 }
 
 .content {
