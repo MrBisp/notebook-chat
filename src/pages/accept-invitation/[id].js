@@ -18,6 +18,7 @@ const InvitationPage = () => {
                     if (data.success) {
                         setInvitation(data.invitation);
                     } else {
+                        console.log(data.error);
                         setError(data.error);
                     }
                 })
@@ -26,8 +27,9 @@ const InvitationPage = () => {
 
 
     return (
-        <Invitation invitation={invitation} errorInvitation={error} />
-
+        <>
+            {invitation && <Invitation invitation={invitation} errorInvitation={error} />}
+        </>
     )
 }
 

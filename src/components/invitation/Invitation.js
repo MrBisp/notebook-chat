@@ -260,9 +260,6 @@ const Invitation = ({ invitation, errorInvitation }) => {
                     !viewOnlyMode && !errorInvitation && !isLoading && !showRegister && !showLogin && (
                         <div className={styles.content}>
                             <h1 className={styles.title}>You have been invited to collaborate on a shared note!</h1>
-                            <p className={styles.description}>
-                                Someone thinks that you are the perfect person to collaborate with on this note.
-                            </p>
                             {
                                 user && (
                                     <p>
