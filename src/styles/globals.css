@@ -545,6 +545,7 @@ pre {
 
 .share {
     padding-right: 1rem;
+    cursor: pointer;
     text-decoration: underline;
 }
 
