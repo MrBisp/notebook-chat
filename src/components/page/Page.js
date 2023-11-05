@@ -1,16 +1,19 @@
 import React, { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import 'react-quill/dist/quill.snow.css';
-import dynamic from "next/dynamic";
 import { AuthContext } from '../../context/AuthContext';
 import Tiptap from '../tiptap/TipTap';
 import EditorMenu from '../editor-menu/Editor-menu';
+import { MdChevronRight } from 'react-icons/md';
+import Link from 'next/link';
 
 const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) => {
-    const { updatePage, authToken, user, track } = useContext(AuthContext);
+    const { updatePage, authToken, user, track, workbooks } = useContext(AuthContext);
     const [content, setContent] = useState(initialContent);
     const [pageTitle, setPageTitle] = useState(page.title);
     const [editingTitle, setEditingTitle] = useState(false);
     const [editor, setEditor] = useState(null);
+    const [showSimilarPages, setShowSimilarPages] = useState(localStorage.getItem('showSimilarPages') === 'true');
+    const [similarPages, setSimilarPages] = useState([]);
 
     const timeSinceLastChange = useRef(0);
     const changeSinceLastSave = useRef(false);
@@ -23,15 +26,12 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
     const handleContentChange = (content) => {
         setContent(content);
 
-        //console.log('Content changed...')
-
         changeSinceLastSave.current = true;
         lastChange.current = new Date().getTime();
         contentRef.current = content;
     }
 
     const savePage = async () => {
-        //console.log('Saving page...')
         let update = {
             title: pageTitleRef.current,
             content: contentRef.current,
@@ -40,6 +40,27 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
         updatePage(page._id, update, workbookId)
         updatePinecone();
         track('Page saved', { page: page.title, notebook: workbookId ? workbookId : '[No notebook]' })
+    }
+
+    const getSimilarPages = (pages) => {
+        //In workbooks, find the pages by id (pages[0].id)
+        //Then, get the titles of those pages
+        let similarPages = [];
+
+        pages.forEach(page => {
+            workbooks.forEach(workbook => {
+                workbook.pages.forEach(workbookPage => {
+                    if (workbookPage._id === page.id) {
+                        similarPages.push({
+                            id: page.id,
+                            title: workbookPage.title,
+                        });
+                    }
+                });
+            });
+        });
+        console.log(similarPages)
+        setSimilarPages(similarPages);
     }
 
     const updatePinecone = async () => {
@@ -54,6 +75,7 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
         }
         let response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
         let data = await response.json();
+        getSimilarPages(data.similar);
 
         const order = await fetch('/api/order', {
             method: 'POST',
@@ -121,6 +143,33 @@ const Page = ({ page, initialContent, workbookId = null, accessLevel = null }) =
                 className='page_title_input'
             />
             <Tiptap saveHandler={handleContentChange} value={content} key={page._id} setEditor={setEditorFromRef} pageId={page._id} />
+            <div className='similar-pages'>
+                <div className='similar-pages-header'>
+                    <div className='similar-pages-header-title'
+                        onClick={() => {
+                            setShowSimilarPages(!showSimilarPages);
+                            localStorage.setItem('showSimilarPages', !showSimilarPages);
+                        }}
+                    ><MdChevronRight style={{ transform: showSimilarPages ? 'rotate(90deg)' : 'rotate(0deg)' }} /></div>
+                    {showSimilarPages && (<div className='similar-pages-header-text'>Related notes</div>)}
+                </div>
+                {
+                    showSimilarPages && (
+                        <div className='similar-pages-list'>
+                            {
+                                similarPages.map((page, index) => (
+                                    <Link href={`/page/${page.id}`} key={index}>
+                                        <div className='similar-pages-list-item'>
+                                            {page.title}
+                                        </div>
+                                    </Link>
+                                ))
+                            }
+                        </div>
+                    )
+                }
+
+            </div>
         </div>
     )
 }

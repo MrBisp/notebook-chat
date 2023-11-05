@@ -521,6 +521,29 @@ pre {
     color: #9a9a9a;
 }
 
+.similar-pages {
+    width: 100%;
+    max-width: 600px;
+    color: var(--primary);
+}
+
+.similar-pages-header-title {
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.3;
+    margin-left: -2rem;
+    height: 0.5rem;
+}
+
+.similar-pages-header-title svg {
+    transition-duration: 0.1s;
+}
+
+.similar-pages-header-text {
+    font-weight: 600;
+}
+
+
 /* EDITOR */
 .editor {
     width: 100%;
@@ -529,7 +552,7 @@ pre {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    min-height: 100vh;
+    padding-bottom: 10rem;
     position: relative;
     overflow: scroll;
 }

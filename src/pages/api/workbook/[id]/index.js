@@ -1,4 +1,7 @@
 import dbConnect from "utils/dbConnect";
+import User from "models/User";
+import UserPageAccess from "models/UserPageAccess";
+import UserWorkbookAccess from "models/UserWorkbookAccess";
 import { Workbook, Page } from "models/Workbook";
 import jwt from "jsonwebtoken";
 import { Pinecone } from '@pinecone-database/pinecone';
@@ -65,6 +68,21 @@ export default async (req, res) => {
                 res.status(400).json({ success: false });
                 return;
             }
+
+            //Remove the workbook from the user's workbooks
+            const user = await User.findOne({ _id: decoded.user._id });
+            const indexToDelete = user.workbooks.indexOf(id);
+            if (indexToDelete > -1) {
+                user.workbooks.splice(indexToDelete, 1);
+            }
+            await user.save();
+
+            //Remove the workbook from the user's workbook access
+            await UserWorkbookAccess.deleteMany({ workbook: id });
+
+            //Remove the workbook from the user's page access
+            await UserPageAccess.deleteMany({ page: { $in: pages_ids } });
+
 
             res.status(200).json({ success: true });
 

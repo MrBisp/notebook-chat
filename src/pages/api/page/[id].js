@@ -1,6 +1,7 @@
 import dbConnect from "utils/dbConnect";
 import User from "models/User";
 import UserPageAccess from "models/UserPageAccess";
+import UserWorkbookAccess from "models/UserWorkbookAccess";
 import { Page, Workbook } from "models/Workbook";
 import jwt from "jsonwebtoken";
 import { Pinecone } from '@pinecone-database/pinecone';
@@ -13,6 +14,7 @@ export default async (req, res) => {
     } = req;
 
     const page = await Page.findOne({ _id: id });
+    let accessLevel;
 
     if (!page) {
         res.status(404).json({ success: false, error: "Page not found" });
@@ -35,9 +37,23 @@ export default async (req, res) => {
 
     //If the user has access to the page, then continue
     if (userPageAccess.length === 0) {
-        res.status(401).json({ success: false, error: "User does not have access to this page" });
-        return;
+        const workbook = await Workbook.findOne({ pages: id });
+        if (!workbook) {
+            res.status(404).json({ success: false, message: "Page does not belong to any workbook" });
+            return;
+        }
+
+        const userWorkbookAccess = await UserWorkbookAccess.findOne({ workbook: workbook._id, user: decoded.user._id });
+
+        if (!userWorkbookAccess) {
+            res.status(401).json({ success: false, error: "User does not have access to this page or its workbook" });
+            return;
+        }
+        accessLevel = userWorkbookAccess.accessLevel;
+    } else {
+        accessLevel = userPageAccess[0].accessLevel;
     }
+
 
 
     switch (method) {
@@ -48,7 +64,7 @@ export default async (req, res) => {
                 res.status(200).json({
                     success: true,
                     page: page,
-                    accessLevel: userPageAccess[0].accessLevel
+                    accessLevel: accessLevel
                 });
             } catch (error) {
                 res.status(400).json({ success: false, error: error });
@@ -58,7 +74,7 @@ export default async (req, res) => {
             try {
                 const allowedPermissions = ["write", "owner"]
                 //First check if the user has write access to the page
-                if (!allowedPermissions.includes(userPageAccess[0].accessLevel)) {
+                if (!allowedPermissions.includes(accessLevel)) {
                     res.status(401).json({ success: false, error: "User does not have write access to this page" });
                     return;
                 }
@@ -97,7 +113,7 @@ export default async (req, res) => {
             break;
         case "DELETE":
             try {
-                if (userPageAccess[0].accessLevel !== "owner") {
+                if (accessLevel !== "owner") {
                     res.status(401).json({ success: false, error: "User does not have write access to this page" });
                     return;
                 }
@@ -120,6 +136,15 @@ export default async (req, res) => {
                 })
                 const index = pinecone.index(process.env.PINECONE_INDEX);
                 await index.deleteOne(id);
+
+                //Now remove the page from the user's page access
+                await UserPageAccess.deleteMany({ page: id });
+
+                //Now remove the page from the workbook
+                await Workbook.updateOne(
+                    { _id: req.body.workbookId },
+                    { $pull: { pages: id } }
+                );
 
             } catch (error) {
                 console.log(error)

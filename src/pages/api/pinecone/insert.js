@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import dbConnect from '../../../../utils/dbConnect';
 import { Page, Workbook } from "models/Workbook";
 import UserPageAccess from 'models/UserPageAccess'
+import UserWorkbookAccess from 'models/UserWorkbookAccess';
 import User from '../../../../models/User'
 
 export default async function handler(req, res) {
@@ -21,13 +22,26 @@ export default async function handler(req, res) {
     const pageId = req.body.pageId;
     const userId = decoded.user._id;
 
-    const userpageaccess = await UserPageAccess.findOne({ page: pageId, user: userId });
-    const accessLevel = userpageaccess.accessLevel;
+    const userPageAccess = await UserPageAccess.findOne({ page: pageId, user: userId });
 
-    if (accessLevel != "write" && accessLevel != "owner") {
-        res.status(401).json({ success: false, message: "Not authorized (accessLevel)" });
-        return;
+    if (userPageAccess && (userPageAccess.accessLevel === "write" || userPageAccess.accessLevel === "owner")) {
+        //Then we're good (skip to the next step)
+    } else {
+        // Check access to the workbook the page belongs to
+        const workbook = await Workbook.findOne({ pages: pageId });
+        if (!workbook) {
+            res.status(404).json({ success: false, message: "Page does not belong to any workbook" });
+            return;
+        }
+
+        const userWorkbookAccess = await UserWorkbookAccess.findOne({ workbook: workbook._id, user: userId });
+
+        if (!userWorkbookAccess || !(userWorkbookAccess.accessLevel === "write" || userWorkbookAccess.accessLevel === "owner")) {
+            res.status(401).json({ success: false, message: "Not authorized (accessLevel)" });
+            return;
+        }
     }
+
 
     //User is allowed to edit the page
     //Embed the page using OpenAI embeddings
@@ -63,5 +77,17 @@ export default async function handler(req, res) {
         }
     ]
     await index.upsert(records);
-    res.status(200).json({ success: true, message: "Successfully updated embeddings" });
+
+
+    //Now get the 3 most similar pages
+    const similar = await index.query({
+        vector: embeddings,
+        topK: 3,
+        includeValues: false,
+        filter: {
+            "userId": decoded.user._id
+        }
+    })
+
+    res.status(200).json({ success: true, message: "Successfully updated embeddings", similar: similar.matches });
 }

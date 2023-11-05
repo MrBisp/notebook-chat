@@ -29,6 +29,7 @@ const InvitationPage = () => {
     return (
         <>
             {invitation && <Invitation invitation={invitation} errorInvitation={error} />}
+            {error && <Invitation invitation={invitation} errorInvitation={error} />}
         </>
     )
 }

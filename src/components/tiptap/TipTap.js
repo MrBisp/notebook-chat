@@ -105,7 +105,6 @@ function EditorEditor({ provider, saveHandler, value, setEditor, pageId, allExte
         },
         onUpdate: e => {
             if (!hasInsertedStarterHTML.current) return;
-
             saveHandler(e.editor.getHTML());
             const selection = e.editor.state.selection
             const lastTwo = getPrevText(e.editor, {

@@ -32,7 +32,7 @@ const handler = async (req, res) => {
                 }
 
                 if (existingInvitation && existingInvitation.expiration < new Date()) {
-                    await existingInvitation.delete();
+                    await Invitation.deleteOne({ _id: existingInvitation._id });
                 }
 
                 const invitation = new Invitation({
@@ -47,6 +47,7 @@ const handler = async (req, res) => {
 
                 res.status(200).json({ success: true, link: link });
             } catch (error) {
+                console.log(error);
                 res.status(400).json({ success: false, error: error });
             }
             break;

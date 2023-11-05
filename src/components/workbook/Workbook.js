@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import withAuth from '../../components/withAuth/WithAuth';
@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { set } from 'mongoose';
 
 const Workbook = ({ workbookId, pageId = null }) => {
-    const { workbooks, deleteWorkbook, updateWorkbook, addPage, deletePage, track, user, authToken } = useContext(AuthContext);
+    const { workbooks, deleteWorkbook, updateWorkbook, addPage, track, user, authToken, setModalContent } = useContext(AuthContext);
 
     const [workbook, setWorkbook] = useState(null);
     const [page, setPage] = useState(null);
@@ -82,26 +82,111 @@ const Workbook = ({ workbookId, pageId = null }) => {
         if (!pageId || !user) return;
 
         //Get access level
+        const getAccessLevel = async () => {
+            const access = await getAccessLevelToWorkbook(pageId);
+            console.log(access)
+            if (!access) {
+                await getAccessLevelToPage(pageId);
+            }
+        }
+        getAccessLevel();
+
+    }, [pageId])
+
+    const getAccessLevelToWorkbook = async (pageId) => {
+        const url = `/api/userworkbookaccessbypage`;
+        const body = {
+            pageId: pageId
+        };
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        };
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to fetch workbook access level');
+            }
+
+            const data = await res.json();
+            if (data.data.accessLevel) {
+                setAccessLevel(data.data.accessLevel);
+                return data.data.accessLevel;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    };
+
+    const getAccessLevelToPage = async (pageId) => {
         const url = `/api/userpageaccess?pageId=${pageId}`;
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authToken}`
-        }
-        fetch(url, {
-            method: 'GET',
-            headers: headers
-        }).then((res) => {
-            if (res.status === 200) {
-                return res.json();
-            } else {
-                throw new Error('Something went wrong');
+        };
+
+        try {
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: headers
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to fetch page access level');
             }
-        }).then((data) => {
+
+            const data = await res.json();
             setAccessLevel(data.data.accessLevel);
-        }).catch((err) => {
-            console.log(err);
-        })
-    }, [pageId])
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const showShareScreen = async () => {
+        const url = `/api/workbook-invitation/`;
+        const body = {
+            workbookId: workbookId,
+            expiration: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        }
+        const headers = {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${authToken}`
+        }
+        const request = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: headers
+        });
+        const response = await request.json();
+        const link = response.link;
+
+        const html = <Fragment>
+            <div className='modal-content-inner'>
+                <h3>Share notebook</h3>
+                <p>Share this notebook with others by sending them the link below.</p>
+                <div className='link-container'>
+                    <input type="text" value={link} disabled />
+                    <button onClick={() => {
+                        navigator.clipboard.writeText(link)
+                        document.getElementById("linkCopiedText").innerHTML = "Copied!"
+
+                    }}>Copy</button>
+                </div>
+                <div id="linkCopiedText"></div>
+            </div>
+        </Fragment>
+
+        setModalContent(html);
+    }
 
 
     return (
@@ -116,6 +201,7 @@ const Workbook = ({ workbookId, pageId = null }) => {
                                     <>
                                         <div className='all-pages-header'>
                                             <h1>{workbook.title}</h1>
+                                            <span className='share' onClick={() => { showShareScreen() }}>Share</span>
                                             <span className='settings' onClick={() => { setShowSettings(true) }}>Settings</span>
                                         </div>
 

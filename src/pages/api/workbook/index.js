@@ -3,6 +3,7 @@ import User from "models/User";
 import { Workbook } from "models/Workbook";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import UserWorkbookAccess from "../../../../models/UserWorkbookAccess";
 
 export default async (req, res) => {
     await dbConnect();
@@ -26,6 +27,13 @@ export default async (req, res) => {
 
                 user.workbooks.push(newWorkbook._id);
                 await user.save();
+
+                const newUserWorkbookAccess = new UserWorkbookAccess({
+                    user: user._id,
+                    workbook: newWorkbook._id,
+                    accessLevel: "owner"
+                });
+                await newUserWorkbookAccess.save();
 
                 console.log('Successfully created new workbook')
                 res.status(200).json({ success: true, workbook: newWorkbook });

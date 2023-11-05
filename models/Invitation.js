@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import User from './User';
+import { Page } from './Workbook';
 
 const invitationSchema = new mongoose.Schema({
     user: {

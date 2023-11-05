@@ -3,16 +3,35 @@ import User from "models/User";
 import { Workbook, Page } from "models/Workbook";
 import UserPageAccess from "models/UserPageAccess";
 import jwt from "jsonwebtoken";
+import UserWorkbookAccess from "../../../../../../models/UserWorkbookAccess";
 
 export default async (req, res) => {
     await dbConnect();
 
     console.log('Trying to add a page...')
 
-    const {
-        method,
-        query: { id }
-    } = req;
+    const { method, query: { id } } = req;
+
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    if (!decoded.user._id) {
+        res.status(400).json({ success: false, error: 'Invalid user' });
+        return;
+    }
+
+    const hasAccessToWorkbook = await UserWorkbookAccess.findOne({ user: decoded.user._id, workbook: id });
+
+    if (!hasAccessToWorkbook) {
+        res.status(401).json({ success: false, error: 'User does not have access to this workbook' });
+        return;
+    }
+
+    const workbook = await Workbook.findOne({ _id: id });
+
+    const user = decoded.user;
+
+
 
     switch (method) {
         //Add a new page to the workbook
@@ -23,29 +42,6 @@ export default async (req, res) => {
 
             try {
                 if (parentPageId == null) {
-                    const token = req.headers.authorization.split(' ')[1];
-                    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-                    if (!decoded?.user?._id) {
-                        console.log('Invalid user')
-                        res.status(400).json({ success: false, error: 'Invalid user' });
-                    }
-
-                    //Check if the user contains the workbook (user.workbooks._id)
-                    const user = decoded.user;
-
-                    console.log('User', user)
-                    console.log(id)
-                    console.log(user.workbooks.includes(id))
-
-                    if (!user.workbooks.includes(id)) {
-                        res.status(401).json({ success: false, error: 'User does not have access to this workbook' });
-                        return;
-                    }
-
-
-                    const workbook = await Workbook.findOne({ _id: id });
-
                     if (workbook) {
                         const newPage = new Page({
                             title: title,
@@ -70,8 +66,6 @@ export default async (req, res) => {
                         res.status(200).json({ success: true, page: newPage });
                     }
                 } else {
-                    const workbook = Workbook.findOne({ _id: id });
-
                     if (workbook) {
                         const newPage = new Page({
                             title: title,
@@ -103,18 +97,10 @@ export default async (req, res) => {
                 console.log(error)
                 res.status(400).json({ success: false, error: error });
             }
-
             break;
 
         case "PUT":
             try {
-                const token = req.headers.authorization.split(' ')[1];
-                const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-                if (!decoded?.user?._id) {
-                    res.status(400).json({ success: false, error: 'Invalid user' });
-                }
-
                 Workbook.findOneAndUpdate({ _id: id }, req.body, { new: true }, (err, workbook) => {
                     if (err) {
                         res.status(400).json({ success: false, error: err });
@@ -132,13 +118,6 @@ export default async (req, res) => {
 
         case "DELETE":
             try {
-                const token = req.headers.authorization.split(' ')[1];
-                const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-                if (!decoded?.user?._id) {
-                    res.status(400).json({ success: false, error: 'Invalid user' });
-                }
-
                 Workbook.findOneAndDelete({ _id: id }, (err, workbook) => {
                     if (err) {
                         res.status(400).json({ success: false, error: err });

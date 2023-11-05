@@ -3,6 +3,7 @@ import User from "models/User";
 import Workbook from "models/Workbook";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import UserWorkbookAccess from "models/UserWorkbookAccess";
 
 const handler = async (req, res) => {
     await dbConnect();
@@ -12,35 +13,31 @@ const handler = async (req, res) => {
     switch (method) {
         case "GET":
             try {
-                console.log('Trying to get user from Bearer token')
+                console.log('Trying to get user from Bearer token');
                 const token = req.headers.authorization.split(' ')[1];
                 const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-                const user = await User.findById(decoded.user._id).populate({
-                    path: 'workbooks',
-                    populate: {
-                        path: 'pages',
+
+                // Find the user's workbook access entries
+                const workbookAccessEntries = await UserWorkbookAccess.find({ user: decoded.user._id })
+                    .populate({
+                        path: 'workbook',
                         populate: {
-                            path: 'subPages',
+                            path: 'pages',
+                            populate: {
+                                path: 'subPages',
+                            }
                         }
-                    }
-                });
+                    });
 
-                if (!user) {
-                    console.log('User not found')
-                    return res.status(401).json({ success: false, message: 'User not found' });
-                }
+                // Extract the workbooks from the access entries
+                const workbooks = workbookAccessEntries.map(entry => entry.workbook);
 
-                console.log('Successfully found user')
-                console.log(user);
-                console.log(user.token)
-                res.status(200).json({ user: { id: user.id, email: user.email, workbooks: user.workbooks } });
+                console.log('Successfully found user and their workbooks');
+                res.status(200).json({ user: { id: decoded.user._id, email: decoded.user.email, workbooks: workbooks } });
             } catch (error) {
-                console.log(error)
+                console.log(error);
                 res.status(400).json({ success: false, message: "Something went wrong..." });
             }
-            break;
-        default:
-            res.status(400).json({ success: false, message: "We only support GET requests" });
             break;
     }
 };
