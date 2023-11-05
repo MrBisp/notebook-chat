@@ -543,6 +543,10 @@ pre {
     font-weight: 600;
 }
 
+.share {
+    padding-right: 1rem;
+    text-decoration: underline;
+}
 
 /* EDITOR */
 .editor {
