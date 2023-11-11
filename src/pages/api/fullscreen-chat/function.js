@@ -4,11 +4,20 @@ import { Page } from "models/Workbook";
 import { OpenAIStream, streamToResponse } from 'ai';
 import OpenAI from 'openai';
 import dbConnect from '../../../../utils/dbConnect';
+import Memory from '../../../../models/Memory';
 export const runtime = 'nodejs'
 
 export default async function POST(req, res) {
     await dbConnect();
     const { messages } = req.body;
+    console.log(req.body);
+    let memories = req.body.memories;
+    if (memories) {
+        //Right now, the memories are objects. Grab the actual memory from object.memory
+        memories = memories.map((memory) => memory.memory);
+    }
+
+    let gptVersion = req.body.gptVersion ? req.body.gptVersion : 'gpt-3.5-turbo';
 
     let pagesForResponse = [];
 
@@ -130,30 +139,48 @@ export default async function POST(req, res) {
         });
     }
 
+    async function saveMemory(memory) {
+        const newMemory = new Memory({
+            user: decoded.user._id,
+            memory: memory,
+            importance: 0
+        });
+        const newmemory = await newMemory.save();
+        return "memory saved."
+    }
+
     const runFunction = async (name, args) => {
         switch (name) {
             case 'getPagesFromPinecone':
                 console.log("Running getPagesFromPinecone function with args: ", args);
                 return await getPagesFromPinecone(args.query);
+            case 'saveMemory':
+                console.log("Running saveMemory function with args: ", args);
+                return await saveMemory(args.memory);
             default:
                 throw null;
         }
     }
 
+
     //Add a system message to the start of the messages array
     messages.unshift(
         {
-            role: 'user',
-            content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
-                'Here are som examples:' +
-                '"Let\'s brainstorm some ways to make the booking process easier and more efficient for people! 💡 To start, let\'s consider the current process and figure out where the pain points are. Can you walk me through the booking process, from the perspective of a typical user?"' +
-                '"Absolutely, that\'s what I\'m here for! 😉 I can ask insightful questions and give straightforward answers. I\'m ready to help you have a conversation that is as meaningful and productive as possible. What would you like to discuss?"' +
-                '"It\'s great that you\'re taking the time to think about your business strategy! Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? I\'d be happy to help you think through this decision."' +
-                '"I would love to help you think through this! Would you mind walking me through how it works today? 😊 "'
+            role: 'system',
+            content: 'You are an AI on Notebook-chat.com that allows the user to chat with an AI, that knows about the user. ' +
+                'You have access to your own memories about the user, and can look into the user\'s notes to see what is on their mind. ' +
+                'You uses casual, comforting language to foster a sense of understanding and companionship, and professional advice when needed.' +
+                'You should ask open-ended questions to encourage further conversation.'
         },
         {
             role: 'assistant',
-            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short responses (max 100 words!). And I will answer with questions. Ready to start the conversation? 😊'
+            content: 'Here are the memories I have about the user: ' + memories.join(', ')
+        },
+        {
+            role: 'user',
+            content: 'Here are how I want you to respond to my messages (short and without lists or bulletpoints):' +
+                'Ugh, work stress is the wooorst. What happened that made the day so rough? Was it a specific project, or just a general sense of overwhelm?' +
+                'Bingo, you hit the nail on the head! That\'s why people are studying it.'
         }
     )
 
@@ -173,6 +200,20 @@ export default async function POST(req, res) {
             },
             required: ['query']
         }
+    }, {
+        name: 'saveMemory',
+        description: 'Saves a memory about the user. Use this function whenever the user tells you something new and meaningful, that you should remember.',
+        parameters: {
+            type: 'object',
+            properties: {
+                "memory": {
+                    type: 'string',
+                    description: 'The memory to save as a short string.'
+                }
+            },
+            required: ['memory']
+        }
+
     }]
 
     const openai = new OpenAI({
@@ -182,7 +223,7 @@ export default async function POST(req, res) {
 
     //GUIDE: https://vercel.com/guides/openai-function-calling
     const initialResponse = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo-0613',
+        model: gptVersion,
         messages,
         temperature: temperature,
         stream: true,
@@ -199,7 +240,7 @@ export default async function POST(req, res) {
             //console.log("Messages (after function call): ", [...messages, ...newMessages])
 
             return openai.chat.completions.create({
-                model: "gpt-3.5-turbo-0613",
+                model: gptVersion,
                 stream: true,
                 messages: [...messages, ...newMessages],
                 temperature: 0.2,

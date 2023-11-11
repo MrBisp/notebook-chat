@@ -21,6 +21,9 @@ const Chat = ({ currentPage, workbook }) => {
             console.error(err)
             setErrorMessage(err.message)
         },
+        onResponse: (response) => {
+            console.log(response);
+        },
         onFinish: () => {
             setErrorMessage("")
             const order = fetch('/api/order', {

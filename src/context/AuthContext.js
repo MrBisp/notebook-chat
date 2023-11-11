@@ -10,7 +10,9 @@ export const AuthProvider = ({ children }) => {
     const [authToken, setAuthToken] = useState(null);
     const [user, setUser] = useState(null);
     const [workbooks, setWorkbooks] = useState([]);
+    const [memories, setMemories] = useState([]);
     const [modalContent, setModalContent] = useState(null);
+    const [settings, setSettings] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [userSet, setUserSet] = useState(false);
@@ -403,6 +405,74 @@ export const AuthProvider = ({ children }) => {
         return newMixpanelId;
     }
 
+    const getMemories = async () => {
+        const url = '/api/memory';
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setMemories(data.data);
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    const createMemory = (memory, importance) => {
+        const url = '/api/memory';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+                memory: memory,
+                user: user.id,
+                importance: importance
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) return;
+                setMemories((prevMemories) => [...prevMemories, data.data]);
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    const deleteMemory = (id) => {
+        const url = '/api/memory/' + id;
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+                user_id: user.id
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) return;
+                setMemories((prevMemories) => prevMemories.filter((memory) => memory._id !== id));
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
     //Get pages shared with user
     useEffect(() => {
         if (!user) return;
@@ -425,6 +495,102 @@ export const AuthProvider = ({ children }) => {
             }
         };
         fetchData();
+    }, [user]);
+
+
+    //Get memories
+    useEffect(() => {
+        if (!user) return;
+        getMemories();
+    }, [user]);
+
+    const getSettings = async () => {
+        const url = '/api/settings';
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setSettings(data.data);
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    const createSetting = (setting, value) => {
+        const url = '/api/settings';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+                setting: setting,
+                user: user.id,
+                value: value
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setSettings((prevSettings) => [...prevSettings, data.data]);
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    const updateSetting = (id, value) => {
+        const url = '/api/settings/' + id;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+                value: value
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                if (!data.success) return;
+                setSettings((prevSettings) => prevSettings.map((setting) => {
+                    if (setting._id === id) {
+                        return data.data;
+                    }
+                    return setting;
+                }));
+            }
+            )
+            .catch((error) => {
+                throw error;
+            });
+    }
+
+    const updateSettings = (settings) => {
+        try {
+            settings.forEach(setting => {
+                updateSetting(setting._id, setting.value);
+            });
+        } catch (error) {
+            return false;
+        }
+
+        return true;
+    }
+
+    useEffect(() => {
+        if (!user) return;
+        getSettings();
     }, [user]);
 
 
@@ -453,7 +619,14 @@ export const AuthProvider = ({ children }) => {
         showCommmands,
         setShowCommands,
         commandTitle,
-        setCommandTitle
+        setCommandTitle,
+        memories,
+        createMemory,
+        deleteMemory,
+        settings,
+        setSettings,
+        updateSettings,
+        updateSetting,
     };
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

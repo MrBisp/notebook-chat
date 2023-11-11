@@ -7,7 +7,7 @@ import { MdOutlineAssignment, MdMenuBook, MdClose, MdSend } from 'react-icons/md
 import { useRouter } from 'next/router';
 
 const ChatFullscreen = ({ }) => {
-    const { user, authToken, logout, loading, workbooks, track } = useContext(AuthContext);
+    const { user, authToken, logout, loading, workbooks, track, memories, settings } = useContext(AuthContext);
 
     const [errorMessage, setErrorMessage] = useState('');
     const [makingResponse, setMakingResponse] = useState(false);
@@ -15,12 +15,26 @@ const ChatFullscreen = ({ }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [suggestedMessages, setSuggestedMessages] = useState([]);
+    const [gptVersion, setGptVersion] = useState('');
 
     const router = useRouter();
 
-    const { append, messages, setMessages, stop, complete } = useChat({
+    useEffect(() => {
+        if (settings) {
+            const gptVersionSetting = settings.find(setting => setting?.setting === 'gpt-version');
+            if (gptVersionSetting) {
+                setGptVersion(gptVersionSetting.value);
+            }
+        }
+    }, [settings])
+
+    const { append, messages, setMessages } = useChat({
         'api': '/api/fullscreen-chat/function',
         'id': 'fullscreen-chat',
+        'body': {
+            memories,
+            gptVersion
+        },
         onError: err => {
             console.error(err)
             setErrorMessage(err.message)
@@ -46,7 +60,8 @@ const ChatFullscreen = ({ }) => {
                 'Messages': messages.length
             })
         },
-        onResponse: () => {
+        onResponse: (r) => {
+            console.log(messages);
             setIsLoading(false)
         },
         headers: {
@@ -81,42 +96,6 @@ const ChatFullscreen = ({ }) => {
             headers: {
                 'Content-Type': 'application/json',
                 'authorization': 'Bearer ' + authToken
-            }
-        });
-
-        //Scroll down to bottom now
-        let chat = document.getElementById('chat-fullscreen-scrollable');
-        chat.scrollTop = chat.scrollHeight;
-    }
-
-    const sendMessage = async () => {
-        if (isLoading) return;
-        if (!input) {
-            setErrorMessage("Please enter a message")
-            return;
-        }
-        let newMessage = input;
-        setInput('');
-        setIsLoading(true);
-
-        //Now let's append the context
-        const pages = await getPagesFromPinecone(newMessage);
-        let context = '';
-        pages.forEach((page) => {
-            context += extractText(page.title + ': ' + page.content) + '\n';
-        })
-
-        newMessage = "###NOTES START###\n" + context + "###NOTES END###\n" + newMessage;
-        let newMessageObj = {
-            role: 'user',
-            content: newMessage
-        }
-
-        //This triggers the API to send a response
-        append(newMessageObj, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
             }
         });
 
@@ -194,6 +173,7 @@ const ChatFullscreen = ({ }) => {
 
     //Get suggested messages
     useEffect(() => {
+        return; //Turn this off for now
         if (typeof window !== 'undefined') {
 
             //First, let's check in localstorage if we have the suggested messages
@@ -260,7 +240,6 @@ const ChatFullscreen = ({ }) => {
 
     //Make the first message
     useEffect(() => {
-
         if (typeof window == 'undefined') {
             setMessages([{
                 role: 'assistant',
@@ -364,15 +343,6 @@ const ChatFullscreen = ({ }) => {
                 <div id="chat-fullscreen-scrollable" className={styles.scrollable}>
                     <div className={styles.chatHeader}>
                         <h1>Ask anything, your notes are the limits</h1>
-                        <div className={styles.buttonContainer}>
-                            {
-                                suggestedMessages.map((message, index) => {
-                                    return (
-                                        <button key={index} onClick={() => { sendMessageWithButton(message) }}>✨ {message}</button>
-                                    )
-                                })
-                            }
-                        </div>
                     </div>
                     <div className={styles.chatBody}>
                         {

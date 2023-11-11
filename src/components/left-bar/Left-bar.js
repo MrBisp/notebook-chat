@@ -3,15 +3,14 @@ import styles from './Left-bar.module.css';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AuthContext } from "../../context/AuthContext";
-
-import { MdDeleteOutline, MdKeyboardBackspace, MdAutoAwesome, MdClose, MdHome, MdSearch, MdOutlineStickyNote2 } from "react-icons/md";
+import { MdPerson, MdAutoAwesome, MdClose, MdHome, MdSearch, MdOutlineStickyNote2 } from "react-icons/md";
 
 
 const LeftBar = ({ searchFunction, notebook = null }) => {
 
     const router = useRouter();
 
-    const { addPage, logout, track } = useContext(AuthContext);
+    const { addPage, logout, track, setModalContent } = useContext(AuthContext);
 
     const addPageHandler = async (e) => {
         e.preventDefault();
@@ -63,6 +62,10 @@ const LeftBar = ({ searchFunction, notebook = null }) => {
                 }
             </div>
             <div className={styles.bottomContainer}>
+                <div className={styles.iconContainer} onClick={() => { router.push('/profile') }}>
+                    <MdPerson />
+                    <span>Profile</span>
+                </div>
                 <div className={styles.iconContainer} onClick={() => {
                     //Reset localstorage
                     localStorage.removeItem('notebook-chat');
