@@ -6,7 +6,7 @@ import { useChat } from 'ai/react'
 import { MdOutlineAssignment, MdMenuBook, MdClose } from 'react-icons/md';
 
 const Chat = ({ currentPage, workbook }) => {
-    const { workbooks, user, authToken, track } = useContext(AuthContext);
+    const { workbooks, user, authToken, track, memories, settings } = useContext(AuthContext);
 
     const [contextOption, setContextOption] = useState('current-page')
     const [contextPages, setContextPages] = useState([])
@@ -14,9 +14,24 @@ const Chat = ({ currentPage, workbook }) => {
 
     const [errorMessage, setErrorMessage] = useState("");
 
+    const [gptVersion, setGptVersion] = useState('');
+
+    useEffect(() => {
+        if (settings) {
+            const gptVersionSetting = settings.find(setting => setting?.setting === 'gpt-version');
+            if (gptVersionSetting) {
+                setGptVersion(gptVersionSetting.value);
+            }
+        }
+    }, [settings])
+
     const { append, messages, setMessages, input, setInput, handleInputChange, stop, isLoading } = useChat({
         'api': '/api/chat',
         'id': 'notebook-chat',
+        'body': {
+            memories,
+            gptVersion
+        },
         onError: err => {
             console.error(err)
             setErrorMessage(err.message)

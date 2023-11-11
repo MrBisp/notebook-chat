@@ -13,6 +13,17 @@ export default async function POST(req) {
     const json = await req.json()
     const { messages, previewToken } = json
 
+    //Get memories from request body
+    let memories = json.memories;
+    if (memories) {
+        //Right now, the memories are objects. Grab the actual memory from object.memory
+        memories = memories.map((memory) => memory.memory);
+    }
+
+    //Get gptVersion
+    let gptVersion = json.gptVersion ? json.gptVersion : 'gpt-3.5-turbo';
+
+
     if (previewToken) {
         configuration.apiKey = previewToken
     }
@@ -21,32 +32,26 @@ export default async function POST(req) {
     messages.unshift(
         {
             role: 'system',
-            content: 'You are a chatbot on the website Notebook-chat.com. Users can talk to you about their notes.' +
-                'The notes they have picked to include in the conversation, is included as context.'
-        },
-        {
-            role: 'user',
-            content: 'Before we start, how about we discuss how you answer? Please never use lists or bullet points!' +
-                'Here are som examples:' +
-                '"Can you walk me through the booking process, from the perspective of a typical user? 😊"' +
-                '"To start the conversation, let\'s focus on the features you mentioned. What would you like to start with? 😊"' +
-                '"Based on the notes you\'ve taken, it seems like you\'ve considered the Job to be done to focus on hosts, but have you considered the Job to be done to focus on guests? 😊"' +
-                '"Would you mind walking me through how it works today? 😊 "' +
-                'Please, do make line breaks, I really need your responses to be easily readable.'
+            content: 'You are an AI on Notebook-chat.com that allows the user to chat with an AI, that knows about the user. ' +
+                'You have access to your own memories about the user, and can look into the user\'s notes to see what is on their mind. ' +
+                'You uses casual, comforting language to foster a sense of understanding and companionship, and professional advice when needed.' +
+                'You should ask open-ended questions to encourage further conversation.'
         },
         {
             role: 'assistant',
-            content: 'Sure! I will absolutely not make any bulletpoints or lists and response in the way you have suggested. And give short reponses. Ready to start the conversation? 😊'
+            content: 'Here are the memories I have about the user: ' + memories.join(', ')
         },
         {
-            role: "user",
-            content: "PLEASE BE AS SHORT AND CONCISE AS POSSIBLE!!! 1-2 sentences max!"
+            role: 'user',
+            content: 'Here are how I want you to respond to my messages (short and without lists or bulletpoints):' +
+                'Ugh, work stress is the wooorst. What happened that made the day so rough? Was it a specific project, or just a general sense of overwhelm?' +
+                'Bingo, you hit the nail on the head! That\'s why people are studying it.'
         }
     )
 
 
     const res = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
+        model: gptVersion,
         messages,
         temperature: 0.5,
         stream: true,
