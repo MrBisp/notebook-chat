@@ -515,7 +515,13 @@ export const AuthProvider = ({ children }) => {
         })
             .then((response) => response.json())
             .then((data) => {
-                setSettings(data.data);
+                if (!data.success) return;
+                if (data.data.length === 0) {
+                    createSetting('gpt-version', 'gpt-3.5-turbo');
+                    return;
+                } else {
+                    setSettings(data.data);
+                }
             }
             )
             .catch((error) => {
@@ -523,7 +529,7 @@ export const AuthProvider = ({ children }) => {
             });
     }
 
-    const createSetting = (setting, value) => {
+    const createSetting = async (setting, value) => {
         const url = '/api/settings';
         fetch(url, {
             method: 'POST',
