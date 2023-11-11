@@ -1,5 +1,5 @@
 import User from "../../../../models/User"
-import Settings from "../../../../models/settings";
+import Settings from "../../../../models/Settings";
 import dbConnect from "utils/dbConnect";
 
 

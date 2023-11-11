@@ -5,13 +5,12 @@ import { AuthContext } from '../../context/AuthContext';
 import Page from '../page/Page';
 import styles from './Invitation.module.css';
 import { useRouter } from 'next/router';
-import { set } from 'mongoose';
 
 const Invitation = ({ invitation, errorInvitation }) => {
     const { user, loading, track, login } = useContext(AuthContext);
 
     const [page, setPage] = useState(invitation?.page);
-    const [viewOnlyMode, setViewOnlyMode] = useState(false);
+    const [viewOnlyMode, setViewOnlyMode] = useState(true);
     const [isLoading, setIsLoading] = useState(null);
     const [showRegister, setShowRegister] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
@@ -246,7 +245,7 @@ const Invitation = ({ invitation, errorInvitation }) => {
     return (
         <>
             <Head>
-                <title>Invitation to collaborate on a note! | Notebook-chat.com</title>
+                <title>{page?.title} | Notebook-chat.com</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon-192.png" />
                 <meta name="robots" content="noindex" />
