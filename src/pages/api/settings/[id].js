@@ -1,5 +1,5 @@
 import dbConnect from "../../../../utils/dbConnect";
-import Settings from "../../../../models/settings";
+import Settings from "../../../../models/Settings";
 import jwt from "jsonwebtoken";
 
 export default async function POST(req, res) {
