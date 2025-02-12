@@ -5,7 +5,10 @@ Notebook-chat is a simple note taking app that supports:
 - Chat with your notes using AI! You can for example ask: "Quiz me on my notes on Europe"
 - Write "+++" to let AI continue your writing!
 
-# Images of the project
+# Images / videos of the project
+
+https://github.com/user-attachments/assets/a6af20df-befb-4c54-9d39-5735c881974a
+
 ![image](https://github.com/user-attachments/assets/ab22c8e7-8cdd-4aea-ab90-fc9a8444955e)
 
 ![notebook-chat-1](https://github.com/user-attachments/assets/4eec295e-1b88-40ad-b39f-44c34d633d35)
